@@ -1,0 +1,10 @@
+psutil
+scipy
+filelock
+torch
+transformers
+jieba
+stanza
+matplotlib
+tensorboard
+h5py===3.1.0

@@ -1,0 +1,100 @@
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'teaching guide'}
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'what kind of teaching materials do you provide'}
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'teaching materials'}
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'do i need to prepare teaching plans before the session'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'i think this student should be at a lower level what can i do'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'my student does not know this grammar can i downgrade him'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'how to upgrade student'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'may i upgrade my student i do not know what to do on the system'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'how can i downgrade students'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'what can i do to upgrade a student'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'my student is more suitable for a higher level can i upgrade him'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'how should i downgrade a student'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'the student is way below or above the level of the lesson material'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'the student is lower than the level of today s session'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'i had 2 students one fluent and should be upgraded the other needed a lot of help to engage in the session'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'the student is struggling on level 4 when he should be on level 1'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'she was in a level 2 class and it is too advanced for her as she is only just learning her alphabet'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'she is currently at the 3rd level but this level is to hard for her please put her in a lower level'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'she came as a level 5 client ready for the material on her first session but she was not able to handle this material because it was much harder for her'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'i feel sorry for the student at the wrong level and i hope we can help him'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': True, 'text': 'this lesson is inappropriate for the students'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'please revise the material it is too long'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'the chosen lesson is far far too easy and short for him'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'we need to explain in details plenty of activities and exercises will be the way to go'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'it was very blatantly sexist and i think it needs to be removed from circulation or edited'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'the lesson was related to skeletal system which was just not appropriate for the clients'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'please remove the super specific lessons they are not helping anyone'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'the content is insufficient please add some discuss questions'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i am writing to apply for a writing position'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i would like to participate to your writing projects'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'can you please explain how i can become a writer for itoturgroup'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'are you hiring the material writer'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'is it possible for me to become a writer'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i am interested in becoming a writer what is the criteria and how do i apply'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i can produce material specific to the uk britain as well as interesting lessons relating to the legal industry poetry and a wide range of social topics and contexts'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i am interested in your writer position'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': True, 'text': 'where can i submit my lesson plan'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'how to sumbit a lesson plan'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'please let me know how to upload lesson plans'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'where can i view my submitted materials'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'where can i sumbit the material'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'how should i submit a lesson plan'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'i was wondering how to upload lesson plans'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'i want to submit a lesson plan to the adult portal'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how to resubmit my lesson plan'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'i made the necessary revisions can i log back onto the consultant page and re upload my changed lesson plan'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how can i resubmit a lesson'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'where should i resubmit it'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how should i resubmit my lesson'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'i made the necessary revisions how can i resubmit'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how can i go to the upload page again'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'could you please let me know how to reupload'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': True, 'text': 'do you have the instructions for uploading lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'what can i do to upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i want to upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i was told that i could upload lesson plans what can i do'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'who can instruct me on how to upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i was asked to upload lesson plans but i did not get any instructions'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'how can i upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i want to know how to upload lesson plans'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'before i do my task i want to read writer guidelines if there are any'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'do you have any guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'is there a place where i can see the writer guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'please tell me where can i find writer guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'may i know the guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'are there any guidelines for writers'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'i am wondering where i can see the writer guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'could you tell me the writer guidelines'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'what do you require for the lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'i am about to write the lesson what are your requirements'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'could you tell me the requirements of writing lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'i want to know the requirements of writing lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'i would like to know the requirements of writing lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'is there a link where i can see requirements of lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'please let me know what i need to do to apply for a writer position'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'are there any requirements for the writers'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'my computer is down i can not check in'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'when do i need to check in'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'wrong no checkin record'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'how do i check in for lvp session'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'can you add back my hour'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'how do i check in for lvp hour'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'my checkin time is wrong'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'the check in popup keeps showing what should i do'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'i forget to check in'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'invalid noshow record for lvp hours'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'why am i getting error no show records'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'i failed to check in twice in a row can you check my absense'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'i can not enter classroom due to power outage can you remove my noshow'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'my computer is frozen i can not enter session i do not want to be marked as no show'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'please appeal all demo no shows because i have not made any mistake that is mentioned in my record'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'i want to keep track of my demo record please send me the details'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i want to know something about dynamic materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i want to have a look at all the dynamic materials so i can get prepared for it to teach'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'can you return the old materials back'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'how can i find the dynamic materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i am very confused about how to use the new dynamic material with the kids'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'show me how to use demo dynamic materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'tell me how to use demo materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i do not want to use dynamic materials'}
