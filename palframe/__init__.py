@@ -38,3 +38,8 @@ import traceback
 import threading
 import subprocess
 import psutil
+
+import palframe.__version__ as about
+from palframe.__version__ import __version__
+
+version = __version__
