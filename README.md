@@ -1,5 +1,5 @@
 # Palframe
-## install palframe
+## Install palframe
 - Install from source code
  ```shell script
     git http://code.paic.com.cn/git/pal_frame.git

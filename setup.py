@@ -7,8 +7,8 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname), encoding='utf-8').read()
 
 py_modules = [
-    f'palframe.{name}' for name in os.listdir('palframe')
-    if name.endswith('.py') and not name in ['__init__.py']
+    f'palframe.{name.replace(".py","")}' for name in os.listdir('palframe')
+    if name.endswith('.py') and name not in ['__init__.py']
 ]
 
 setup(
