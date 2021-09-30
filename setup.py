@@ -26,7 +26,7 @@ setup(
     long_description=read('README.md'),
     install_requires=open('requirements.txt').readlines(),
     license='MIT',
-    python_requires='>=3.6',
+    python_requires='>=3.7',
 )
 
 
