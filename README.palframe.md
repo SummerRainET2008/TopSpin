@@ -662,5 +662,5 @@ Sure. You can do it, and it indeed speedups the data loading as well as the trai
 
 First, copy ALL data to each server. Then, you do not need to change any code. It runs perfectly.
 
-Second, copy `1/n` data to `n` servers respectively to save disk space. Then in the user's train.py, you need to update the parameters of get_batch_data(...) in ```Trainer.__init__(...)```. Change ```dist.get_rank()``` and ```dist.get_word_size()``` to ```dist.get_local_rank()``` and ```self._param.gpu_num```.
+Second, copy `1/n` data to `n` servers respectively to save disk space. Then in the user's train.py, you need to update the parameters of get_batch_data(...) in ```Trainer.__init__(...)```. Change ```dist.get_rank()``` and ```dist.get_world_size()``` to ```dist.get_local_rank()``` and ```self._param.gpu_num```.
 
