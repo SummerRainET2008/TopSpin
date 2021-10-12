@@ -23,6 +23,7 @@ def process(data_files: list, out_file: str):
   data = list(data_generator())
   labels = {y for _, y in data}
   Logger.info(f"{data_files} has {len(data)} examples with {len(labels)}.")
+  nlp.command(f"rm -r {out_file}")
   pickle.dump(data, open(out_file, "wb"))
 
 def main():
