@@ -4,8 +4,10 @@
 from pyspark.sql import SparkSession
 from palframe import nlp
 from typing import Union
+import os
 
-def get_new_spark(app_name):
+def get_new_spark(app_name, python_ver="python3"):
+  os.environ["PYSPARK_PYTHON"] = python_ver
   return SparkSession.builder.appName(app_name).getOrCreate()
 
 def read_file(filenames: Union[list, str], spark=None):

@@ -10,6 +10,7 @@ from operator import add
 from palframe import spark_helper
 from palframe import nlp
 import optparse
+import os
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
