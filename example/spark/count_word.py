@@ -25,7 +25,7 @@ def main():
     .reduceByKey(lambda c1, c2: c1 + c2)
 
   if options.save_to_file:
-    out_file = "/tmp/test.out"
+    out_file = "/tmp/test.sp"
     nlp.execute_cmd(f"rm -r {out_file}")
     word_stat.saveAsTextFile(out_file)
     print(f"word statistics has been saved to /tmp/test.out")
