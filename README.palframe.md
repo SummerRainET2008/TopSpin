@@ -546,6 +546,9 @@ No any change for your codes.
 So far we only support Debug mode, Distributed mode, and a single task in Auto 
 mode. Todo: to support Auto mode fully.
 
+In the ___construction function___ of the user's Parameter class, set the `restore_training_from_path_work` as the running path of your last run. Its default
+value is `None`.
+
 #### 8. Early stop
 
 #### 9. Mixed precision training

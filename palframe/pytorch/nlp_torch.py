@@ -136,6 +136,10 @@ def label_smoothing_loss(logits, labels, smoothing_factor,
   :param reduction: batchmean, sum, mean, none
   :return:
   '''
+
+  assert len(logits.shape) == 2
+  assert len(labels.shape) == 1
+
   input = torch.log_softmax(logits, 1)
   label_num = logits.size(1)
   smoothing_value = smoothing_factor / (label_num - 1)
@@ -148,6 +152,27 @@ def label_smoothing_loss(logits, labels, smoothing_factor,
   loss = torch.nn.functional.kl_div(input, labels_prob, reduction=reduction)
 
   return loss
+
+class FocalLoss(nn.Module):
+  def __init__(self, gamma=2):
+    super(FocalLoss, self).__init__()
+    self._gamma = gamma
+
+  def forward(self, logits, labels):
+    '''
+    input:  [batch, label_num]
+    target: [batch]
+    '''
+    assert len(logits.shape) == 2
+    assert len(labels.shape) == 1
+
+    labels = labels.unsqueeze(-1)
+    logpt = func.log_softmax(logits, dim=1)
+    logpt = logpt.gather(1, labels).view(-1)
+    pt = torch.exp(logpt)
+
+    loss = -1 * (1 - pt) ** self._gamma * logpt
+    return loss.mean()
 
 class PrePostProcessingWrapper(nn.Module):
   def __init__(self, layer, input_dim, dropout_to_drop_prob=0):
