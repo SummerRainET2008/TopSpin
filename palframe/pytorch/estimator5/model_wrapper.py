@@ -94,7 +94,8 @@ class ModelWrapperBase:
     if nlp.is_none_or_empty(param.servers_file):
       server_ips = set(["127.0.0.1"])
     else:
-      server_ips = set(open(param.servers_file).read().split())
+      server_ips = set(sum([open(f).read().split()
+                            for f in param.servers_file.split(",")], []))
     addrs = psutil.net_if_addrs()
 
     for net_name, attr in addrs.items():
