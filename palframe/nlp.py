@@ -30,6 +30,22 @@ class TerminalColors:
     print(f"{TC.BOLD}This color is 'BOLD'{TC.ENDC}")
     print(f"{TC.UNDERLINE}This color is 'UNDERLINE'{TC.ENDC}")
 
+def get_GPU_info(gpu_id):
+  with Timer(f"get_GPU_info({gpu_id})"):
+    nvidia_smi.nvmlInit()
+    handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    total = info.total / 1024 ** 2
+    free = info.free / 1024 ** 2
+    used = info.used / 1024 ** 2
+    nvidia_smi.nvmlShutdown()
+
+    return {
+      "Total memory": total,
+      "Free memory": free,
+      "Used memory": used
+    }
+
 def coloring(s, value=TerminalColors.HEADER):
   return f"{value}{s}{TerminalColors.ENDC}"
 
@@ -39,18 +55,22 @@ def is_sys_mac():
 def is_os_linux():
   return "linux" in sys.platform
 
-def histogram_ascii(points, max_y_height=160) -> None:
+def histogram_ascii(points) -> None:
   counted = Counter(points)
   sumv = sum(counted.values())
-
+  max_ratio = max([v / sumv for v in counted.values()])
   accum_sum = 0
-  print(f"{'index':>10} {'value':>10} {'percent':>10} {'accum':>6} {'freq'}")
+  print()
+  print(f"{'INDEX':>7} {'VALUE':>10} {'PERCENT':>7} {'ACCUM':>7} {'FREQ'}")
+
   for index, [k, v] in enumerate(sorted(counted.items())):
     ratio = v / sumv
     accum_sum += v
-    scaled_v = math.ceil(ratio * max_y_height)
-    print(f"{index:10d} {k:10d} {ratio * 100:>10.2f} "
-          f" {100 * accum_sum / sumv:>6.2f}  {'+' * scaled_v} {counted[k]}")
+    bar_len = math.ceil(ratio / max_ratio * 120)
+    print(f"{index:7d} {k:10d} {ratio * 100:>7.2f} "
+          f" {100 * accum_sum / sumv:>7.2f}  {'+' * bar_len} {counted[k]}")
+
+  print()
 
 def set_random_seeds(seed=0):
   '''
@@ -206,7 +226,7 @@ def pydict_file_read(file_name, max_num: int=-1)-> typing.Iterator:
       except Exception as err:
         Logger.error(f"reading {file_name}:{idx + 1}: {err} '{ln}'")
 
-  Logger.info(f"{file_name}: #data={data_num}")
+  Logger.info(f"{file_name}: #data={data_num:,}")
 
 def pydict_file_write(data: typing.Iterator, file_name: str)-> None:
   assert file_name.endswith(".pydict")
@@ -232,7 +252,8 @@ def replace_file_name(file_name: str, old_suffix: str, new_suffix: str):
   assert old_suffix in file_name
   return file_name[: len(file_name) - len(old_suffix)] + new_suffix
 
-def get_files_in_folder(data_path, file_extensions: list=None,
+def get_files_in_folder(data_path,
+                        file_extensions: typing.Union[list, set]=None,
                         resursive=False)-> list:
   '''file_exts: should be a set, or None, e.g, ["wav", "flac"]
   return: a list, [fullFilePath]'''
@@ -243,7 +264,7 @@ def get_files_in_folder(data_path, file_extensions: list=None,
     return is_none_or_empty(file_extensions) or ext in file_extensions
 
   if file_extensions is not None:
-    assert isinstance(file_extensions, (list, dict))
+    assert isinstance(file_extensions, (list, set))
     file_extensions = set(file_extensions)
 
   for path, folders, files in os.walk(data_path, topdown=resursive,
@@ -292,7 +313,10 @@ def to_readable_time(seconds: float):
 
   return " ".join(result)
 
-def get_log_time(utc_time=True):
+def get_log_time(utc_time: bool=True):
+  '''
+  e.g., SF time is utf-8, then get_log_time(True) - 8 = get_log_time(False)
+  '''
   if utc_time:
     now = datetime.datetime.utcnow()
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
@@ -513,7 +537,7 @@ class Timer(object):
 
   def __enter__(self) -> None:
     if not is_none_or_empty(self._title):
-      Logger.info(f"Timer starts: '{self._title}'")
+      Logger.info(f"Timer starts:\t '{self._title}'")
     self._starting = time.time()
     return self
 
@@ -521,7 +545,7 @@ class Timer(object):
     self._duration = time.time() - self._starting
     if not is_none_or_empty(self._title):
       Logger.info(
-        f"Timer: '{self._title}', takes {to_readable_time(self.duration)} "
+        f"Timer finishes:\t '{self._title}', takes {to_readable_time(self.duration)} "
         f"seconds."
       )
 

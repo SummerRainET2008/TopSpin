@@ -63,7 +63,7 @@ tensorflow==2.3.0
 tensorflow-estimator==2.3.0
 termcolor==1.1.0
 tokenizers==0.8.1rc1
-torch==1.6.0
+torch==1.7.1
 torchvision==0.7.0
 tqdm==4.54.1
 traitlets==5.0.5
@@ -74,3 +74,4 @@ wcwidth==0.2.5
 Werkzeug==1.0.1
 wrapt==1.12.1
 zipp==3.1.0
+nvidia-ml-py3 

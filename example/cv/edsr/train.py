@@ -13,40 +13,40 @@ from palframe.pytorch.estimator5.train import TrainerBase
 from palframe.pytorch import *
 
 class Trainer(TrainerBase):
-    def __init__(self, param):
-        model_wrapper = ModelWrapper(param)
+  def __init__(self, param):
+    model_wrapper = ModelWrapper(param)
 
-        super(Trainer, self).__init__(
-            model_wrapper,
-            get_batch_data(param, param.train_files, param.epoch_num,
-                           dist.get_rank(), dist.get_world_size(), True),
-            None
-        )
+    super(Trainer, self).__init__(
+      model_wrapper,
+      get_batch_data(param, param.train_files, param.epoch_num,
+               dist.get_rank(), dist.get_world_size(), True),
+      None
+    )
 
-    def train_one_batch(self, l8_imgs, s2_imgs):
-        pred_l8_imgs = self._model_wrapper.predict(l8_imgs)
-        print(pred_l8_imgs.shape)
-        print(s2_imgs.shape)
-        print(type(pred_l8_imgs))
-        print(pred_l8_imgs.dtype,s2_imgs.dtype)
-        print(type(s2_imgs))
+  def train_one_batch(self, l8_imgs, s2_imgs):
+    pred_l8_imgs = self._model_wrapper.predict(l8_imgs)
+    print(pred_l8_imgs.shape)
+    print(s2_imgs.shape)
+    print(type(pred_l8_imgs))
+    print(pred_l8_imgs.dtype,s2_imgs.dtype)
+    print(type(s2_imgs))
 
-        loss = nn.L1Loss()
-        loss_mean = loss(pred_l8_imgs, s2_imgs)
+    loss = nn.L1Loss()
+    loss_mean = loss(pred_l8_imgs, s2_imgs)
 
-        return {"loss": loss_mean}
+    return {"loss": loss_mean}
 
 
 def main():
-    parser = optparse.OptionParser(usage="cmd [optons] ..]")
-    # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
-    parser.add_option("--debug_level", type=int, default=1)
-    (options, args) = parser.parse_args()
+  parser = optparse.OptionParser(usage="cmd [optons] ..]")
+  # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
+  parser.add_option("--debug_level", type=int, default=1)
+  (options, args) = parser.parse_args()
 
-    Logger.set_level(options.debug_level)
+  Logger.set_level(options.debug_level)
 
-    Trainer(Param.get_instance()).train()
+  Trainer(Param.get_instance()).train()
 
 
 if __name__ == "__main__":
-    main()
+  main()

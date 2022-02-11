@@ -78,6 +78,9 @@ class TrainerBase:
         if "batch_id" in info:
           self._batch_id = info["batch_id"]
 
+        if "optimizer_state" in info:
+          self._optimizer.load_state_dict(info["optimizer_state"])
+
     else:
       if self._rank == 0:
         nlp.execute_cmd(f"echo > {param.path_model}/checkpoint")
@@ -88,7 +91,7 @@ class TrainerBase:
 
     if self._rank == 0:
       tb_dir = f"{param.path_work}/tensorboard"
-      nlp.mkdir(tb_dir, True)
+      nlp.mkdir(tb_dir, False)
       self._writer = SummaryWriter(tb_dir)
 
     if self._use_amp:
@@ -110,7 +113,8 @@ class TrainerBase:
       "model_seen_sample_num": self._model_seen_sample_num,
       "opt_evaluate_error": self._opt_evaluate_error,
       "last_evaluate_point": self._last_evaluate_point,
-      "figure_data": self._figure_data
+      "figure_data": self._figure_data,
+      "optimizer_state": self._optimizer.state_dict(),
     }
     param = self._model_wrapper._param
 
@@ -258,13 +262,16 @@ class TrainerBase:
           ret = self._train_one_batch_check(*batch)
           ret["loss"].backward()
 
+        ret["loss"] = ret["loss"].item()
+
         return ret
 
-      if self._param.detect_anomaly:
-        with autograd.detect_anomaly():
+      with Timer("run_minibatch"):
+        if self._param.detect_anomaly:
+          with autograd.detect_anomaly():
+            return run()
+        else:
           return run()
-      else:
-        return run()
 
     def reduce_batch_figure(figures: list):
       lines = defaultdict(list)
@@ -314,9 +321,10 @@ class TrainerBase:
         train_start_time = time.time()
         batch_start_time = time.time()
 
-      if self._check_sync_stop_condition(batches == []):
-        Logger.info(f"Exit training. Batch is empty.")
-        break
+      with nlp.Timer("data fetching syn"):
+        if self._check_sync_stop_condition(batches == []):
+          Logger.info(f"Exit training. Batch is empty.")
+          break
 
       batch_accum_loss = []
       current_batch_size = 0
@@ -333,7 +341,7 @@ class TrainerBase:
             batch_train_result = run_minibatch(batch)
 
         mini_batch_train_time.append(mini_timer.duration)
-        batch_accum_loss.append(batch_train_result["loss"].item())
+        batch_accum_loss.append(batch_train_result["loss"])
         current_batch_size += batch[0].size(0)
         current_sum_loss_num += batch_train_result["batch_num"]
         batch_figure.append(batch_train_result.get("figure", {}))
@@ -370,10 +378,12 @@ class TrainerBase:
       total_norm = torch.nn.utils.clip_grad_norm_(
         self._model_wrapper._model.parameters(), param.param_norm
       )
-      Logger.debug(f"total_norm(parameters.grad)={total_norm}")
+      if nlp.eq(total_norm, 0):
+        Logger.warn(f"total_norm(parameters.grad)={total_norm}")
 
       self._update_lr()
-      self._step_optimizer()
+      with Timer("step optimizer"):
+        self._step_optimizer()
 
       batch_duration = time.time() - batch_start_time
       train_duration = time.time() - train_start_time
@@ -498,25 +508,48 @@ class TrainerBase:
       assert False
 
   def _update_lr(self):
+    strategy_id = self._param.lr_decay_strategy[1]
+    if strategy_id == 0:
+      self._update_lr_liner_decay()
+    elif strategy_id == 1:
+      self._update_lr_SGD()
+    else:
+      assert False
+
+  def _update_lr_SGD(self):
+    param = self._param
+    epoch_id = self._model_seen_sample_num // param.train_sample_num
+    lr_ratio = param.stepwise_lr_decay_ratio ** \
+               (epoch_id // param.stepwise_lr_decay_epochs)
+
+    self._update_lr_ratioi(lr_ratio)
+
+  def _update_lr_liner_decay(self):
     param = self._param
     warmup_num = int(param.warmup_ratio * self._target_seen_sample_num)
     if self._model_seen_sample_num <= warmup_num:
       lr_ratio = self._model_seen_sample_num / warmup_num
+      flag = "+"
     else:
       a = max(self._target_seen_sample_num - self._model_seen_sample_num, 0)
       b = self._target_seen_sample_num - warmup_num
       ratio = a / b
       lr_ratio = param.ending_lr_ratio + (1 - param.ending_lr_ratio) * ratio
+      flag = "-"
 
+    Logger.info(f"lr[{flag}]")
+    self._update_lr_ratioi(lr_ratio)
+
+  def _update_lr_ratioi(self, ratio):
     lrs = []
     for param_group in self._optimizer.param_groups:
       if "initial_lr" not in param_group:
         param_group["initial_lr"] = param_group["lr"]
-      lr = lr_ratio * param_group["initial_lr"]
+      lr = ratio * param_group["initial_lr"]
       lrs.append(lr)
       param_group["lr"] = lr
 
-    Logger.info(f"lr: ratio={lr_ratio}, {lrs}")
+    Logger.info(f"lr: ratio={ratio}, value={lrs}")
 
   def _when_evaluate(self, train_done=False):
     if self._rank != 0:

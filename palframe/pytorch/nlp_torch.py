@@ -231,6 +231,48 @@ class Dense(nn.Module):
   def forward(self, x: torch.Tensor):
     return self._layer(x)
 
+class AttenDense(nn.Module):
+  def __init__(self, linear_layer: nn.Linear, activation=nn.LeakyReLU(),
+               max_emb_num=None, dropout=0.0):
+    super(AttenDense, self).__init__()
+
+    self._in_features = linear_layer.in_features
+    if max_emb_num is None:
+      self._out_features = linear_layer.out_features
+    else:
+      self._out_features = min(linear_layer.out_features, max_emb_num)
+    self._atten_emb = nn.Parameter(
+      torch.Tensor(self._out_features, self._in_features)
+    )
+    self._dropout = nn.Dropout(dropout)
+
+    if activation is None:
+      self._layer = linear_layer
+    else:
+      self._layer = nn.Sequential(
+        linear_layer, activation
+      )
+
+    self._reset_parameters()
+
+  def _reset_parameters(self):
+    self._atten_emb.data.normal_(mean=0.0, std=0.1)
+
+  def forward(self, x: torch.Tensor):
+    '''
+    :param x: [batch, * ..., dim]
+    :return:
+    '''
+    shape = list(x.shape)
+    x = x.reshape(-1, shape[-1])
+    scores = torch.einsum("bx,cx->bc", self._dropout(x), self._atten_emb)
+    probs = torch.softmax(scores, dim=1)
+    atten_x = probs @ self._atten_emb
+    x = x + atten_x
+    x = x.view(shape)
+
+    return self._layer(x)
+
 class Attention(nn.Module):
   def __init__(self, query_dim, values_dim, atten_dim):
     super(Attention, self).__init__()

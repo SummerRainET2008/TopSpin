@@ -19,25 +19,26 @@ import logging
 import math
 import multiprocessing as mp
 import numpy as np
+import nvidia_smi
 import operator
 import optparse
 import os
 import pickle
 import pprint
+import psutil
 import queue
 import random
 import re
-import struct
-import sys
-import tempfile
-import time
-import typing
 import scipy
 import socket
-import traceback
-import threading
+import struct
 import subprocess
-import psutil
+import sys
+import tempfile
+import threading
+import time
+import traceback
+import typing
 
 import palframe.__version__ as about
 from palframe.__version__ import __version__

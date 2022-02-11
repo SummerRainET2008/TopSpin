@@ -28,9 +28,10 @@ class ParamBase(abc.ABC):
   def __init__(self,
                run_tag: str,
                path_work_restored_training=None,
-               experiment_folder="work",
-               ):
+               experiment_folder="work"):
     self._check_validity()
+
+    self.seed = 0     # 0 means random.
 
     if not nlp.is_none_or_empty(path_work_restored_training):
       self.path_work = path_work_restored_training
@@ -41,33 +42,60 @@ class ParamBase(abc.ABC):
       date_str = nlp.get_log_time(True)
       date_str = date_str.replace(" ", "_").replace(":", "-")\
                          .replace("[utc]", "utc")
-      run_tag = f"{run_tag}.{date_str}"
-      self.path_work  = f"{experiment_folder}/run.{run_tag}"
+      self.run_tag = f"{run_tag}.{date_str}"
+      self.path_work  = f"{experiment_folder}/run.{self.run_tag}"
 
-    '''
-    self.path_model, self.path_log, self.path_meta, are set automatically
-    by path_work.
-    '''
 
-    self.path_initial_model = None
-    self.path_inference_model = None
+    # self.path_model, self.path_log, self.path_meta, are set automatically
+    # by path_work.
 
+    # If optimizer is set as SGD, then lr decay is forced to the classic
+    # step-wise decay, and warmup_ratio, ending_lr_ratio becomes void.
     self.optimizer_name = "AdamW"
-    self.lr = 0.001
-    self.weight_decay = 0.01
-    self.param_norm = 1
-    self.seed = 0     # 0 means random.
 
-    self.bucket_cap_mb = 25   # 25 Mb. Default value for distributed training.
-    self.servers_file = None
+    self.lr = 0.001
     self.gpu_num = 1
     self.use_gpu = True
-    self.gpus = [0]      # Do not use it, as it will be allocated automatically.
+    # Mixed-precision optimization
     self.use_amp = True
-    self.backhand = "gloo"  # "nccl", "gloo"
-    self.net_name = None
+    # Initialization model.
+    self.path_initial_model = None
+    # For deployment.
+    self.path_inference_model = None
 
+    # Two learning rate decay strategies.
+    # "linear": linear decay,
+    # "stepwise_sgd": stepwise (traditional SGD style)
+    self.lr_decay_strategy = "linear"
+
+    # lr decay strategy 0: linear decay
+    self.warmup_ratio = 0.
+    self.ending_lr_ratio = 1e-5  # 1 means no lr decay
+
+    # lr decay strategy 1: step-wise_decay
+    # lr_{epoch=n} = lr_{epoch=n-1} * decay_ratio, if decay_epochs == 1.
+    self.stepwise_lr_decay_ratio = 0.1
+    self.stepwise_lr_decay_epochs = 30
+
+    #  Such in RoBERTa, l2 weight decay is 0.01
+    self.weight_decay = 0.01
+
+    # Default settings that work fine.
+    self.param_norm = 1
+    # Do not use it, as it will be allocated automatically,
+    # except for debug mode.
+    self.gpus = [0]
     self.batch_dim = 0
+
+    # Distributed training.
+    self.servers_file = None
+    # Default value 25Mb works fine.
+    self.bucket_cap_mb = 25
+    # "nccl" for GPU; "gloo" for GPU and CPU.
+    self.backhand = "gloo"
+    # Usually you do NOT need to set it, as PAL Frame Would set for you in
+    # the background.
+    self.net_name = None
 
     # example on one gpu
     self.variable_batch_size = {
@@ -85,18 +113,16 @@ class ParamBase(abc.ABC):
     self.train_sample_num = None
     self.epoch_num = None       # can be float.
 
+    # Evaluation would be conducted every eval_gap_sample_num samples.
     self.eval_gap_sample_num = None
 
     self.restore_from_last_train = \
       not nlp.is_none_or_empty(path_work_restored_training)
     self.find_unused_parameters = True
 
-    self.warmup_ratio = 0.1
-    self.ending_lr_ratio = 0.001  # 1 means no lr decay
-
     self.model_saved_num = 3
 
-    #Sets the number of threads used for intraop parallelism on CPU.
+    # Sets the number of threads used for intraop parallelism on CPU.
     self.num_threads_cpu = 4
     self.num_workers_loading_data = 2
 
@@ -104,6 +130,7 @@ class ParamBase(abc.ABC):
     # set a value.
     self.automl_max_model_size = None
 
+    # For the case that each GPU worker consumes different batch size.
     self.true_gradient = False
 
     self.debug_level = 1    # debug=0, info=1, warning=2, error=3
@@ -121,6 +148,20 @@ class ParamBase(abc.ABC):
 
     if not ParamBase.cls_locks.get(cls_str, False):
       assert False, "Use Param.get_instance(cls), rather than Param()"
+
+  @property
+  def lr_decay_strategy(self):
+    return self.__lr_decay_strategy, self.__lr_decay_strategy_id
+
+  @lr_decay_strategy.setter
+  def lr_decay_strategy(self, name: str):
+    name = name.lower()
+    cand_names = ["linear", "stepwise_sgd"]
+    try:
+      self.__lr_decay_strategy = name
+      self.__lr_decay_strategy_id = cand_names.index(name)
+    except ValueError:
+      assert False, f"param.lr_decay_strategy should be {cand_names}"
 
   @property
   def true_gradient(self):
@@ -163,7 +204,8 @@ class ParamBase(abc.ABC):
   def train_files(self, value):
     if not nlp.is_none_or_empty(value):
       files = parse_feat_folder(value)
-      assert len(files) > 0
+      if len(files) == 0:
+        Logger.warn(f"Empty train_files")
     self.__train_files = value
 
   @property

@@ -50,6 +50,7 @@ class ModelWrapperBase:
     else:
       Logger.set_level(2)
 
+    param.worker_IP = os.getenv("worker_IP")
     param.display()
 
     user_model = user_model_cls(param)
@@ -134,6 +135,7 @@ class ModelWrapperBase:
       incompatible_keys = self._model.load_state_dict(state_dict, strict=False)
       Logger.info(f"Incompatible keys: {incompatible_keys}")
       Logger.info(f"Model load succeeds: {model_file}")
+
       return info
 
     except Exception as error:
@@ -143,11 +145,19 @@ class ModelWrapperBase:
   def _load_model_folder(self):
     param = self._param
     check_point_file = f"{param.path_model}/checkpoint"
-    if not os.path.isfile(check_point_file):
-      Logger.info("No model to load")
-      return
+    if os.path.isfile(check_point_file):
+      model_names = open(check_point_file).read().split()
+      if len(model_names) > 0:
+        model_name = model_names[-1]
+      else:
+        model_name = ""
+    else:
+      model_name = ""
 
-    model_name = open(check_point_file).readlines()[-1].strip()
+    if nlp.is_none_or_empty(model_name):
+      Logger.info("No model to load")
+      return None
+
     model_file = f"{param.path_model}/{model_name}"
     return self._load_model_file(model_file)
 

@@ -150,7 +150,10 @@ class _RunTaskThread(threading.Thread):
 
   def run(self):
     param = self._task._param
+    param.working_server = self._task._avail_server._ip
+    param.working_GPUs   = self._task._avail_gpus
     param.create_workspace()
+
     param_file = f"{param.path_meta}/param.pkl"
     pickle.dump(param, open(param_file, "wb"))
     port = _get_netport()
@@ -207,9 +210,19 @@ class _RunTaskThread(threading.Thread):
       self._is_alive = False
 
 class RunManager:
-  def __init__(self, tasks, servers):
+  avail_opts = [
+    "no_GPU_check"
+  ]
+
+  def __init__(self, tasks, servers, **kwargs):
     Logger.info("-" * 80)
     Logger.info("GPU task scheduling manager")
+
+    assert len(tasks) > 0
+
+    self._options = kwargs
+    for key in self._options:
+      assert key in self.avail_opts
 
     self._check_tasks_condition(tasks)
     self._check_servers(servers, tasks)
@@ -218,8 +231,9 @@ class RunManager:
     Logger.info(f"#task: {len(tasks)}, #gpu: {num_gpu}")
 
     nlp.set_random_seeds(0)
+    run_tag = tasks[0]._param.run_tag
     self._run_id = random.randint(0, 1024 * 1024)
-    run_root_path = f"work/batch_task.run_id_{self._run_id}"
+    run_root_path = f"work/batch_task.{run_tag}.run_id_{self._run_id}"
     nlp.mkdir(run_root_path)
     self._run_lock_file = f"{run_root_path}/.run.lock"
     for task in tasks:
@@ -248,7 +262,8 @@ class RunManager:
     use_gpu = tasks[0]._param.use_gpu
     if use_gpu:
       server_gpu_info = [[server._ip, server._avail_gpus] for server in servers]
-      assert _check_server_gpus(server_gpu_info)
+      if not self._options.get("no_GPU_check", False):
+        assert _check_server_gpus(server_gpu_info)
 
     assert _check_server_disk_path([server._ip for server in servers],
                                    os.getcwd())
@@ -344,12 +359,13 @@ class RunManager:
 
 def start_train(param: ParamBase,
                 source_script_and_params: str,
-                servers: typing.List[Server]):
+                servers: typing.List[Server],
+                **kwargs):
   tasks = []
   for param_var in param.generate_all_variants():
     tasks.append(Task(param_var, source_script_and_params))
 
-  run_manager = RunManager(tasks, servers)
+  run_manager = RunManager(tasks, servers, **kwargs)
   run_manager.run()
 
 def stop_train(run_id):
@@ -369,6 +385,7 @@ def start_distributed_train(param: ParamBase,
                  f"DIST_RUN=1 " \
                  f"PYTHONPATH=./:{pythonpath} " \
                  f"param_file={param_file} " \
+                 f"worker_IP={server_IP} " \
                  f"<mask1> {sys.executable} -m torch.distributed.launch " \
                  f"--nproc_per_node={param.gpu_num} " \
                  f"--nnodes={len(server_ips)} " \
@@ -422,6 +439,7 @@ def start_distributed_train(param: ParamBase,
 
   param.create_workspace()
   param.gpus = list(range(param.gpu_num))
+  param.worker_IPs = ",".join(server_ips)
   param_file = f"{param.path_meta}/param.pkl"
   pickle.dump(param, open(param_file, "wb"))
 
