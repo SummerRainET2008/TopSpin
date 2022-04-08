@@ -30,6 +30,21 @@ class TerminalColors:
     print(f"{TC.BOLD}This color is 'BOLD'{TC.ENDC}")
     print(f"{TC.UNDERLINE}This color is 'UNDERLINE'{TC.ENDC}")
 
+def async_function(f):
+  '''
+  Decorator
+  :param f: a function with no return value.
+  :return: a threading.Thread
+
+  You should call threading.Thread.join() after calling f.
+  '''
+  def wrapper(*args, **kwargs):
+    thr = threading.Thread(target=f, args=args, kwargs=kwargs)
+    thr.start()
+    return thr
+
+  return wrapper
+
 def get_GPU_info(gpu_id):
   with Timer(f"get_GPU_info({gpu_id})"):
     nvidia_smi.nvmlInit()
@@ -228,7 +243,7 @@ def pydict_file_read(file_name, max_num: int=-1)-> typing.Iterator:
 
   Logger.info(f"{file_name}: #data={data_num:,}")
 
-def pydict_file_write(data: typing.Iterator, file_name: str)-> None:
+def pydict_file_write(data: typing.Iterator, file_name: str, **kwargs)-> None:
   assert file_name.endswith(".pydict")
   if isinstance(data, dict):
     data = [data]
@@ -240,9 +255,10 @@ def pydict_file_write(data: typing.Iterator, file_name: str)-> None:
       if "\n" in obj_str:
         Logger.error(f"pydict_file_write: not '\\n' is allowed: '{obj_str}'")
       print(obj, file=fou)
-      if num % 10_000 == 0:
+      if kwargs.get("print_log", True) and num % 10_000 == 0:
         Logger.info(f"{file_name} has been written {num} lines")
 
+  if kwargs.get("print_log", True):
     Logger.info(f"{file_name} has been written {num} lines totally")
 
 def get_file_extension(file_name: str)-> str:
@@ -522,30 +538,30 @@ def timeout(func, args: list, max_time_seconds):
 
 class Timer(object):
   def __init__(self, title="") -> None:
-    self._title = title
-    self._starting = None
-    self._duration = None
+    self.title = title
+    self.__starting = None
+    self.__duration = None
 
   @property
   def duration(self):
-    if self._duration is not None:
-      return self._duration
-    elif self._starting is None:
+    if self.__duration is not None:
+      return self.__duration
+    elif self.__starting is None:
       return 0
     else:
-      return time.time() - self._starting
+      return time.time() - self.__starting
 
   def __enter__(self) -> None:
-    if not is_none_or_empty(self._title):
-      Logger.info(f"Timer starts:\t '{self._title}'")
-    self._starting = time.time()
+    if not is_none_or_empty(self.title):
+      Logger.info(f"Timer starts:\t '{self.title}'")
+    self.__starting = time.time()
     return self
 
   def __exit__(self, *args) -> None:
-    self._duration = time.time() - self._starting
-    if not is_none_or_empty(self._title):
+    self.__duration = time.time() - self.__starting
+    if not is_none_or_empty(self.title):
       Logger.info(
-        f"Timer finishes:\t '{self._title}', takes {to_readable_time(self.duration)} "
+        f"Timer finishes:\t '{self.title}', takes {to_readable_time(self.duration)} "
         f"seconds."
       )
 

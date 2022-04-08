@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia 
 
-from transformers import AutoTokenizer
+from pytorch_transformers import AutoTokenizer
 from palframe.pytorch import *
 
 class Tokenizer:

@@ -1,24 +1,27 @@
 #coding: utf8
 #author: Tian Xia 
 
-from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
-from palframe.pytorch.estimator5.draw_figure import draw_figure
+from palframe.pytorch.estimator6.model import ModelBase
+from palframe.pytorch.estimator6.predict import PredictorBase
+from palframe.pytorch.estimator6.param import ParamBase
+from palframe.pytorch.estimator6.draw_figure import draw_figure
 from palframe.pytorch import *
 from torch.optim import Optimizer
 from torch.cuda import amp
 from palframe.pytorch.dataset.offline_bigdataset import parse_feat_folder
-from palframe.pytorch.estimator5 import starter
+from palframe.pytorch.estimator6 import starter
 from torch import autograd
 from filelock import FileLock
 
 class TrainerBase:
   @starter.exception_stop
   def __init__(self,
-               model_wrapper: ModelWrapperBase,
-               train_data_iter,
-               optimizer: typing.Union[Optimizer, None]=None):
-    param = model_wrapper._param
+               model: ModelBase,
+               user_predictor_cls,
+               optimizer: typing.Union[Optimizer, None]):
+    param = model._param
     self._param = param
+
     self._check_param_validity()
 
     nlp.set_random_seeds(param.seed)
@@ -26,13 +29,63 @@ class TrainerBase:
     torch.backends.cudnn.benchmark = param.cudnn_benchmark
     torch.set_num_threads(param.num_threads_cpu)
 
-    self._local_rank = model_wrapper._local_rank
+    debug_mode = os.getenv("DIST_RUN") is None
+
+    if debug_mode:
+      current_env = os.environ
+      current_env["MASTER_ADDR"] = "127.0.0.1"
+      current_env["MASTER_PORT"] = f"{random.randint(1024, 1024 * 1024)}"
+      current_env["WORLD_SIZE"] = "1"
+      current_env["RANK"] = "0"
+      current_env["LOCAL_RANK"] = "0"
+
+      param.gpu_num = 1
+      param.gpus = param.gpus[: 1]
+
+      param.create_workspace()
+
+    nlp.timeout(self._init_distributed_training, [param], 30)
+
+    self._local_rank = int(os.getenv("LOCAL_RANK"))
     self._rank = dist.get_rank()
     self._world_size = dist.get_world_size()
 
-    self._model_size = nlp_torch.display_model_parameters(
-      model_wrapper._model
-    )
+    nlp.command(f"touch {param.run_lock_file}")
+    starter._MonitorStopThread(param.run_lock_file).start()
+
+    param_file = param.__module__.replace(".", "/") + ".py"
+    nlp.command(f"cp {param_file} {param.path_work}")
+
+    if not debug_mode:
+      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}")
+    if dist.get_rank() == 0:
+      Logger.set_level(param.debug_level)
+    else:
+      Logger.set_level(2)
+
+    param.worker_IP = os.getenv("worker_IP")
+    param.display()
+
+    if not param.use_gpu:
+      self._device = torch.device("cpu")
+      self._user_model = model
+      self._model = torch.nn.parallel.DistributedDataParallel(
+        self._user_model, bucket_cap_mb=param.bucket_cap_mb,
+        find_unused_parameters=param.find_unused_parameters,
+      )
+    else:
+      gpu_id = param.gpus[self._local_rank]
+      self._device = torch.device(f"cuda:{gpu_id}")
+      torch.cuda.set_device(self._device)
+      self._user_model = model.to(self._device)
+      self._model = torch.nn.parallel.DistributedDataParallel(
+        self._user_model, device_ids=[gpu_id], output_device=gpu_id,
+        bucket_cap_mb=param.bucket_cap_mb,
+        find_unused_parameters=param.find_unused_parameters,
+      )
+
+    self._user_model.set_device(self._device)
+    self._model_size = nlp_torch.display_model_parameters(self._user_model)
 
     if not nlp.is_none_or_empty(param.path_initial_model):
       '''
@@ -41,7 +94,7 @@ class TrainerBase:
       information in current stage.
       '''
       Logger.info(f"Loading initial model '{param.path_initial_model}'")
-      model_wrapper._load_model_file(param.path_initial_model)
+      self._user_model.load_model(param.path_initial_model)
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
@@ -59,14 +112,14 @@ class TrainerBase:
       self._optimizer = optimizer
     else:
       self._optimizer = getattr(torch.optim, param.optimizer_name)(
-        model_wrapper._model.parameters(), lr=param.lr,
+        model.parameters(), lr=param.lr,
         weight_decay=param.weight_decay
       )
 
     if param.restore_from_last_train:
       Logger.info(f"{self._get_worker_info()} "
                   f"Restoring from last training...")
-      info = model_wrapper._load_model_folder()
+      info = self._user_model.load_model_from_folder()
       if info is not None:
         self._model_seen_sample_num = info["model_seen_sample_num"]
         self._opt_evaluate_error  = info["opt_evaluate_error"]
@@ -82,12 +135,9 @@ class TrainerBase:
         if "optimizer_state" in info:
           self._optimizer.load_state_dict(info["optimizer_state"])
 
-    else:
-      if self._rank == 0:
-        nlp.execute_cmd(f"echo > {param.path_model}/checkpoint")
+    elif self._rank == 0:
+      nlp.execute_cmd(f"echo > {param.path_model}/checkpoint")
 
-    self._train_data_iter = train_data_iter
-    self._model_wrapper = model_wrapper
     self._use_amp = param.use_amp and param.use_gpu
 
     if self._rank == 0:
@@ -97,6 +147,8 @@ class TrainerBase:
 
     if self._use_amp:
       self._grad_scaler = amp.GradScaler()
+
+    self._user_predictor_cls = user_predictor_cls
 
   def _check_param_validity(self):
     param = self._param
@@ -130,37 +182,28 @@ class TrainerBase:
     else:
       self._optimizer.step()
 
-  def _try_to_save_best_model(self):
-    info = {
-      "batch_id": self._batch_id,
-      "model_seen_sample_num": self._model_seen_sample_num,
-      "opt_evaluate_error": self._opt_evaluate_error,
-      "last_evaluate_point": self._last_evaluate_point,
-      "figure_data": self._figure_data,
-      "optimizer_state": self._optimizer.state_dict(),
-    }
-    param = self._model_wrapper._param
-
+  def _try_to_save_best_model(self, predictor):
+    param = self._param
     if nlp.is_none_or_empty(param.vali_file):
-      self._model_wrapper._save_model(info)
+      self._save_model()
 
     else:
       with torch.no_grad():
-        eval_error = self._model_wrapper.evaluate_file(param.vali_file)
-        self._figure_data[f"vali_file.{param.vali_file}"].append(
-          [self._batch_id, -eval_error]
-        )
+        eval_error = predictor.evaluate_file(param.vali_file)
 
-        self._vali_error_history.append(eval_error)
-        if eval_error > 0:
-          Logger.error(f"evaluate_file() should return a negative value")
-          assert False
-        self._writer.add_scalar(
-          f"eval '{param.vali_file}'", eval_error, self._model_seen_sample_num
-        )
+      self._figure_data[f"vali_file.{param.vali_file}"].append(
+        [self._batch_id, -eval_error]
+      )
+      self._vali_error_history.append(eval_error)
+      if eval_error > 0:
+        Logger.error(f"evaluate_file() should return a negative value")
+        assert False
+      self._writer.add_scalar(
+        f"eval '{param.vali_file}'", eval_error, self._model_seen_sample_num
+      )
       if eval_error < self._opt_evaluate_error:
         self._opt_evaluate_error = eval_error
-        self._model_wrapper._save_model(info)
+        self._save_model()
       Logger.info(f"so far the best vali error: {self._opt_evaluate_error}")
       pickle.dump(self._vali_error_history,
                   file=open(f"{param.path_meta}/dev.eval.pkl", "wb"))
@@ -168,12 +211,25 @@ class TrainerBase:
   def _evaluate(self):
     with Timer("evaluate"):
       torch.cuda.empty_cache()
-      self._model_wrapper._set_inference()
+      self._model.eval()
 
-      self._try_to_save_best_model()
-      for test_file in parse_feat_folder(self._model_wrapper._param.test_files):
+      param = self._param
+
+      if not nlp.is_none_or_empty(param.vali_file) or \
+        not nlp.is_none_or_empty(param.test_files):
+        param.gpu_inference = param.gpus[0]
+        param.path_inference_model = ""
+        predictor = self._user_predictor_cls(param)
+        predictor._model.load_state_dict(
+          self._user_model.state_dict(), strict=True
+        )
+      else:
+        predictor = None
+
+      self._try_to_save_best_model(predictor)
+      for test_file in parse_feat_folder(self._param.test_files):
         with torch.no_grad():
-          eval_error = self._model_wrapper.evaluate_file(test_file)
+          eval_error = predictor.evaluate_file(test_file)
           self._writer.add_scalar(
             f"eval '{test_file}'", eval_error, self._model_seen_sample_num
           )
@@ -181,10 +237,11 @@ class TrainerBase:
             [self._batch_id, -eval_error]
           )
 
-      self._model_wrapper._set_train()
+      predictor = None
+      self._model.train()
       torch.cuda.empty_cache()
 
-  def train_one_batch(self, *batch)-> dict:
+  def _train_one_batch(self, *batch)-> dict:
     raise NotImplementedError()
 
   def _train_one_batch_check(self, *batch)-> dict:
@@ -195,7 +252,7 @@ class TrainerBase:
     try:
       local_vars = [None]
       sys.setprofile(tracer)
-      ret = self.train_one_batch(*batch)
+      ret = self._train_one_batch(*batch)
       if type(ret) is not dict:
         raise Exception(f"train_one_batch(...) should return a dict.")
 
@@ -245,14 +302,9 @@ class TrainerBase:
           )
 
         Logger.info("Saving debugging model")
-        info = {
-          "model_seen_sample_num": self._model_seen_sample_num,
-          "opt_evaluate_error": self._opt_evaluate_error,
-          "last_evaluate_point": self._last_evaluate_point,
-        }
-        self._model_wrapper._save_model(info, f"rank_{self._rank}")
+        self._save_model(tag=f"rank_{self._rank}")
 
-        for name, var in self._model_wrapper._model.named_parameters():
+        for name, var in self._user_model.named_parameters():
           if nlp_torch.isabnormal(var):
             Logger.error(f"parameter '{name}' has inf or nan.")
           if var.requires_grad and nlp_torch.isabnormal(var.grad):
@@ -265,13 +317,24 @@ class TrainerBase:
 
   def _get_batches_data(self):
     def get_one_batch():
-      for _, batch in self._train_data_iter:
-        batch = [e.to(self._model_wrapper._device) for e in batch]
+      train_data_iter = self._get_training_data(
+        rank=dist.get_rank(), world_size=dist.get_world_size(),
+      )
+      for epoch_id, batch in train_data_iter:
+        batch = [e.to(self._device) for e in batch]
         yield batch
 
     yield from nlp.next_batch(
       get_one_batch(), self._param.iter_num_update_optimizer
     )
+
+  def _get_training_data(self, rank: int, world_size: int):
+    '''
+    :param rank:  GPU worker ID
+    :param world_size: number of all GPU workers
+    :return: an iterator of training batches.
+    '''
+    raise NotImplementedError()
 
   @starter.exception_stop
   def train(self):
@@ -324,7 +387,7 @@ class TrainerBase:
 
     while True:
       batch_start_time = time.time()
-      self._model_wrapper._set_train()
+      self._model.train()
       self._optimizer.zero_grad()
 
       try:
@@ -358,7 +421,7 @@ class TrainerBase:
         mini_timer = Timer()
         with mini_timer:
           if iter_num < len(batches) - 1:
-            with self._model_wrapper._model.no_sync():
+            with self._model.no_sync():
               batch_train_result = run_minibatch(batch)
           else:
             batch_train_result = run_minibatch(batch)
@@ -382,7 +445,7 @@ class TrainerBase:
         batch_loss = self._sync_value(batch_loss) / sum_loss_num
         self._loss_history.append(batch_loss)
 
-        for var in self._model_wrapper._model.parameters():
+        for var in self._model.parameters():
           if var.grad is not None:
             var.grad *= self._world_size / sum_loss_num
       else:
@@ -390,7 +453,7 @@ class TrainerBase:
         batch_loss = self._sync_value(batch_loss, "mean")
         self._loss_history.append(batch_loss)
 
-        for var in self._model_wrapper._model.parameters():
+        for var in self._model.parameters():
           if var.grad is not None:
             var.grad /= len(batches)
 
@@ -399,7 +462,7 @@ class TrainerBase:
         self._draw_figure()
 
       total_norm = torch.nn.utils.clip_grad_norm_(
-        self._model_wrapper._model.parameters(), param.param_norm
+        self._model.parameters(), param.param_norm
       )
       if nlp.eq(total_norm, 0):
         Logger.warn(f"total_norm(parameters.grad)={total_norm}")
@@ -460,7 +523,12 @@ class TrainerBase:
         Logger.info(f"Exit training: enough training")
         break
 
-      if self._check_sync_stop_condition(self._early_stop()):
+      is_early_stop = self._early_stop(
+        self._model_seen_sample_num // self._param.train_sample_num,
+        self._loss_history,
+        self._vali_error_history
+      )
+      if self._check_sync_stop_condition(is_early_stop):
         Logger.info(f"{self._get_worker_info()}: early stopped")
         break
 
@@ -504,15 +572,8 @@ class TrainerBase:
       Logger.warn(f"memory: {used_memory:_} KB, "
                   f"{round(used_memory / 1024 ** 3, 2)} GB.")
 
-  def early_stop(self, epoch_id, loss_history: list, vali_error_history: list):
+  def _early_stop(self, epoch_id, loss_history: list, vali_error_history: list):
     return False
-
-  def _early_stop(self):
-    return self.early_stop(
-      self._model_seen_sample_num // self._param.train_sample_num,
-      self._loss_history,
-      self._vali_error_history
-    )
 
   def _check_sync_stop_condition(self, bool_cond):
     value = 0 if bool_cond else 1
@@ -520,7 +581,7 @@ class TrainerBase:
     return value < self._world_size
 
   def _sync_value(self, single_value, reduce_op: str="sum"):
-    ts = torch.tensor(single_value, device=self._model_wrapper._device)
+    ts = torch.tensor(single_value, device=self._device)
     torch.distributed.all_reduce(ts)
     value = ts.item()
     if reduce_op == "sum":
@@ -604,3 +665,67 @@ class TrainerBase:
       for line_id, key in enumerate(sorted(self._figure_data.keys())):
         figure_data[f"{line_id}.{key}"] = self._figure_data[key]
       draw_figure(figure_data, out_file)
+
+  def _save_model(self, tag=""):
+    param = self._param
+    if param.model_saved_num <= 0:
+      return
+
+    info = {
+      "batch_id": self._batch_id,
+      "model_seen_sample_num": self._model_seen_sample_num,
+      "opt_evaluate_error": self._opt_evaluate_error,
+      "last_evaluate_point": self._last_evaluate_point,
+      "figure_data": self._figure_data,
+      "optimizer_state": self._optimizer.state_dict(),
+    }
+
+    model_seen_sample_num = self._model_seen_sample_num
+    info["model"] = self._user_model.state_dict()
+    if tag != "":
+      name = f'model_{model_seen_sample_num:015}.{tag}.pt'
+    else:
+      name = f'model_{model_seen_sample_num:015}.pt'
+    nlp.execute_cmd(
+      f"echo {name} >> {param.path_model}/checkpoint"
+    )
+
+    torch.save(info, os.path.join(param.path_model, name))
+
+    model_names = open(f"{param.path_model}/checkpoint").read().split()
+    for name in model_names[: -param.model_saved_num]:
+      model_file = f"{param.path_model}/{name}"
+      if os.path.isfile(model_file):
+        nlp.execute_cmd(f"rm {model_file}")
+
+  def _init_distributed_training(self, param: ParamBase):
+    if param.backhand == "gloo" or not param.use_gpu:
+      socket_ifname = "GLOO_SOCKET_IFNAME"
+      param.backhand = "gloo"
+    elif param.backhand == "nccl":
+      socket_ifname = "NCCL_SOCKET_IFNAME"
+    else:
+      assert False, f"wrong backhand: {param.backhand}"
+    os.environ[socket_ifname] = self._try_get_net_name(param)
+
+    dist.init_process_group(backend=param.backhand)
+
+  def _try_get_net_name(self, param):
+    if not nlp.is_none_or_empty(param.net_name):
+      return param.net_name
+
+    if nlp.is_none_or_empty(param.servers_file):
+      server_ips = set(["127.0.0.1"])
+    else:
+      server_ips = set(sum([open(f).read().split()
+                            for f in param.servers_file.split(",")], []))
+    addrs = psutil.net_if_addrs()
+
+    for net_name, attr in addrs.items():
+      if attr[0].address in server_ips:
+        return net_name
+    else:
+      Logger.error(
+        "Cannot find a suitable net_name, please set manually."
+      )
+      assert False

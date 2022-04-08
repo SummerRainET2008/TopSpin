@@ -7,6 +7,15 @@ from palframe import nlp
 from torch.nn import functional as func
 from palframe.pytorch import *
 import torch
+from pytorch_transformers import (
+  RobertaModel as RoBERTaModel_en,
+  RobertaTokenizer as RoBERTaTokenizer_en
+)
+# From HuggingFace
+from transformers import (
+  BertModel as RoBERTaModel_zh,
+  BertTokenizer as RoBERTaTokenizer_zh
+)
 
 def nan_tensor():
   return torch.tensor(float("NaN"))

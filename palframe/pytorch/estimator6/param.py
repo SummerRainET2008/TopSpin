@@ -55,7 +55,7 @@ class ParamBase(abc.ABC):
 
     self.lr = 0.001
     self.gpu_num = 1
-    self.use_gpu = True
+    self.use_gpu = False
     # Mixed-precision optimization
     self.use_amp = True
     # Initialization model.
@@ -82,9 +82,13 @@ class ParamBase(abc.ABC):
 
     # Default settings that work fine.
     self.param_norm = 1
-    # Do not use it, as it will be allocated automatically,
+    # Training GPUs. Do not set it, as it will be set automatically,
     # except for debug mode.
     self.gpus = [0]
+    # Only support single-GPU inference. DataParallel is not applicable as
+    # it does not support module.parameters(), while in some important models,
+    # such as pytorch_transformers, they call module.parameters().
+    self.gpu_inference = 0
     self.batch_dim = 0
 
     # Distributed training.

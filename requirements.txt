@@ -64,10 +64,9 @@ tensorflow-estimator==2.3.0
 termcolor==1.1.0
 tokenizers==0.8.1rc1
 torch==1.7.1
-torchvision==0.7.0
+torchvision
 tqdm==4.54.1
 traitlets==5.0.5
-transformers==3.0.2
 typing==3.7.4.3
 urllib3==1.25.10
 wcwidth==0.2.5
@@ -75,3 +74,5 @@ Werkzeug==1.0.1
 wrapt==1.12.1
 zipp==3.1.0
 nvidia-ml-py3 
+pytorch-transformers==1.2.0
+transformers==3.5.1

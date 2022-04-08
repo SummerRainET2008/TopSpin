@@ -585,6 +585,13 @@ in `train_one_batch`, you should return `(loss, batch num)`, instead of just
 1. Training time prediction 
 
 1. Network efficiency estimate
+
+#### 16. Deployment
+A default PredictorBase is provided and we have preset some enviroment for you, such as
+set inference and no gradient.
+
+Each deployment supports only GPU and is defined as param.gpus[0]. 
+Thus, you should set proper param.gpus values. 
     
 ## Section 4. Config your linux server 
 

@@ -5,7 +5,7 @@ from palframe.pytorch.estimator2.model_wrapper import ModelWrapperBase
 from palframe.pytorch import *
 from torch.optim import Optimizer
 from torch.cuda import amp
-from transformers import get_cosine_schedule_with_warmup
+from pytorch_transformers import get_cosine_schedule_with_warmup
 
 class TrainerBase:
   def __init__(self,
