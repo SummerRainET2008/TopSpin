@@ -536,6 +536,70 @@ def timeout(func, args: list, max_time_seconds):
 
   raise TimeoutError()
 
+def is_wide_char(ch):
+  return unicodedata.east_asian_width(ch) in ['W', "F"]
+
+def get_console_text_length(text):
+  ext_len = sum([is_wide_char(e) for e in text])
+  return len(text) + ext_len
+
+def full_justify_zh_en(article: str, max_width)-> list:
+  def split(text):
+    text = text.strip()
+    console_len_sum = 0
+    for p, e in enumerate(text):
+      console_len_sum += 1
+      if is_wide_char(e):
+        console_len_sum += 1
+
+      # print(f"{console_len_sum}, {p}, '{e}', {char_type}, {text[: p + 1]}")
+
+      if console_len_sum == max_width:
+        return text[: p + 1], text[p + 1:]
+      elif console_len_sum == max_width + 1:
+        return text[: p], text[p:]
+
+    return text, ""
+
+  article = " ".join(article.split())
+  ret = []
+  remaining = article
+  while remaining != "":
+    text, remaining = split(remaining)
+    ret.append(text)
+
+  return ret
+
+def full_justify_en(article: str, max_width)-> list:
+  words = article.split()
+  buff, words_length = [], 0
+  ret, p = [], 0
+  while p < len(words):
+    w = words[p]
+    if words_length + len(w) + len(buff) <= max_width:
+      buff.append(w)
+      if p == len(words) - 1:
+        ret.append(" ".join(buff))
+      else:
+        words_length += len(w)
+      p += 1
+    elif buff == []:
+      assert words_length == 0
+      ret.append(w)
+      p += 1
+    else:
+      if len(buff) == 1:
+        ret.append(buff[0].rjust(max_width))
+      else:
+        blank = (max_width - words_length) // (len(buff) - 1)
+        mod = max_width - words_length - blank * (len(buff) - 1)
+        ret.append((" " * (blank + 1)).join(buff[: mod + 1]) +
+                   " " * blank + (" " * blank).join(buff[mod + 1:]))
+      buff = []
+      words_length = 0
+
+  return ret
+
 class Timer(object):
   def __init__(self, title="") -> None:
     self.title = title

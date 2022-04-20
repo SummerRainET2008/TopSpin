@@ -39,6 +39,7 @@ import threading
 import time
 import traceback
 import typing
+import unicodedata
 
 import palframe.__version__ as about
 from palframe.__version__ import __version__
