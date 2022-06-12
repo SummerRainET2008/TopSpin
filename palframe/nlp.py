@@ -6,6 +6,14 @@ from palframe import *
 INF         = float("inf")
 EPSILON     = 1e-6
 
+def load_module_from_full_path(path):
+  import importlib.util
+  path = os.path.abspath(path)
+  spec = importlib.util.spec_from_file_location("module.name", location=path)
+  foo = importlib.util.module_from_spec(spec)
+  spec.loader.exec_module(foo)
+  return foo
+
 class TerminalColors:
   HEADER    = '\033[95m'
   OKBLUE    = '\033[94m'
@@ -82,7 +90,7 @@ def histogram_ascii(points) -> None:
     ratio = v / sumv
     accum_sum += v
     bar_len = math.ceil(ratio / max_ratio * 120)
-    print(f"{index:7d} {k:10d} {ratio * 100:>7.2f} "
+    print(f"{index:7d} {k:>10} {ratio * 100:>7.2f} "
           f" {100 * accum_sum / sumv:>7.2f}  {'+' * bar_len} {counted[k]}")
 
   print()
@@ -671,3 +679,61 @@ class Logger:
     if Logger.level <= 3:
       print(get_log_time(), "ERR:", *args, file=Logger.outstream)
       Logger.outstream.flush()
+
+def top_k_max_or_min(data: list, k, type="max", to_sort=False,
+                     data_key_func=lambda d: d):
+  def top_k_largest(key_func):
+    if len(data) <= k:
+      return data
+
+    min_heap = []
+    for d in data:
+      key = key_func(d)
+      if len(min_heap) < k:
+        heapq.heappush(min_heap, (key, d))
+      elif key > min_heap[0][0]:
+        heapq.heappop(min_heap)
+        heapq.heappush(min_heap, (key, d))
+
+    if to_sort:
+      min_heap.sort(reverse=True)
+
+    return [d for _, d in min_heap]
+
+  if type == "max":
+    return top_k_largest(data_key_func)
+  elif type == "min":
+    key_func = lambda item: -data_key_func(item)
+    return top_k_largest(key_func)
+
+class DisjointSet:
+  def __init__(self, n):
+    self._fathers = {}
+    self._sizes = {}
+    self._clusters_num = n
+
+  def combine(self, a, b):
+    c1 = self.get_cluster_id(a)
+    c2 = self.get_cluster_id(b)
+    if c1 == c2:
+      return
+
+    if self._sizes.get(c1, 1) > self._sizes.get(c2, 1):
+      self.combine(b, a)
+      return
+
+    self._fathers[c1] = c2
+    self._sizes[c2] = self._sizes.get(c2, 1) + self._sizes.get(c1, 1)
+    self._clusters_num -= 1
+
+  def get_cluster_id(self, a):
+    father = self._fathers.get(a, -1)
+    if father == -1:
+      return a
+    cluster_id = self.get_cluster_id(father)
+    self._fathers[a] = cluster_id
+    return cluster_id
+
+  def get_cluster_num(self):
+    return self._clusters_num
+

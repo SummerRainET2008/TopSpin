@@ -47,7 +47,8 @@ def _get_vali_error(log_file):
     error = float(line.split()[10])
     return error
   except Exception as error:
-    Logger.warn(error)
+    # Logger.warn(error)
+    Logger.warn(f"No evaluation found in '{log_file}'")
     return 0
 
 def _get_netport(buffer=set()):
@@ -157,6 +158,7 @@ class _RunTaskThread(threading.Thread):
     param_file = f"{param.path_meta}/param.pkl"
     pickle.dump(param, open(param_file, "wb"))
     port = _get_netport()
+    pythonpath = ":".join(sys.path)
     server_ip = self._task._avail_server._ip
     Logger.info(f"Task[{self._thread_id}], pid={os.getpid()} "
                 f"'{param.path_work}' starts.")
@@ -169,8 +171,8 @@ class _RunTaskThread(threading.Thread):
     ).start()
 
     cmd = f"cd {os.getcwd()}; " \
-          f"PYTHONPATH=./:$PYTHONPATH " \
           f"DIST_RUN=1 " \
+          f"PYTHONPATH=./:{pythonpath} " \
           f"param_file={param_file} " \
           f"{sys.executable} -m " \
           f"torch.distributed.launch " \
@@ -211,7 +213,8 @@ class _RunTaskThread(threading.Thread):
 
 class RunManager:
   avail_opts = [
-    "no_GPU_check"
+    "no_GPU_check",
+    "run_tag"
   ]
 
   def __init__(self, tasks, servers, **kwargs):
@@ -231,14 +234,22 @@ class RunManager:
     Logger.info(f"#task: {len(tasks)}, #gpu: {num_gpu}")
 
     nlp.set_random_seeds(0)
-    run_tag = tasks[0]._param.run_tag
     self._run_id = random.randint(0, 1024 * 1024)
-    run_root_path = f"work/batch_task.{run_tag}.run_id_{self._run_id}"
+    run_root_path = [
+      f"work/batch_task",
+      f"run_id_{self._run_id}"
+    ]
+    run_tag = kwargs.get("run_tag", "")
+    if not nlp.is_none_or_empty(run_tag):
+      run_root_path.append(run_tag)
+    run_root_path = ".".join(run_root_path)
+
     nlp.mkdir(run_root_path)
     self._run_lock_file = f"{run_root_path}/.run.lock"
     for task in tasks:
-      task._param.path_work = task._param.path_work.replace("work",
-                                                            run_root_path)
+      task._param.path_work = task._param.path_work.replace(
+        "work", run_root_path
+      )
 
     self._tasks = tasks
     self._servers = servers
@@ -303,6 +314,7 @@ class RunManager:
         ret = task
     except Exception as error:
       Logger.error(error)
+      traceback.print_exc()
       ret = None
 
     finally:

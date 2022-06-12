@@ -1,5 +1,9 @@
 # Palframe
 ## Install palframe
+- Quick install
+
+ Download Palframe, and set `$PYTHONPATH`.
+
 - Install from source code
  ```shell script
     git http://code.paic.com.cn/git/pal_frame.git

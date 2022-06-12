@@ -87,6 +87,14 @@ class TrainerBase:
     self._user_model.set_device(self._device)
     self._model_size = nlp_torch.display_model_parameters(self._user_model)
 
+    if optimizer is not None:
+      self._optimizer = optimizer
+    else:
+      self._optimizer = getattr(torch.optim, param.optimizer_name)(
+        model.parameters(), lr=param.lr,
+        weight_decay=param.weight_decay
+      )
+
     if not nlp.is_none_or_empty(param.path_initial_model):
       '''
       If we loads a model as its initizaliazation, we ignore 
@@ -94,7 +102,12 @@ class TrainerBase:
       information in current stage.
       '''
       Logger.info(f"Loading initial model '{param.path_initial_model}'")
-      self._user_model.load_model(param.path_initial_model)
+      info = self._user_model.load_model(param.path_initial_model)
+      if info is not None and "optimizer_state" in info:
+        try:
+          self._optimizer.load_state_dict(info["optimizer_state"])
+        except:
+          pass
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
@@ -107,14 +120,6 @@ class TrainerBase:
 
     self._vali_error_history = []
     self._target_seen_sample_num = param.epoch_num * param.train_sample_num
-
-    if optimizer is not None:
-      self._optimizer = optimizer
-    else:
-      self._optimizer = getattr(torch.optim, param.optimizer_name)(
-        model.parameters(), lr=param.lr,
-        weight_decay=param.weight_decay
-      )
 
     if param.restore_from_last_train:
       Logger.info(f"{self._get_worker_info()} "

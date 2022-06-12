@@ -47,7 +47,8 @@ def _get_vali_error(log_file):
     error = float(line.split()[10])
     return error
   except Exception as error:
-    Logger.warn(error)
+    # Logger.warn(error)
+    Logger.warn(f"No evaluation found in '{log_file}'")
     return 0
 
 def _get_netport(buffer=set()):
@@ -157,6 +158,7 @@ class _RunTaskThread(threading.Thread):
     param_file = f"{param.path_meta}/param.pkl"
     pickle.dump(param, open(param_file, "wb"))
     port = _get_netport()
+    pythonpath = ":".join(sys.path)
     server_ip = self._task._avail_server._ip
     Logger.info(f"Task[{self._thread_id}], pid={os.getpid()} "
                 f"'{param.path_work}' starts.")
@@ -169,8 +171,8 @@ class _RunTaskThread(threading.Thread):
     ).start()
 
     cmd = f"cd {os.getcwd()}; " \
-          f"PYTHONPATH=./:$PYTHONPATH " \
           f"DIST_RUN=1 " \
+          f"PYTHONPATH=./:{pythonpath} " \
           f"param_file={param_file} " \
           f"{sys.executable} -m " \
           f"torch.distributed.launch " \
@@ -303,6 +305,7 @@ class RunManager:
         ret = task
     except Exception as error:
       Logger.error(error)
+      traceback.print_exc()
       ret = None
 
     finally:
