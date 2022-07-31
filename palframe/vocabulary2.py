@@ -1,14 +1,19 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 from palframe import nlp
-
 '''This class has added two special tokens, <empty> and <oov> by default.
 '''
+
+
 class Vocabulary:
-  def create_from_data(self, special_tokens: list, empty_word: str,
-                       oov_word: str, word2freq: dict, min_freq: int=0):
+  def create_from_data(self,
+                       special_tokens: list,
+                       empty_word: str,
+                       oov_word: str,
+                       word2freq: dict,
+                       min_freq: int = 0):
     self._word2id = {}
     self._words = []
 
@@ -30,12 +35,10 @@ class Vocabulary:
 
   def save_model(self, vob_file: str):
     nlp.write_pydict_file(
-      [self._word2id, self._words, self._empty_id, self._oov_id],
-      vob_file
-    )
+        [self._word2id, self._words, self._empty_id, self._oov_id], vob_file)
     print(f"wrote {self.size()} words to {vob_file}.")
 
-  def _add_word(self, word: str)-> int:
+  def _add_word(self, word: str) -> int:
     ''' add word if it does not exist, and then return its id.
     '''
     idx = self._word2id.get(word, None)
@@ -47,16 +50,17 @@ class Vocabulary:
     self._words.append(word)
     return id
 
-  def size(self)-> int:
+  def size(self) -> int:
     return len(self._words)
 
-  def get_word(self, idx: int)-> typing.Union[str, None]:
+  def get_word(self, idx: int) -> typing.Union[str, None]:
     return self._words[idx] if 0 <= idx < self.size() else None
 
-  def get_word_id(self, word: str)-> typing.Union[int, None]:
+  def get_word_id(self, word: str) -> typing.Union[int, None]:
     return self._word2id.get(word, None)
 
-  def get_word_ids(self, words: list, output_len: int, remove_oov: bool)-> list:
+  def get_word_ids(self, words: list, output_len: int,
+                   remove_oov: bool) -> list:
     '''
     :param output_len: < 0, keeping original length.
     '''
@@ -65,10 +69,9 @@ class Vocabulary:
       ids = [id for id in ids if id is not None]
     else:
       ids = [id if id is not None else self._oov_id for id in ids]
-      
+
     if output_len >= 0:
-      ids = ids[: output_len]
+      ids = ids[:output_len]
       ids.extend([self._empty_id] * (output_len - len(ids)))
-      
+
     return ids
-  

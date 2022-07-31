@@ -1,10 +1,11 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator6.param import ParamBase
 from palframe.pytorch.estimator6 import starter
 from palframe.pytorch import *
 import collections
+
 
 class ModelBase(nn.Module):
   def __init__(self, param: ParamBase):
@@ -69,4 +70,3 @@ class ModelBase(nn.Module):
 
     model_file = f"{param.path_model}/{model_name}"
     return self.load_model(model_file)
-

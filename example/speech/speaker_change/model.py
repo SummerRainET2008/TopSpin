@@ -3,6 +3,7 @@
 
 from example.speech.speaker_change import *
 
+
 class ConvBNBlock(nn.Module):
   def __init__(self,
                in_channels,
@@ -34,6 +35,7 @@ class ConvBNBlock(nn.Module):
     output = self.net(x)
     return output
 
+
 class SCDetConv(nn.Module):
   """
   Speaker Change Detector classifier
@@ -61,23 +63,21 @@ class SCDetConv(nn.Module):
       pad_size = (param.strides[i] * (conv_out_len - 1) - conv_out_len +
                   param.kernel_sizes[i]) // 2
       self.convolutions.append(
-        ConvBNBlock(conv_sizes[i],
-                    conv_sizes[i + 1],
-                    kernel_size=param.kernel_sizes[i],
-                    stride=param.strides[i],
-                    padding=pad_size,
-                    nonlinear=param.activation)
-      )
+          ConvBNBlock(conv_sizes[i],
+                      conv_sizes[i + 1],
+                      kernel_size=param.kernel_sizes[i],
+                      stride=param.strides[i],
+                      padding=pad_size,
+                      nonlinear=param.activation))
       # Work out the len of time axis of conv layer output
-      conv_out_len = int((
-        conv_out_len + 2 * pad_size - param.kernel_sizes[i]) / param.strides[i] + 1)
+      conv_out_len = int((conv_out_len + 2 * pad_size -
+                          param.kernel_sizes[i]) / param.strides[i] + 1)
 
     self.linears = nn.ModuleList()
     linear_sizes = [conv_sizes[-1] * conv_out_len] + param.linear_sizes + [1]
     for i in range(len(linear_sizes) - 1):
       self.linears.append(
-        nn.Linear(linear_sizes[i], linear_sizes[i + 1], bias=True)
-      )
+          nn.Linear(linear_sizes[i], linear_sizes[i + 1], bias=True))
     self._init_weights()
 
   def _init_weights(self):

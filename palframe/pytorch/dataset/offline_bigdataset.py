@@ -7,25 +7,26 @@ from palframe.pytorch import *
 from palframe.pytorch.dataset import *
 from palframe.pytorch.dataset.helper import *
 
+
 class Dataset(torch.utils.data.Dataset):
   '''
   When a single GPU worker cannot accomendate the whole data, but can
   for data/gpu_num, then use it.
   '''
-  def __init__(self,
-               feat_path,  # folder or file, or list
-               world_size=1,
-               rank=0,
-               shuffle: bool=True,
-               sample_filter_func=None):
+  def __init__(
+      self,
+      feat_path,  # folder or file, or list
+      world_size=1,
+      rank=0,
+      shuffle: bool = True,
+      sample_filter_func=None):
     '''
       keep the sample when sample_filter_func(sample) == True.
     '''
     all_feat_files = sorted(parse_feat_folder(feat_path))
     with nlp.Timer(f"Loading {feat_path}"):
-      self._data = self._load_data(
-        all_feat_files, world_size, rank, sample_filter_func
-      )
+      self._data = self._load_data(all_feat_files, world_size, rank,
+                                   sample_filter_func)
 
     estimated_total_data = len(self._data) * world_size
     Logger.info(f"rank={rank} has loaded {len(self._data)} samples, "
@@ -48,6 +49,7 @@ class Dataset(torch.utils.data.Dataset):
   def __getitem__(self, index):
     return self._data[index]
 
+
 def get_batch_data(feat_path,
                    epoch_num,
                    batch_size,
@@ -57,9 +59,6 @@ def get_batch_data(feat_path,
                    world_size,
                    pad_batch_data_func,
                    sample_filter_func=None):
-  dataset = Dataset(
-    feat_path, world_size, rank, shuffle, sample_filter_func
-  )
-  yield from get_batch_data_helper(
-    dataset, epoch_num, batch_size, worker_num, shuffle, pad_batch_data_func
-  )
+  dataset = Dataset(feat_path, world_size, rank, shuffle, sample_filter_func)
+  yield from get_batch_data_helper(dataset, epoch_num, batch_size, worker_num,
+                                   shuffle, pad_batch_data_func)

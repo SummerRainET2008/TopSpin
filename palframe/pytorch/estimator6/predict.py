@@ -1,9 +1,10 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch import *
 from palframe.pytorch.estimator6.model import ModelBase
 from palframe.pytorch.estimator6.param import ParamBase
+
 
 class PredictorBase:
   def __init__(self, model: ModelBase):
@@ -32,5 +33,5 @@ class PredictorBase:
     with torch.no_grad():
       return self._model(*batch)
 
-  def evaluate_file(self, data_file)-> float:
+  def evaluate_file(self, data_file) -> float:
     raise NotImplementedError()

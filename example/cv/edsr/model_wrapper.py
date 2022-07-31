@@ -36,7 +36,7 @@ class ModelWrapper(ModelWrapperBase):
     # result = Measure.calc_precision_recall_fvalue(all_true_labels,
     #                         all_pred_labels)
     sum_psnr = 0
-    for pred_l8_img, s2_img in zip(pred_l8_imgs,ground_truth):
+    for pred_l8_img, s2_img in zip(pred_l8_imgs, ground_truth):
       psnr = 10. * torch.log10(1 / torch.mean((pred_l8_img - s2_img)**2))
       sum_psnr += psnr
     avg_psnr = sum_psnr / len(ground_truth)
@@ -44,9 +44,9 @@ class ModelWrapper(ModelWrapperBase):
     avg_time = total_time / (len(ground_truth) + 1e-6)
     weighted_f = avg_psnr
     Logger.info(
-      f"eval: "
-      f"file={data_file} weighted_f={weighted_f} result={avg_psnr} "
-      f"total_time={total_time:.4f} secs avg_time={avg_time:.4f} sec/sample "
+        f"eval: "
+        f"file={data_file} weighted_f={weighted_f} result={avg_psnr} "
+        f"total_time={total_time:.4f} secs avg_time={avg_time:.4f} sec/sample "
     )
     Logger.info(f"WEIGHTED_F : {weighted_f}")
 

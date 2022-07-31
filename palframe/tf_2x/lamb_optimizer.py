@@ -1,12 +1,14 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 import re
 import six
 import tensorflow as tf
 
+
 class LAMBOptimizer:
   """LAMB (Layer-wise Adaptive Moments optimizer for Batch training)."""
+
   # A new optimizer that includes correct L2 weight decay, adaptive
   # element-wise updating, and layer-wise justification. The LAMB optimizer
   # was proposed by Yang You, Jing Li, Jonathan Hseu, Xiaodan Song,
@@ -14,14 +16,14 @@ class LAMBOptimizer:
   # Pre-Training Time from 3 Days to 76 Minutes (arxiv.org/abs/1904.00962)
 
   def __init__(
-    self,
-    learning_rate,
-    weight_decay_rate=0.0,
-    beta_1=0.9,
-    beta_2=0.999,
-    epsilon=1e-6,
-    exclude_from_weight_decay=None,
-    exclude_from_layer_adaptation=["LayerNorm", "layer_norm", "bias"],
+      self,
+      learning_rate,
+      weight_decay_rate=0.0,
+      beta_1=0.9,
+      beta_2=0.999,
+      epsilon=1e-6,
+      exclude_from_weight_decay=None,
+      exclude_from_layer_adaptation=["LayerNorm", "layer_norm", "bias"],
   ):
     """Constructs a LAMBOptimizer."""
     # super(LAMBOptimizer, self).__init__(False, name)
@@ -44,16 +46,16 @@ class LAMBOptimizer:
       return buff[param_name]
 
     m = tf.Variable(
-      initial_value=tf.zeros_like(param),
-      trainable=False,
-      name=param_name + "/adam_m",
-      dtype=tf.float32,
+        initial_value=tf.zeros_like(param),
+        trainable=False,
+        name=param_name + "/adam_m",
+        dtype=tf.float32,
     )
     v = tf.Variable(
-      initial_value=tf.zeros_like(param),
-      trainable=False,
-      name=param_name + "/adam_v",
-      dtype=tf.float32,
+        initial_value=tf.zeros_like(param),
+        trainable=False,
+        name=param_name + "/adam_v",
+        dtype=tf.float32,
     )
     buff[param_name] = [m, v]
 
@@ -70,13 +72,10 @@ class LAMBOptimizer:
       m, v = self._get_variable(param_name, param)
 
       # Standard Adam update.
-      next_m = (
-        tf.multiply(self.beta_1, m) + tf.multiply(1.0 - self.beta_1, grad)
-      )
-      next_v = (
-        tf.multiply(self.beta_2, v) +
-        tf.multiply(1.0 - self.beta_2, tf.square(grad))
-      )
+      next_m = (tf.multiply(self.beta_1, m) +
+                tf.multiply(1.0 - self.beta_1, grad))
+      next_v = (tf.multiply(self.beta_2, v) +
+                tf.multiply(1.0 - self.beta_2, tf.square(grad)))
 
       update = next_m / (tf.sqrt(next_v) + self.epsilon)
 
@@ -95,10 +94,8 @@ class LAMBOptimizer:
         w_norm = tf.linalg.norm(param, ord=2)
         g_norm = tf.linalg.norm(update, ord=2)
         ratio = tf.where(
-          tf.greater(w_norm, 0),
-          tf.where(tf.greater(g_norm, 0), (w_norm / g_norm), 1.0),
-          1.0
-        )
+            tf.greater(w_norm, 0),
+            tf.where(tf.greater(g_norm, 0), (w_norm / g_norm), 1.0), 1.0)
 
       lr = self._hyper["learning_rate"]
       update_with_lr = ratio * lr * update
@@ -106,8 +103,9 @@ class LAMBOptimizer:
       next_param = param - update_with_lr
 
       assignments.extend(
-        [param.assign(next_param), m.assign(next_m), v.assign(next_v)]
-      )
+          [param.assign(next_param),
+           m.assign(next_m),
+           v.assign(next_v)])
 
     return tf.group(*assignments, name=name)
 

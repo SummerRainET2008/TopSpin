@@ -1,10 +1,11 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch import *
 from torch.multiprocessing import Process
 
-def ring_reduce(data, rank_list: list=None):
+
+def ring_reduce(data, rank_list: list = None):
   world_size = dist.get_world_size()
   if rank_list is None:
     rank_list = list(range(world_size))
@@ -12,7 +13,7 @@ def ring_reduce(data, rank_list: list=None):
   rank_pos = rank_list.index(rank)
   assert rank_pos != -1
 
-  left_rank  = rank_list[rank_pos - 1]
+  left_rank = rank_list[rank_pos - 1]
   right_rank = rank_list[(rank_pos + 1) % len(rank_list)]
 
   send_buff = data.clone()
@@ -29,6 +30,7 @@ def ring_reduce(data, rank_list: list=None):
 
     data += recv_buff
     send_buff, recv_buff = recv_buff, send_buff
+
 
 def group_ring_reduce(data, group_size=4):
   world_size = dist.get_world_size()
@@ -50,6 +52,7 @@ def group_ring_reduce(data, group_size=4):
     head_rank = (rank // group_size) * group_size
     dist.send(data, head_rank)
     dist.recv(data, head_rank)
+
 
 def tree_reduce(data, buff={}):
   class TreeNode:
@@ -77,7 +80,7 @@ def tree_reduce(data, buff={}):
     return leaf_nodes
 
   if "leaf_nodes" not in buff:
-    leaf_nodes  = create_tree(dist.get_world_size())
+    leaf_nodes = create_tree(dist.get_world_size())
     buff["leaf_nodes"] = leaf_nodes
 
   rank = dist.get_rank()
@@ -100,5 +103,3 @@ def tree_reduce(data, buff={}):
   while current_node.right_son is not None:
     dist.send(data, current_node.right_son.rank)
     current_node = current_node.left_son
-
-

@@ -7,6 +7,7 @@ from example.speech.speaker_change.param import Param
 from example.speech.speaker_change.model_wrapper import ModelWrapper
 from example.speech.speaker_change.model import SCDetConv as Model
 
+
 class Predictor(PredictorBase):
   def __init__(self):
     param = Param.get_instance()
@@ -14,6 +15,7 @@ class Predictor(PredictorBase):
     super(Predictor, self).__init__(model_wrapper)
     self._param = model_wrapper._param
     self._device = model_wrapper._device
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
@@ -23,9 +25,8 @@ def main():
 
   predictor = Predictor()
   for file in predictor._param.test_files:
-    predictor.evaluate_file(
-      file
-    )
+    predictor.evaluate_file(file)
+
 
 if __name__ == '__main__':
-    main()
+  main()

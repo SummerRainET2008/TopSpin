@@ -1,9 +1,10 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator5.param import ParamBase
 from palframe.pytorch.estimator5 import starter
 from palframe.pytorch import *
+
 
 class ModelWrapperBase:
   def __init__(self, param: ParamBase, user_model_cls):
@@ -23,7 +24,8 @@ class ModelWrapperBase:
 
       if not param.is_instance():
         if param.restore_from_last_train:
-          Logger.error(f"Restore_from_last_train does not support ParamerRange")
+          Logger.error(
+              f"Restore_from_last_train does not support ParamerRange")
           assert False
 
         param_instance = next(param.generate_all_variants())
@@ -58,8 +60,9 @@ class ModelWrapperBase:
     if not param.use_gpu:
       self._device = torch.device("cpu")
       self._dist_model = torch.nn.parallel.DistributedDataParallel(
-        user_model, bucket_cap_mb=param.bucket_cap_mb,
-        find_unused_parameters=param.find_unused_parameters,
+          user_model,
+          bucket_cap_mb=param.bucket_cap_mb,
+          find_unused_parameters=param.find_unused_parameters,
       )
     else:
       gpu_id = param.gpus[self._local_rank]
@@ -67,9 +70,11 @@ class ModelWrapperBase:
       torch.cuda.set_device(self._device)
       user_model = user_model.to(self._device)
       self._dist_model = torch.nn.parallel.DistributedDataParallel(
-        user_model, device_ids=[gpu_id], output_device=gpu_id,
-        bucket_cap_mb=param.bucket_cap_mb,
-        find_unused_parameters=param.find_unused_parameters,
+          user_model,
+          device_ids=[gpu_id],
+          output_device=gpu_id,
+          bucket_cap_mb=param.bucket_cap_mb,
+          find_unused_parameters=param.find_unused_parameters,
       )
 
     self._param = param
@@ -95,17 +100,16 @@ class ModelWrapperBase:
     if nlp.is_none_or_empty(param.servers_file):
       server_ips = set(["127.0.0.1"])
     else:
-      server_ips = set(sum([open(f).read().split()
-                            for f in param.servers_file.split(",")], []))
+      server_ips = set(
+          sum([open(f).read().split() for f in param.servers_file.split(",")],
+              []))
     addrs = psutil.net_if_addrs()
 
     for net_name, attr in addrs.items():
       if attr[0].address in server_ips:
         return net_name
     else:
-      Logger.error(
-        "Cannot find a suitable net_name, please set manually."
-      )
+      Logger.error("Cannot find a suitable net_name, please set manually.")
       assert False
 
   def _set_train(self):
@@ -179,15 +183,12 @@ class ModelWrapperBase:
       name = f'model_{model_seen_sample_num:015}.{tag}.pt'
     else:
       name = f'model_{model_seen_sample_num:015}.pt'
-    nlp.execute_cmd(
-      f"echo {name} >> {param.path_model}/checkpoint"
-    )
+    nlp.execute_cmd(f"echo {name} >> {param.path_model}/checkpoint")
 
     torch.save(info, os.path.join(param.path_model, name))
 
     model_names = open(f"{param.path_model}/checkpoint").read().split()
-    for name in model_names[: -param.model_saved_num]:
+    for name in model_names[:-param.model_saved_num]:
       model_file = f"{param.path_model}/{name}"
       if os.path.isfile(model_file):
         nlp.execute_cmd(f"rm {model_file}")
-

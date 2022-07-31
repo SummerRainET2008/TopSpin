@@ -4,8 +4,9 @@ from palframe import nlp
 from palframe.pytorch.dataset import *
 from palframe.nlp import Logger
 
+
 def parse_feat_folder(feat_path: typing.Union[list, str, None],
-                      valid_file_extention: typing.List=["pkl", "pydict"]):
+                      valid_file_extention: typing.List = ["pkl", "pydict"]):
   if nlp.is_none_or_empty(feat_path):
     return []
 
@@ -33,12 +34,11 @@ def parse_feat_folder(feat_path: typing.Union[list, str, None],
 
       else:
         full_files = list(
-          nlp.get_files_in_folder(feat_path, valid_file_extention, True)
-        )
+            nlp.get_files_in_folder(feat_path, valid_file_extention, True))
         rel_files = [f[len(feat_path) + 1:] for f in full_files]
         meta = {
-          "valid_file_extention": valid_file_extention,
-          "files": rel_files
+            "valid_file_extention": valid_file_extention,
+            "files": rel_files
         }
         pickle.dump(meta, open(meta_file, "wb"))
         return full_files
@@ -57,17 +57,16 @@ def parse_feat_folder(feat_path: typing.Union[list, str, None],
       ret.extend(parse_feat_folder(f, valid_file_extention))
     return ret
 
-def get_batch_data_helper(dataset,
-                          epoch_num,
-                          batch_size,
-                          worker_num,
-                          shuffle: bool,
-                          pad_batch_data_func):
+
+def get_batch_data_helper(dataset, epoch_num, batch_size, worker_num,
+                          shuffle: bool, pad_batch_data_func):
   for epoch_id in range(epoch_num):
     data_iter = torch.utils.data.DataLoader(
-      dataset, batch_size, shuffle=shuffle,
-      num_workers=0 if nlp.is_debugging() else worker_num,
-      collate_fn=pad_batch_data_func,
+        dataset,
+        batch_size,
+        shuffle=shuffle,
+        num_workers=0 if nlp.is_debugging() else worker_num,
+        collate_fn=pad_batch_data_func,
     )
     for b in data_iter:
       yield epoch_id, b

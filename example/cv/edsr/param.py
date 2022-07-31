@@ -4,10 +4,10 @@
 from os import path
 from palframe.pytorch.estimator5.param import ParamBase
 
+
 class Param(ParamBase):
   def __init__(self):
-    super(Param, self).__init__("paltest",
-                  experiment_folder="exp")
+    super(Param, self).__init__("paltest", experiment_folder="exp")
 
     ################ training related settings ################
     self.gpu_num = 1

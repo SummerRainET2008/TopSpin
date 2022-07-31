@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator6.model import ModelBase
 from palframe.pytorch.estimator6.predict import PredictorBase
@@ -13,11 +13,10 @@ from palframe.pytorch.estimator6 import starter
 from torch import autograd
 from filelock import FileLock
 
+
 class TrainerBase:
   @starter.exception_stop
-  def __init__(self,
-               model: ModelBase,
-               user_predictor_cls,
+  def __init__(self, model: ModelBase, user_predictor_cls,
                optimizer: typing.Union[Optimizer, None]):
     param = model._param
     self._param = param
@@ -34,13 +33,13 @@ class TrainerBase:
     if debug_mode:
       current_env = os.environ
       current_env["MASTER_ADDR"] = "127.0.0.1"
-      current_env["MASTER_PORT"] = f"{random.randint(1024, 1024 * 1024)}"
+      current_env["MASTER_PORT"] = f"{random.randint(1000, 10_000)}"
       current_env["WORLD_SIZE"] = "1"
       current_env["RANK"] = "0"
       current_env["LOCAL_RANK"] = "0"
 
       param.gpu_num = 1
-      param.gpus = param.gpus[: 1]
+      param.gpus = param.gpus[:1]
 
       param.create_workspace()
 
@@ -70,8 +69,9 @@ class TrainerBase:
       self._device = torch.device("cpu")
       self._user_model = model
       self._model = torch.nn.parallel.DistributedDataParallel(
-        self._user_model, bucket_cap_mb=param.bucket_cap_mb,
-        find_unused_parameters=param.find_unused_parameters,
+          self._user_model,
+          bucket_cap_mb=param.bucket_cap_mb,
+          find_unused_parameters=param.find_unused_parameters,
       )
     else:
       gpu_id = param.gpus[self._local_rank]
@@ -79,9 +79,11 @@ class TrainerBase:
       torch.cuda.set_device(self._device)
       self._user_model = model.to(self._device)
       self._model = torch.nn.parallel.DistributedDataParallel(
-        self._user_model, device_ids=[gpu_id], output_device=gpu_id,
-        bucket_cap_mb=param.bucket_cap_mb,
-        find_unused_parameters=param.find_unused_parameters,
+          self._user_model,
+          device_ids=[gpu_id],
+          output_device=gpu_id,
+          bucket_cap_mb=param.bucket_cap_mb,
+          find_unused_parameters=param.find_unused_parameters,
       )
 
     self._user_model.set_device(self._device)
@@ -91,9 +93,7 @@ class TrainerBase:
       self._optimizer = optimizer
     else:
       self._optimizer = getattr(torch.optim, param.optimizer_name)(
-        model.parameters(), lr=param.lr,
-        weight_decay=param.weight_decay
-      )
+          model.parameters(), lr=param.lr, weight_decay=param.weight_decay)
 
     if not nlp.is_none_or_empty(param.path_initial_model):
       '''
@@ -119,7 +119,13 @@ class TrainerBase:
     self._figure_data["loss"] = self._loss_history
 
     self._vali_error_history = []
-    self._target_seen_sample_num = param.epoch_num * param.train_sample_num
+
+    if param.epoch_num is not None:
+      self._target_seen_sample_num = param.epoch_num * param.train_sample_num
+    else:
+      self._target_seen_sample_num = param.max_train_step * self._world_size * param.batch_size
+      param.epoch_num = math.ceil(self._target_seen_sample_num /
+                                  param.train_sample_num)
 
     if param.restore_from_last_train:
       Logger.info(f"{self._get_worker_info()} "
@@ -127,7 +133,7 @@ class TrainerBase:
       info = self._user_model.load_model_from_folder()
       if info is not None:
         self._model_seen_sample_num = info["model_seen_sample_num"]
-        self._opt_evaluate_error  = info["opt_evaluate_error"]
+        self._opt_evaluate_error = info["opt_evaluate_error"]
         self._last_evaluate_point = info["last_evaluate_point"]
 
         if "figure_data" in info:
@@ -170,8 +176,12 @@ class TrainerBase:
       files = parse_feat_folder(param.test_files)
       assert len(files) > 0, "Wrong param.test_files"
 
+    if int(param.epoch_num is None) + int(param.max_train_step is None) != 1:
+      assert False, \
+        "param.epoch_num and param.max_train_step can not be None or not None " \
+        "AT THE SAME TIME"
+
     assert param.train_sample_num is not None
-    assert param.epoch_num is not None
     assert param.eval_gap_sample_num is not None, \
       "You can set as 'self.train_sample_num"
     if param.use_gpu:
@@ -197,15 +207,13 @@ class TrainerBase:
         eval_error = predictor.evaluate_file(param.vali_file)
 
       self._figure_data[f"vali_file.{param.vali_file}"].append(
-        [self._batch_id, -eval_error]
-      )
+          [self._batch_id, -eval_error])
       self._vali_error_history.append(eval_error)
       if eval_error > 0:
         Logger.error(f"evaluate_file() should return a negative value")
         assert False
-      self._writer.add_scalar(
-        f"eval '{param.vali_file}'", eval_error, self._model_seen_sample_num
-      )
+      self._writer.add_scalar(f"eval '{param.vali_file}'", eval_error,
+                              self._model_seen_sample_num)
       if eval_error < self._opt_evaluate_error:
         self._opt_evaluate_error = eval_error
         self._save_model()
@@ -225,9 +233,8 @@ class TrainerBase:
         param.gpu_inference = param.gpus[0]
         param.path_inference_model = ""
         predictor = self._user_predictor_cls(param)
-        predictor._model.load_state_dict(
-          self._user_model.state_dict(), strict=True
-        )
+        predictor._model.load_state_dict(self._user_model.state_dict(),
+                                         strict=True)
       else:
         predictor = None
 
@@ -235,21 +242,19 @@ class TrainerBase:
       for test_file in parse_feat_folder(self._param.test_files):
         with torch.no_grad():
           eval_error = predictor.evaluate_file(test_file)
-          self._writer.add_scalar(
-            f"eval '{test_file}'", eval_error, self._model_seen_sample_num
-          )
+          self._writer.add_scalar(f"eval '{test_file}'", eval_error,
+                                  self._model_seen_sample_num)
           self._figure_data[f"test_file.{test_file}"].append(
-            [self._batch_id, -eval_error]
-          )
+              [self._batch_id, -eval_error])
 
       predictor = None
       self._model.train()
       torch.cuda.empty_cache()
 
-  def _train_one_batch(self, *batch)-> dict:
+  def _train_one_batch(self, *batch) -> dict:
     raise NotImplementedError()
 
-  def _train_one_batch_check(self, *batch)-> dict:
+  def _train_one_batch_check(self, *batch) -> dict:
     def tracer(frame, event, arg):
       if event == "return":
         local_vars[0] = frame.f_locals
@@ -282,29 +287,26 @@ class TrainerBase:
       with FileLock(f"{self._param.bug_lock_file}"):
         Logger.info(f"Saving debugging batch data to {self._param.path_bug}")
         pickle.dump(
-          batch,
-          open(
-            f"{self._param.path_bug}/"
-            f"batch.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
-            "wb"
-          )
-        )
+            batch,
+            open(
+                f"{self._param.path_bug}/"
+                f"batch.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
+                "wb"))
 
         Logger.info(f"Saving local_vars data to {self._param.path_bug}")
         if local_vars[0] is not None:
           local_vars = local_vars[0]
           clean_local_vars = {
-            k: v for k, v in local_vars.items()
-            if type(v) in {int, float, str, list, dict, tuple, torch.Tensor}
+              k: v
+              for k, v in local_vars.items()
+              if type(v) in {int, float, str, list, dict, tuple, torch.Tensor}
           }
           pickle.dump(
-            clean_local_vars,
-            open(
-              f"{self._param.path_bug}/"
-              f"local_vars.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
-              "wb"
-            )
-          )
+              clean_local_vars,
+              open(
+                  f"{self._param.path_bug}/"
+                  f"local_vars.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
+                  "wb"))
 
         Logger.info("Saving debugging model")
         self._save_model(tag=f"rank_{self._rank}")
@@ -323,15 +325,15 @@ class TrainerBase:
   def _get_batches_data(self):
     def get_one_batch():
       train_data_iter = self._get_training_data(
-        rank=dist.get_rank(), world_size=dist.get_world_size(),
+          rank=dist.get_rank(),
+          world_size=dist.get_world_size(),
       )
       for epoch_id, batch in train_data_iter:
         batch = [e.to(self._device) for e in batch]
         yield batch
 
-    yield from nlp.next_batch(
-      get_one_batch(), self._param.iter_num_update_optimizer
-    )
+    yield from nlp.next_batch(get_one_batch(),
+                              self._param.iter_num_update_optimizer)
 
   def _get_training_data(self, rank: int, world_size: int):
     '''
@@ -466,9 +468,8 @@ class TrainerBase:
       if self._batch_id > 0 and self._batch_id % 100 == 0:
         self._draw_figure()
 
-      total_norm = torch.nn.utils.clip_grad_norm_(
-        self._model.parameters(), param.param_norm
-      )
+      total_norm = torch.nn.utils.clip_grad_norm_(self._model.parameters(),
+                                                  param.param_norm)
       if nlp.eq(total_norm, 0):
         Logger.warn(f"total_norm(parameters.grad)={total_norm}")
 
@@ -484,7 +485,8 @@ class TrainerBase:
       remaining_time = a * b
       progress = self._model_seen_sample_num / self._target_seen_sample_num
       if self._rank == 0:
-        self._writer.add_scalar("loss", batch_loss, self._model_seen_sample_num)
+        self._writer.add_scalar("loss", batch_loss,
+                                self._model_seen_sample_num)
 
       mini_batch_num = len(mini_batch_train_time)
       if mini_batch_num > 1:
@@ -492,30 +494,26 @@ class TrainerBase:
           sum(mini_batch_train_time[: -1]) / (mini_batch_num - 1)
         est_net_time = max(0, mini_batch_train_time[-1] - avg_mini_batch_time)
         Logger.info(
-          f"Forward and backward time for {current_batch_size} samples is "
-          f"{avg_mini_batch_time * mini_batch_num: .2f} seconds."
-        )
+            f"Forward and backward time for {current_batch_size} samples is "
+            f"{avg_mini_batch_time * mini_batch_num: .2f} seconds.")
         Logger.info(
-          f"Estimated network gradient sync time: {est_net_time:.2f} seconds "
-          f"for {self._world_size} GPUs, "
-          f"taking {100 * est_net_time / batch_duration:.2f} %."
-        )
+            f"Estimated network gradient sync time: {est_net_time:.2f} seconds "
+            f"for {self._world_size} GPUs, "
+            f"taking {100 * est_net_time / batch_duration:.2f} %.")
 
       self._memory_information()
       Logger.info(
-        f"Training time: {nlp.to_readable_time(train_duration)}, "
-        f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"Training time: {nlp.to_readable_time(train_duration)}, "
+          f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
       )
-      Logger.info(
-        f"{self._get_worker_info()}: "
-        f"*Epoch: {epoch_id:.2f}, "
-        f"batch_id: {self._batch_id:_}, "
-        f"progress: {progress * 100:.2f} %, "
-        f"sample_num: {self._model_seen_sample_num:_} "
-        f"batch_size: [{current_batch_size} {real_batch_size}], "
-        f"loss: {batch_loss:.4f}, "
-        f"batch time: {batch_duration:.4f} "
-      )
+      Logger.info(f"{self._get_worker_info()}: "
+                  f"*Epoch: {epoch_id:.2f}, "
+                  f"batch_id: {self._batch_id:_}, "
+                  f"progress: {progress * 100:.2f} %, "
+                  f"sample_num: {self._model_seen_sample_num:_} "
+                  f"batch_size: [{current_batch_size} {real_batch_size}], "
+                  f"loss: {batch_loss:.4f}, "
+                  f"batch time: {batch_duration:.4f} ")
       Logger.info("-" * 128)
 
       if self._when_evaluate():
@@ -529,10 +527,8 @@ class TrainerBase:
         break
 
       is_early_stop = self._early_stop(
-        self._model_seen_sample_num // self._param.train_sample_num,
-        self._loss_history,
-        self._vali_error_history
-      )
+          self._model_seen_sample_num // self._param.train_sample_num,
+          self._loss_history, self._vali_error_history)
       if self._check_sync_stop_condition(is_early_stop):
         Logger.info(f"{self._get_worker_info()}: early stopped")
         break
@@ -544,9 +540,8 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;" 
-      f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error"
-    )
+        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+        f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error")
     Logger.info(f"Training is Done.")
     nlp.command(f"touch {param.path_meta}/train.done")
 
@@ -566,9 +561,8 @@ class TrainerBase:
       speed = (buff["memory"].free - m.free) / (time.time() - buff["time"])
       depletion_time = m.free / (speed + 1e-6)
       Logger.warn(
-        f"free memory: {m.free:_} B, {round(m.free / 1024 ** 3, 2)} GB, "
-        f"depletion time: {nlp.to_readable_time(depletion_time)}."
-      )
+          f"free memory: {m.free:_} B, {round(m.free / 1024 ** 3, 2)} GB, "
+          f"depletion time: {nlp.to_readable_time(depletion_time)}.")
       buff["memory"] = m
       buff["time"] = time.time()
 
@@ -577,7 +571,8 @@ class TrainerBase:
       Logger.warn(f"memory: {used_memory:_} KB, "
                   f"{round(used_memory / 1024 ** 3, 2)} GB.")
 
-  def _early_stop(self, epoch_id, loss_history: list, vali_error_history: list):
+  def _early_stop(self, epoch_id, loss_history: list,
+                  vali_error_history: list):
     return False
 
   def _check_sync_stop_condition(self, bool_cond):
@@ -585,7 +580,7 @@ class TrainerBase:
     value = self._sync_value(value)
     return value < self._world_size
 
-  def _sync_value(self, single_value, reduce_op: str="sum"):
+  def _sync_value(self, single_value, reduce_op: str = "sum"):
     ts = torch.tensor(single_value, device=self._device)
     torch.distributed.all_reduce(ts)
     value = ts.item()
@@ -658,13 +653,11 @@ class TrainerBase:
       return
 
     with nlp.Timer("Draw training loss"):
-      pickle.dump(
-        self._figure_data, open(f"{self._param.path_meta}/figure.data", "wb")
-      )
+      pickle.dump(self._figure_data,
+                  open(f"{self._param.path_meta}/figure.data", "wb"))
       out_file = os.path.join(
-        self._param.path_work,
-        os.path.split(self._param.path_work)[1] + ".train.loss.png"
-      )
+          self._param.path_work,
+          os.path.split(self._param.path_work)[1] + ".train.loss.png")
 
       figure_data = {}
       for line_id, key in enumerate(sorted(self._figure_data.keys())):
@@ -677,12 +670,12 @@ class TrainerBase:
       return
 
     info = {
-      "batch_id": self._batch_id,
-      "model_seen_sample_num": self._model_seen_sample_num,
-      "opt_evaluate_error": self._opt_evaluate_error,
-      "last_evaluate_point": self._last_evaluate_point,
-      "figure_data": self._figure_data,
-      "optimizer_state": self._optimizer.state_dict(),
+        "batch_id": self._batch_id,
+        "model_seen_sample_num": self._model_seen_sample_num,
+        "opt_evaluate_error": self._opt_evaluate_error,
+        "last_evaluate_point": self._last_evaluate_point,
+        "figure_data": self._figure_data,
+        "optimizer_state": self._optimizer.state_dict(),
     }
 
     model_seen_sample_num = self._model_seen_sample_num
@@ -691,14 +684,12 @@ class TrainerBase:
       name = f'model_{model_seen_sample_num:015}.{tag}.pt'
     else:
       name = f'model_{model_seen_sample_num:015}.pt'
-    nlp.execute_cmd(
-      f"echo {name} >> {param.path_model}/checkpoint"
-    )
+    nlp.execute_cmd(f"echo {name} >> {param.path_model}/checkpoint")
 
     torch.save(info, os.path.join(param.path_model, name))
 
     model_names = open(f"{param.path_model}/checkpoint").read().split()
-    for name in model_names[: -param.model_saved_num]:
+    for name in model_names[:-param.model_saved_num]:
       model_file = f"{param.path_model}/{name}"
       if os.path.isfile(model_file):
         nlp.execute_cmd(f"rm {model_file}")
@@ -722,15 +713,14 @@ class TrainerBase:
     if nlp.is_none_or_empty(param.servers_file):
       server_ips = set(["127.0.0.1"])
     else:
-      server_ips = set(sum([open(f).read().split()
-                            for f in param.servers_file.split(",")], []))
+      server_ips = set(
+          sum([open(f).read().split() for f in param.servers_file.split(",")],
+              []))
     addrs = psutil.net_if_addrs()
 
     for net_name, attr in addrs.items():
       if attr[0].address in server_ips:
         return net_name
     else:
-      Logger.error(
-        "Cannot find a suitable net_name, please set manually."
-      )
+      Logger.error("Cannot find a suitable net_name, please set manually.")
       assert False

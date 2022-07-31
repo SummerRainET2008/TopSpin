@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 from palframe.pytorch.estimator5.draw_figure import draw_figure
@@ -11,12 +11,13 @@ from palframe.pytorch.estimator5 import starter
 from torch import autograd
 from filelock import FileLock
 
+
 class TrainerBase:
   @starter.exception_stop
   def __init__(self,
                model_wrapper: ModelWrapperBase,
                train_data_iter,
-               optimizer: typing.Union[Optimizer, None]=None):
+               optimizer: typing.Union[Optimizer, None] = None):
     param = model_wrapper._param
     self._param = param
     self._check_param_validity()
@@ -30,17 +31,15 @@ class TrainerBase:
     self._rank = dist.get_rank()
     self._world_size = dist.get_world_size()
 
-    self._model_size = nlp_torch.display_model_parameters(
-      model_wrapper._model
-    )
+    self._model_size = nlp_torch.display_model_parameters(model_wrapper._model)
 
     if optimizer is not None:
       self._optimizer = optimizer
     else:
       self._optimizer = getattr(torch.optim, param.optimizer_name)(
-        model_wrapper._model.parameters(), lr=param.lr,
-        weight_decay=param.weight_decay
-      )
+          model_wrapper._model.parameters(),
+          lr=param.lr,
+          weight_decay=param.weight_decay)
 
     if not nlp.is_none_or_empty(param.path_initial_model):
       '''
@@ -74,7 +73,7 @@ class TrainerBase:
       info = model_wrapper._load_model_folder()
       if info is not None:
         self._model_seen_sample_num = info["model_seen_sample_num"]
-        self._opt_evaluate_error  = info["opt_evaluate_error"]
+        self._opt_evaluate_error = info["opt_evaluate_error"]
         self._last_evaluate_point = info["last_evaluate_point"]
 
         if "figure_data" in info:
@@ -137,12 +136,12 @@ class TrainerBase:
 
   def _try_to_save_best_model(self):
     info = {
-      "batch_id": self._batch_id,
-      "model_seen_sample_num": self._model_seen_sample_num,
-      "opt_evaluate_error": self._opt_evaluate_error,
-      "last_evaluate_point": self._last_evaluate_point,
-      "figure_data": self._figure_data,
-      "optimizer_state": self._optimizer.state_dict(),
+        "batch_id": self._batch_id,
+        "model_seen_sample_num": self._model_seen_sample_num,
+        "opt_evaluate_error": self._opt_evaluate_error,
+        "last_evaluate_point": self._last_evaluate_point,
+        "figure_data": self._figure_data,
+        "optimizer_state": self._optimizer.state_dict(),
     }
     param = self._model_wrapper._param
 
@@ -153,16 +152,14 @@ class TrainerBase:
       with torch.no_grad():
         eval_error = self._model_wrapper.evaluate_file(param.vali_file)
         self._figure_data[f"vali_file.{param.vali_file}"].append(
-          [self._batch_id, -eval_error]
-        )
+            [self._batch_id, -eval_error])
 
         self._vali_error_history.append(eval_error)
         if eval_error > 0:
           Logger.error(f"evaluate_file() should return a negative value")
           assert False
-        self._writer.add_scalar(
-          f"eval '{param.vali_file}'", eval_error, self._model_seen_sample_num
-        )
+        self._writer.add_scalar(f"eval '{param.vali_file}'", eval_error,
+                                self._model_seen_sample_num)
       if eval_error < self._opt_evaluate_error:
         self._opt_evaluate_error = eval_error
         self._model_wrapper._save_model(info)
@@ -176,23 +173,22 @@ class TrainerBase:
       self._model_wrapper._set_inference()
 
       self._try_to_save_best_model()
-      for test_file in parse_feat_folder(self._model_wrapper._param.test_files):
+      for test_file in parse_feat_folder(
+          self._model_wrapper._param.test_files):
         with torch.no_grad():
           eval_error = self._model_wrapper.evaluate_file(test_file)
-          self._writer.add_scalar(
-            f"eval '{test_file}'", eval_error, self._model_seen_sample_num
-          )
+          self._writer.add_scalar(f"eval '{test_file}'", eval_error,
+                                  self._model_seen_sample_num)
           self._figure_data[f"test_file.{test_file}"].append(
-            [self._batch_id, -eval_error]
-          )
+              [self._batch_id, -eval_error])
 
       self._model_wrapper._set_train()
       torch.cuda.empty_cache()
 
-  def train_one_batch(self, *batch)-> dict:
+  def train_one_batch(self, *batch) -> dict:
     raise NotImplementedError()
 
-  def _train_one_batch_check(self, *batch)-> dict:
+  def _train_one_batch_check(self, *batch) -> dict:
     def tracer(frame, event, arg):
       if event == "return":
         local_vars[0] = frame.f_locals
@@ -225,35 +221,32 @@ class TrainerBase:
       with FileLock(f"{self._param.bug_lock_file}"):
         Logger.info(f"Saving debugging batch data to {self._param.path_bug}")
         pickle.dump(
-          batch,
-          open(
-            f"{self._param.path_bug}/"
-            f"batch.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
-            "wb"
-          )
-        )
+            batch,
+            open(
+                f"{self._param.path_bug}/"
+                f"batch.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
+                "wb"))
 
         Logger.info(f"Saving local_vars data to {self._param.path_bug}")
         if local_vars[0] is not None:
           local_vars = local_vars[0]
           clean_local_vars = {
-            k: v for k, v in local_vars.items()
-            if type(v) in {int, float, str, list, dict, tuple, torch.Tensor}
+              k: v
+              for k, v in local_vars.items()
+              if type(v) in {int, float, str, list, dict, tuple, torch.Tensor}
           }
           pickle.dump(
-            clean_local_vars,
-            open(
-              f"{self._param.path_bug}/"
-              f"local_vars.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
-              "wb"
-            )
-          )
+              clean_local_vars,
+              open(
+                  f"{self._param.path_bug}/"
+                  f"local_vars.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
+                  "wb"))
 
         Logger.info("Saving debugging model")
         info = {
-          "model_seen_sample_num": self._model_seen_sample_num,
-          "opt_evaluate_error": self._opt_evaluate_error,
-          "last_evaluate_point": self._last_evaluate_point,
+            "model_seen_sample_num": self._model_seen_sample_num,
+            "opt_evaluate_error": self._opt_evaluate_error,
+            "last_evaluate_point": self._last_evaluate_point,
         }
         self._model_wrapper._save_model(info, f"rank_{self._rank}")
 
@@ -274,9 +267,8 @@ class TrainerBase:
         batch = [e.to(self._model_wrapper._device) for e in batch]
         yield batch
 
-    yield from nlp.next_batch(
-      get_one_batch(), self._param.iter_num_update_optimizer
-    )
+    yield from nlp.next_batch(get_one_batch(),
+                              self._param.iter_num_update_optimizer)
 
   @starter.exception_stop
   def train(self):
@@ -404,8 +396,7 @@ class TrainerBase:
         self._draw_figure()
 
       total_norm = torch.nn.utils.clip_grad_norm_(
-        self._model_wrapper._model.parameters(), param.param_norm
-      )
+          self._model_wrapper._model.parameters(), param.param_norm)
       if nlp.eq(total_norm, 0):
         Logger.warn(f"total_norm(parameters.grad)={total_norm}")
 
@@ -421,7 +412,8 @@ class TrainerBase:
       remaining_time = a * b
       progress = self._model_seen_sample_num / self._target_seen_sample_num
       if self._rank == 0:
-        self._writer.add_scalar("loss", batch_loss, self._model_seen_sample_num)
+        self._writer.add_scalar("loss", batch_loss,
+                                self._model_seen_sample_num)
 
       mini_batch_num = len(mini_batch_train_time)
       if mini_batch_num > 1:
@@ -429,30 +421,26 @@ class TrainerBase:
           sum(mini_batch_train_time[: -1]) / (mini_batch_num - 1)
         est_net_time = max(0, mini_batch_train_time[-1] - avg_mini_batch_time)
         Logger.info(
-          f"Forward and backward time for {current_batch_size} samples is "
-          f"{avg_mini_batch_time * mini_batch_num: .2f} seconds."
-        )
+            f"Forward and backward time for {current_batch_size} samples is "
+            f"{avg_mini_batch_time * mini_batch_num: .2f} seconds.")
         Logger.info(
-          f"Estimated network gradient sync time: {est_net_time:.2f} seconds "
-          f"for {self._world_size} GPUs, "
-          f"taking {100 * est_net_time / batch_duration:.2f} %."
-        )
+            f"Estimated network gradient sync time: {est_net_time:.2f} seconds "
+            f"for {self._world_size} GPUs, "
+            f"taking {100 * est_net_time / batch_duration:.2f} %.")
 
       self._memory_information()
       Logger.info(
-        f"Training time: {nlp.to_readable_time(train_duration)}, "
-        f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"Training time: {nlp.to_readable_time(train_duration)}, "
+          f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
       )
-      Logger.info(
-        f"{self._get_worker_info()}: "
-        f"*Epoch: {epoch_id:.2f}, "
-        f"batch_id: {self._batch_id:_}, "
-        f"progress: {progress * 100:.2f} %, "
-        f"sample_num: {self._model_seen_sample_num:_} "
-        f"batch_size: [{current_batch_size} {real_batch_size}], "
-        f"loss: {batch_loss:.4f}, "
-        f"batch time: {batch_duration:.4f} "
-      )
+      Logger.info(f"{self._get_worker_info()}: "
+                  f"*Epoch: {epoch_id:.2f}, "
+                  f"batch_id: {self._batch_id:_}, "
+                  f"progress: {progress * 100:.2f} %, "
+                  f"sample_num: {self._model_seen_sample_num:_} "
+                  f"batch_size: [{current_batch_size} {real_batch_size}], "
+                  f"loss: {batch_loss:.4f}, "
+                  f"batch time: {batch_duration:.4f} ")
       Logger.info("-" * 128)
 
       if self._when_evaluate():
@@ -476,9 +464,8 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;" 
-      f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error"
-    )
+        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+        f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error")
     Logger.info(f"Training is Done.")
     nlp.command(f"touch {param.path_meta}/train.done")
 
@@ -498,9 +485,8 @@ class TrainerBase:
       speed = (buff["memory"].free - m.free) / (time.time() - buff["time"])
       depletion_time = m.free / (speed + 1e-6)
       Logger.warn(
-        f"free memory: {m.free:_} B, {round(m.free / 1024 ** 3, 2)} GB, "
-        f"depletion time: {nlp.to_readable_time(depletion_time)}."
-      )
+          f"free memory: {m.free:_} B, {round(m.free / 1024 ** 3, 2)} GB, "
+          f"depletion time: {nlp.to_readable_time(depletion_time)}.")
       buff["memory"] = m
       buff["time"] = time.time()
 
@@ -514,17 +500,15 @@ class TrainerBase:
 
   def _early_stop(self):
     return self.early_stop(
-      self._model_seen_sample_num // self._param.train_sample_num,
-      self._loss_history,
-      self._vali_error_history
-    )
+        self._model_seen_sample_num // self._param.train_sample_num,
+        self._loss_history, self._vali_error_history)
 
   def _check_sync_stop_condition(self, bool_cond):
     value = 0 if bool_cond else 1
     value = self._sync_value(value)
     return value < self._world_size
 
-  def _sync_value(self, single_value, reduce_op: str="sum"):
+  def _sync_value(self, single_value, reduce_op: str = "sum"):
     ts = torch.tensor(single_value, device=self._model_wrapper._device)
     torch.distributed.all_reduce(ts)
     value = ts.item()
@@ -597,13 +581,11 @@ class TrainerBase:
       return
 
     with nlp.Timer("Draw training loss"):
-      pickle.dump(
-        self._figure_data, open(f"{self._param.path_meta}/figure.data", "wb")
-      )
+      pickle.dump(self._figure_data,
+                  open(f"{self._param.path_meta}/figure.data", "wb"))
       out_file = os.path.join(
-        self._param.path_work,
-        os.path.split(self._param.path_work)[1] + ".train.loss.png"
-      )
+          self._param.path_work,
+          os.path.split(self._param.path_work)[1] + ".train.loss.png")
 
       figure_data = {}
       for line_id, key in enumerate(sorted(self._figure_data.keys())):

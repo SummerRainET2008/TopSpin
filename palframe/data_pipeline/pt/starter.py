@@ -1,7 +1,8 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch import *
+
 
 def collect_all_dist_threads(account, server_IP, is_current_node: bool):
   self_thread_id = os.getpid()
@@ -15,6 +16,7 @@ def collect_all_dist_threads(account, server_IP, is_current_node: bool):
     thread_id = ln.split()[1]
     if thread_id != self_thread_id:
       yield thread_id
+
 
 def gen_post_train_script(master_IP, servers_file, server_account, out_script):
   current_node_IP = nlp.get_server_ip()
@@ -34,9 +36,8 @@ def gen_post_train_script(master_IP, servers_file, server_account, out_script):
   fout = open(out_script, "w")
   for server_IP in servers:
     is_current_node = server_IP == current_node_IP
-    for thread_id in collect_all_dist_threads(
-      server_account, server_IP, is_current_node
-    ):
+    for thread_id in collect_all_dist_threads(server_account, server_IP,
+                                              is_current_node):
       if is_current_node:
         print(f"kill -9 {thread_id}", file=fout)
       else:
@@ -45,6 +46,7 @@ def gen_post_train_script(master_IP, servers_file, server_account, out_script):
 
   fout.close()
   nlp.execute_cmd(f"chmod 777 {out_script}")
+
 
 def start_distributed_train(source_script_and_params,
                             servers_file,
@@ -56,7 +58,7 @@ def start_distributed_train(source_script_and_params,
                             backhand="gloo",
                             py_ver="python3",
                             log_dir=".",
-                            stop_all_threads: bool=False):
+                            stop_all_threads: bool = False):
   if stop_all_threads:
     script = "/tmp/stop.sh"
     gen_post_train_script(master_IP, servers_file, server_account, script)

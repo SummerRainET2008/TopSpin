@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 import librosa
 import numpy as np
@@ -10,6 +10,7 @@ from palframe.audio.audio_helper import AudioHelper
 
 # output length = (seconds) * (sample rate) / (hop_length)
 HOP_LENGTH = 160
+
 
 def calc_mfcc_delta(wav_file_16bits: str, mfcc_dim: int,
                     file_sample_rate: int):
@@ -28,11 +29,10 @@ def calc_mfcc_delta(wav_file_16bits: str, mfcc_dim: int,
   wav_data, real_sample_rate = librosa.load(wav_file_16bits, sr=None)
   assert real_sample_rate == file_sample_rate
   mfcc = np.transpose(
-    librosa.feature.mfcc(
-      wav_data, real_sample_rate, n_mfcc=mfcc_dim, hop_length=HOP_LENGTH
-    ),
-    [1, 0]
-  )
+      librosa.feature.mfcc(wav_data,
+                           real_sample_rate,
+                           n_mfcc=mfcc_dim,
+                           hop_length=HOP_LENGTH), [1, 0])
 
   delta1 = librosa.feature.delta(mfcc)
   delta2 = librosa.feature.delta(mfcc, order=2)
@@ -43,9 +43,13 @@ def calc_mfcc_delta(wav_file_16bits: str, mfcc_dim: int,
 
   return feature
 
-def parallel_calc_features(wav_files_16bits: list, mfcc_dim: int,
-                           target_sample_rate: int, output_folder: str,
-                           process_num: int, queue_capacity: int=1024):
+
+def parallel_calc_features(wav_files_16bits: list,
+                           mfcc_dim: int,
+                           target_sample_rate: int,
+                           output_folder: str,
+                           process_num: int,
+                           queue_capacity: int = 1024):
   def run_process(process_id: int, audio_file_pipe: mp.Queue):
     count = 0
     with open(f"{output_folder}/part.{process_id}.feat", "w") as fou:
@@ -69,8 +73,10 @@ def parallel_calc_features(wav_files_16bits: list, mfcc_dim: int,
 
   start_time = time.time()
   file_pipe = mp.Queue(queue_capacity)
-  process_runners = [mp.Process(target=run_process, args=(idx, file_pipe))
-                     for idx in range(process_num)]
+  process_runners = [
+      mp.Process(target=run_process, args=(idx, file_pipe))
+      for idx in range(process_num)
+  ]
 
   for p in process_runners:
     p.start()

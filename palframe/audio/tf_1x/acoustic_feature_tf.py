@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 import tensorflow as tf
 import numpy
@@ -9,14 +9,15 @@ import librosa
 from palframe import common as nlp
 from palframe.audio.audio_helper import AudioHelper
 
+
 class DataGraphMFCC:
   # do NOT modify these numbers.
-  window_duration       = 25        # ms
-  stride_duration       = 10        # ms
-  frame_num_per_second  = 100
-  max_mfcc_num          = 40
+  window_duration = 25  # ms
+  stride_duration = 10  # ms
+  frame_num_per_second = 100
+  max_mfcc_num = 40
 
-  def __init__(self, sample_rate: int, dct_coef_count: int=-1):
+  def __init__(self, sample_rate: int, dct_coef_count: int = -1):
     '''
     suppose the channel number is 1.
     '''
@@ -44,65 +45,60 @@ class DataGraphMFCC:
       in_audio = tf.expand_dims(self._in_audio, -1)
 
       audio_clamp = tf.clip_by_value(in_audio, -1.0, 1.0)
-      spectrogram = contrib_audio.audio_spectrogram(
-        audio_clamp,
-        window_size=window,
-        stride=stride,
-        magnitude_squared=True)
+      spectrogram = contrib_audio.audio_spectrogram(audio_clamp,
+                                                    window_size=window,
+                                                    stride=stride,
+                                                    magnitude_squared=True)
       self._out_spectrogram = spectrogram
 
       feat_ts = contrib_audio.mfcc(
-        spectrogram=spectrogram,
-        sample_rate=sample_rate,
-        dct_coefficient_count=dct_coef_count,
+          spectrogram=spectrogram,
+          sample_rate=sample_rate,
+          dct_coefficient_count=dct_coef_count,
       )
       self._out_mfcc = feat_ts[0]
       self._out_real_mfcc_len = tf.shape(self._out_mfcc)[0]
 
       diff = tf.maximum(0, self._in_frame_num - self._out_real_mfcc_len)
       self._out_expanded_mfcc = tf.pad(
-        self._out_mfcc,
-        [[0, diff], [0, 0]],
-      )[: self._in_frame_num]
+          self._out_mfcc,
+          [[0, diff], [0, 0]],
+      )[:self._in_frame_num]
 
     self._sess = tf.Session(graph=self._graph)
     print(f"DataGgraphMFCC graph is created!")
 
   def read_16bits_wav_file(self, wav_file: str):
     audio, sr = self._sess.run(
-      fetches=[self._out_audio, self._out_sample_rate],
-      feed_dict={
-        self._in_wav_file: wav_file,
-      }
-    )
+        fetches=[self._out_audio, self._out_sample_rate],
+        feed_dict={
+            self._in_wav_file: wav_file,
+        })
     assert sr == self._sample_rate
 
     return audio
 
-  def calc_feats(self, audio_data: list, target_frame_num: int=-1):
+  def calc_feats(self, audio_data: list, target_frame_num: int = -1):
     '''
     :return: [frame-num, feature, 3]
     '''
     if target_frame_num <= 0:
-      mfcc, real_length = self._sess.run(
-        fetches=[
+      mfcc, real_length = self._sess.run(fetches=[
           self._out_mfcc,
           self._out_real_mfcc_len,
-        ],
-        feed_dict={
-          self._in_audio: audio_data,
-        }
-      )
+      ],
+                                         feed_dict={
+                                             self._in_audio: audio_data,
+                                         })
       target_frame_num = real_length
 
     else:
       mfcc, real_length = self._sess.run(
-        fetches=[self._out_expanded_mfcc, self._out_real_mfcc_len],
-        feed_dict={
-          self._in_audio: audio_data,
-          self._in_frame_num: target_frame_num
-        }
-      )
+          fetches=[self._out_expanded_mfcc, self._out_real_mfcc_len],
+          feed_dict={
+              self._in_audio: audio_data,
+              self._in_frame_num: target_frame_num
+          })
 
     delta1 = librosa.feature.delta(mfcc)
     delta2 = librosa.feature.delta(delta1)

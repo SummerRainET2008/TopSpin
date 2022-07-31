@@ -1,8 +1,9 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 from palframe import nlp
+
 
 class Measure:
   @staticmethod
@@ -11,9 +12,7 @@ class Measure:
     ref_words = ref.split()
     hyp_words = hyp.split()
 
-    d = np.zeros(
-      (len(ref_words) + 1, len(hyp_words) + 1), dtype=np.int32
-    )
+    d = np.zeros((len(ref_words) + 1, len(hyp_words) + 1), dtype=np.int32)
 
     for j in range(len(hyp_words) + 1):
       d[0][j] = j
@@ -34,8 +33,10 @@ class Measure:
     return d[len(ref_words)][len(hyp_words)], len(ref_words)
 
   @staticmethod
-  def calc_WER(ref_list: list, hyp_list: list,
-               parallel: bool=False, case_sensitive: bool=False):
+  def calc_WER(ref_list: list,
+               hyp_list: list,
+               parallel: bool = False,
+               case_sensitive: bool = False):
     '''
     In the parallel mode, the multiprocess.Pool() would leads memory leak.
     '''
@@ -47,15 +48,15 @@ class Measure:
     if parallel:
       pool = mp.Pool()
       error_list, len_list = list(
-        zip(*pool.map(Measure._WER_single, zip(ref_list, hyp_list)))
-      )
+          zip(*pool.map(Measure._WER_single, zip(ref_list, hyp_list))))
       pool.close()
 
     else:
       error_list, len_list = list(
-        zip(*[Measure._WER_single([ref, hyp])
-             for ref, hyp in zip(ref_list, hyp_list)])
-      )
+          zip(*[
+              Measure._WER_single([ref, hyp])
+              for ref, hyp in zip(ref_list, hyp_list)
+          ]))
 
     error = sum(error_list)
     ref_count = max(1, sum(len_list))
@@ -66,15 +67,13 @@ class Measure:
   def stat_data(true_labels: list):
     labels = Counter(true_labels)
     result = [
-      f"#label: {len(set(true_labels))}",
-      f"#sample: {len(true_labels)}",
+        f"#label: {len(set(true_labels))}",
+        f"#sample: {len(true_labels)}",
     ]
     for label in sorted(labels.keys()):
       c = labels[label]
       ratio = c / len(true_labels)
-      result.append(
-        f"label[{label}]: (count={c}, percent={ratio * 100:.4} %)"
-      )
+      result.append(f"label[{label}]: (count={c}, percent={ratio * 100:.4} %)")
 
     return " ".join(result)
 
@@ -82,8 +81,7 @@ class Measure:
   def calc_classification(true_labels: list, preded_labels: list):
     ret = Measure.calc_precision_recall_fvalue(true_labels, preded_labels)
     ret["kappa_coefficient"] = Measure.calc_kappa_coefficient(
-      true_labels, preded_labels
-    )
+        true_labels, preded_labels)
     return ret
 
   @staticmethod
@@ -96,13 +94,13 @@ class Measure:
     true_label_num = defaultdict(int)
     pred_label_num = defaultdict(int)
     correct_labels = defaultdict(int)
-    
+
     for t_label, p_label in zip(true_labels, preded_labels):
       true_label_num[t_label] += 1
       pred_label_num[p_label] += 1
       if t_label == p_label:
         correct_labels[t_label] += 1
-        
+
     result = dict()
     label_stat = Counter(true_labels)
     for label in label_stat.keys():
@@ -111,19 +109,20 @@ class Measure:
       prec = correct / (pred_label_num.get(label, 0) + nlp.EPSILON)
       f_value = 2 * (recall * prec) / (recall + prec + nlp.EPSILON)
       result[label] = {
-        "recall": round(recall, 4),
-        "precision": round(prec, 4),
-        "f": round(f_value, 4),
+          "recall": round(recall, 4),
+          "precision": round(prec, 4),
+          "f": round(f_value, 4),
       }
-     
-    total_f = sum([result[label]["f"] * label_stat.get(label, 0)
-                   for label in label_stat.keys()])
+
+    total_f = sum([
+        result[label]["f"] * label_stat.get(label, 0)
+        for label in label_stat.keys()
+    ])
     weighted_f_value = total_f / len(true_labels)
     result["weighted_f"] = round(weighted_f_value, 4)
-    
+
     result["accuracy"] = round(
-      sum(correct_labels.values()) / len(true_labels), 4
-    )
+        sum(correct_labels.values()) / len(true_labels), 4)
 
     result["data_description"] = Measure.stat_data(true_labels)
 
@@ -153,7 +152,7 @@ class Measure:
   @staticmethod
   def calc_intervals_accurarcy(true_labels_list: list,
                                pred_labels_list: list,
-                               over_lapping: float=0.75):
+                               over_lapping: float = 0.75):
     '''
     :param true_labels_list: [[(0., 2.0), (3.4, 4.5)], [(2. 0, 4.0)]]
     :param pred_labels_list:  [[(0., 2.0), (3.4, 4.5)], [(2. 0, 4.0)]]
@@ -163,29 +162,27 @@ class Measure:
     assert type(pred_labels_list) == type(pred_labels_list[0]) == list
 
     results = [
-      Measure._intervals_accurarcy_single(
-        true_labels, pred_labels, over_lapping
-      )
-      for true_labels, pred_labels in zip(true_labels_list, pred_labels_list)
+        Measure._intervals_accurarcy_single(true_labels, pred_labels,
+                                            over_lapping)
+        for true_labels, pred_labels in zip(true_labels_list, pred_labels_list)
     ]
     correct = sum([r["correct"] for r in results])
     true_label_num = sum([r["true_label_num"] for r in results])
     pred_label_num = sum([r["pred_label_num"] for r in results])
 
     recall = correct / true_label_num
-    accuracy = correct /pred_label_num
+    accuracy = correct / pred_label_num
     f = 2 * recall * accuracy / (recall + accuracy + nlp.EPSILON)
 
     return {
-      "recall": round(recall, 4),
-      "accuracy": round(accuracy, 4),
-      "f": round(f, 4),
-      "details:": results
+        "recall": round(recall, 4),
+        "accuracy": round(accuracy, 4),
+        "f": round(f, 4),
+        "details:": results
     }
 
   @staticmethod
-  def _intervals_accurarcy_single(true_labels: list,
-                                  pred_labels: list,
+  def _intervals_accurarcy_single(true_labels: list, pred_labels: list,
                                   over_lapping: float):
     def seg_len(seg):
       return seg[1] - seg[0]
@@ -194,8 +191,8 @@ class Measure:
       if not nlp.segment_intersec(pred_label, true_label):
         return False
 
-      area = (max(pred_label[0], true_label[0]),
-              min(pred_label[1], true_label[1]))
+      area = (max(pred_label[0],
+                  true_label[0]), min(pred_label[1], true_label[1]))
       return seg_len(area) / seg_len(true_label) >= over_lapping
 
     matched_label_num = np.zeros([len(pred_labels)], np.int)
@@ -218,11 +215,11 @@ class Measure:
     total_pred_num = len(wrong_labels) + sum(matched_label_num)
 
     return {
-      "correct": correct_num,
-      "true_label_num": len(true_labels),
-      "pred_label_num": total_pred_num,
-      "missing": missing_labels,
-      "wrong": wrong_labels,
+        "correct": correct_num,
+        "true_label_num": len(true_labels),
+        "pred_label_num": total_pred_num,
+        "missing": missing_labels,
+        "wrong": wrong_labels,
     }
 
   @staticmethod
@@ -231,7 +228,6 @@ class Measure:
     :param data: [{"qid": 1234, "ranks": [0, 4, 2, 1]}...]
     :return: [NDCG@1, NDCG@2, ..., NDCG@10]
     '''
-
     def calc_ndcg(pdata: dict):
       qid = pdata["qid"]
       if qid in buff:
@@ -249,7 +245,7 @@ class Measure:
 
     def calc_dcg(ranks: dict):
       norm = lambda pos: math.log(pos + 2)
-      dcg = [(2 ** u - 1) / norm(i) for i, u in enumerate(ranks[: 10])]
+      dcg = [(2**u - 1) / norm(i) for i, u in enumerate(ranks[:10])]
       dcg = [0.0] + dcg + [0.0] * (10 - len(dcg))
       for p in range(1, 11):
         dcg[p] += dcg[p - 1]
@@ -264,4 +260,3 @@ class Measure:
     avg_ndcg /= len(data)
 
     return list(avg_ndcg)[1:]
-

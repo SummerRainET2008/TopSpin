@@ -4,12 +4,13 @@
 import smtplib
 from palframe.nlp import Logger
 
+
 class EmailNotifier:
-  def __init__(self, recipient_emails: list=[]):
+  def __init__(self, recipient_emails: list = []):
     assert type(recipient_emails) is list
     self._recipients = recipient_emails
 
-  def send_email(self, subject: str, text: str)-> bool:
+  def send_email(self, subject: str, text: str) -> bool:
     gmail_user = "xinzhikeji2015@gmail.com"
     gmail_pwd = "tianxia02092015"
     FROM = "xinzhikeji2015@gmail.com"
@@ -32,6 +33,7 @@ class EmailNotifier:
     except Exception as err:
       Logger.error(err)
       return False
+
 
 if __name__ == "__main__":
   email_notifier = EmailNotifier(["SummerRainET2008@gmail.com"])

@@ -1,11 +1,12 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 from palframe import nlp
 from palframe.nlp import Logger
 import torch.distributed as dist
 from palframe.pytorch.dataset.helper import parse_feat_folder
+
 
 class ParameterRange:
   def __init__(self, values, grouped_attribute=False):
@@ -21,6 +22,7 @@ class ParameterRange:
     self.values = list(values)
     self.grouped_attribute = grouped_attribute
 
+
 class ParamBase(abc.ABC):
   instances = {}
   cls_locks = {}
@@ -31,7 +33,7 @@ class ParamBase(abc.ABC):
                experiment_folder="work"):
     self._check_instance_validity()
 
-    self.seed = 0     # 0 means random.
+    self.seed = 0  # 0 means random.
 
     if not nlp.is_none_or_empty(path_work_restored_training):
       self.path_work = path_work_restored_training
@@ -43,8 +45,7 @@ class ParamBase(abc.ABC):
       date_str = date_str.replace(" ", "_").replace(":", "-")\
                          .replace("[utc]", "utc")
       self.run_tag = f"{run_tag}.{date_str}"
-      self.path_work  = f"{experiment_folder}/run.{self.run_tag}"
-
+      self.path_work = f"{experiment_folder}/run.{self.run_tag}"
 
     # self.path_model, self.path_log, self.path_meta, are set automatically
     # by path_work.
@@ -102,20 +103,18 @@ class ParamBase(abc.ABC):
     self.net_name = None
 
     # example on one gpu
-    self.variable_batch_size = {
-      "<=30": 100,
-      "<=128": 30
-    }
+    self.variable_batch_size = {"<=30": 100, "<=128": 30}
     self.batch_size = 10
 
     self.iter_num_update_optimizer = 1
 
-    self.train_files = "" 
-    self.vali_file = "" 
-    self.test_files = "" 
+    self.train_files = ""
+    self.vali_file = ""
+    self.test_files = ""
 
     self.train_sample_num = None
-    self.epoch_num = None       # can be float.
+    self.epoch_num = None  # can be float.
+    self.max_train_step = None  #
 
     # Evaluation would be conducted every eval_gap_sample_num samples.
     self.eval_gap_sample_num = None
@@ -137,9 +136,9 @@ class ParamBase(abc.ABC):
     # For the case that each GPU worker consumes different batch size.
     self.true_gradient = False
 
-    self.debug_level = 1    # debug=0, info=1, warning=2, error=3
+    self.debug_level = 1  # debug=0, info=1, warning=2, error=3
 
-    self.detect_anomaly = False # only for debugging.
+    self.detect_anomaly = False  # only for debugging.
 
     self.cudnn_deterministic = True
     self.cudnn_benchmark = False
@@ -176,8 +175,7 @@ class ParamBase(abc.ABC):
     if isinstance(value, bool) and value:
       self.use_amp = False
       Logger.info(
-        f"Automatically set use_amp=False, when true gradient is used."
-      )
+          f"Automatically set use_amp=False, when true gradient is used.")
     self.__true_gradient = value
 
   @property
@@ -191,10 +189,10 @@ class ParamBase(abc.ABC):
                     "calling param.create_workspace()"
 
     value = os.path.normpath(value)
-    self.path_model  = f"{value}/model"
-    self.path_log    = f"{value}/log"
-    self.path_meta   = f"{value}/meta"
-    self.path_bug    = f"{value}/bug"
+    self.path_model = f"{value}/model"
+    self.path_log = f"{value}/log"
+    self.path_meta = f"{value}/meta"
+    self.path_bug = f"{value}/bug"
     self.run_lock_file = f"{self.path_meta}/run.lock"
     self.bug_lock_file = f"{self.path_meta}/bug.lock"
 
@@ -298,7 +296,7 @@ class ParamBase(abc.ABC):
 
   def size_divided_by_16(self, size, unit=16):
     return math.ceil(size / unit) * unit
-    
+
   def display(self):
     Logger.info("\n", "-" * 64)
     nlp.display_server_info()

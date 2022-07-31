@@ -1,19 +1,20 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator4.param import ParamBase
 from palframe.pytorch import *
+
 
 class ModelWrapperBase:
   def __init__(self, param: ParamBase, user_model: torch.nn.Module):
     self._init_distributed_training(param)
 
     info = {
-      "ip": nlp.get_server_ip(),
-      "pid": os.getpid(),
-      "rank": dist.get_rank(),
-      "local_rank": self._local_rank,
-      "world_size": dist.get_world_size(),
+        "ip": nlp.get_server_ip(),
+        "pid": os.getpid(),
+        "rank": dist.get_rank(),
+        "local_rank": self._local_rank,
+        "world_size": dist.get_world_size(),
     }
     out_file = f"{param.path_meta}/gpu_info.{dist.get_rank()}.pkl"
     pickle.dump(info, open(out_file, "wb"))
@@ -30,8 +31,9 @@ class ModelWrapperBase:
     if not param.use_gpu:
       self._device = torch.device("cpu")
       self._dist_model = torch.nn.parallel.DistributedDataParallel(
-        user_model, bucket_cap_mb=param.bucket_cap_mb,
-        find_unused_parameters=param.find_unused_parameters,
+          user_model,
+          bucket_cap_mb=param.bucket_cap_mb,
+          find_unused_parameters=param.find_unused_parameters,
       )
     else:
       gpu_id = param.gpus[self._local_rank]
@@ -39,11 +41,12 @@ class ModelWrapperBase:
       torch.cuda.set_device(self._device)
       user_model = user_model.to(self._device)
       self._dist_model = torch.nn.parallel.DistributedDataParallel(
-        user_model, device_ids=[gpu_id], output_device=gpu_id,
-        bucket_cap_mb=param.bucket_cap_mb,
-        find_unused_parameters=param.find_unused_parameters,
+          user_model,
+          device_ids=[gpu_id],
+          output_device=gpu_id,
+          bucket_cap_mb=param.bucket_cap_mb,
+          find_unused_parameters=param.find_unused_parameters,
       )
-
 
     self._param = param
     self._model = self._dist_model
@@ -141,15 +144,12 @@ class ModelWrapperBase:
       name = f'model_{model_seen_sample_num}.{tag}.pt'
     else:
       name = f'model_{model_seen_sample_num}.pt'
-    nlp.execute_cmd(
-      f"echo {name} >> {param.path_model}/checkpoint"
-    )
+    nlp.execute_cmd(f"echo {name} >> {param.path_model}/checkpoint")
 
     torch.save(info, os.path.join(param.path_model, name))
 
     model_names = open(f"{param.path_model}/checkpoint").read().split()
-    for name in model_names[: -param.model_saved_num]:
+    for name in model_names[:-param.model_saved_num]:
       model_file = f"{param.path_model}/{name}"
       if os.path.isfile(model_file):
         nlp.execute_cmd(f"rm {model_file}")
-

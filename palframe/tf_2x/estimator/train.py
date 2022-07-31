@@ -1,32 +1,31 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.nlp import Logger
 from palframe.tf_2x import *
 from palframe.tf_2x import nlp_tf
 from palframe.tf_2x.estimator.param import ParamBase
 
+
 class TrainerBase(abc.ABC):
   def __init__(self, param: ParamBase, model, data_reader_iter):
     self._param = param
     self._data_reader_iter = data_reader_iter
     self._model = model
-    
+
     if not param.incremental_train:
       nlp.mkdir(param.path_model, True)
 
     self._checkpoint = tf.train.Checkpoint(
-      global_batch_step=tf.Variable(0, dtype=tf.int64),
-      opt_vali_error=tf.Variable(1e10, dtype=tf.float32),
-      run_sample_num=tf.Variable(0, dtype=tf.int64),
-      # optimizer=self._optimizer,
-      model=self._model,
+        global_batch_step=tf.Variable(0, dtype=tf.int64),
+        opt_vali_error=tf.Variable(1e10, dtype=tf.float32),
+        run_sample_num=tf.Variable(0, dtype=tf.int64),
+        # optimizer=self._optimizer,
+        model=self._model,
     )
-    self._manager = tf.train.CheckpointManager(
-      self._checkpoint,
-      directory=param.path_model,
-      max_to_keep=2
-    )
+    self._manager = tf.train.CheckpointManager(self._checkpoint,
+                                               directory=param.path_model,
+                                               max_to_keep=2)
 
     if param.use_polynormial_decay:
       assert param.train_sample_num is not None
@@ -36,7 +35,9 @@ class TrainerBase(abc.ABC):
       assert total_step > 0
 
       self._lr_decay = tf.keras.optimizers.schedules.PolynomialDecay(
-        param.lr, total_step, end_learning_rate=0.,
+          param.lr,
+          total_step,
+          end_learning_rate=0.,
       )
 
     self._optimizer = tf.keras.optimizers.Adam(learning_rate=1.)
@@ -79,7 +80,7 @@ class TrainerBase(abc.ABC):
     self._optimizer._hyper["learning_rate"] = lr
     self._optimizer.apply_gradients(zip(cropped_g, variables))
     tf.print("lr:", self._optimizer._hyper["learning_rate"])
-    
+
     return loss
 
   def load_model(self):
@@ -127,7 +128,7 @@ class TrainerBase(abc.ABC):
       self.evaluate_file(data_file)
 
   @abc.abstractmethod
-  def train_one_batch(self, *batch)-> float:
+  def train_one_batch(self, *batch) -> float:
     pass
 
   def train(self):
@@ -147,9 +148,8 @@ class TrainerBase(abc.ABC):
       ckp.global_batch_step.assign_add(1)
       batch_id = ckp.global_batch_step.numpy()
       Logger.info(
-        f"Epoch: {epoch_id} batch: {batch_id:_} samples: {run_sample_num:_} "
-        f"loss: {batch_loss} time: {duration:.4f} "
-      )
+          f"Epoch: {epoch_id} batch: {batch_id:_} samples: {run_sample_num:_} "
+          f"loss: {batch_loss} time: {duration:.4f} ")
 
       if batch_num % 5 == 0:
         avg_loss = total_loss / batch_num
@@ -172,4 +172,3 @@ class TrainerBase(abc.ABC):
       return True
 
     return False
-

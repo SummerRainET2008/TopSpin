@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.nlp import *
 
@@ -26,9 +26,9 @@ if __name__ == "__main__":
   print(group_by_key_fun(data).items())
 
   dists = [1, 2, 3, 4]
-  print(collections.Counter([discrete_sample(dists) for freq in range(100000)]))
+  print(collections.Counter([discrete_sample(dists)
+                             for freq in range(100000)]))
 
   print(get_new_temporay_file())
   print(get_new_temporay_file())
   print(get_new_temporay_file())
-

@@ -12,7 +12,6 @@ To maintain a stable GPU cluster to guarantee the efficiency of most of the clus
 
 Chiero cluster, so far, in colovore site, has FIVE 8-GPU servers, namely 5x8=40 cards. 
 
- 1. **docker81**, ip=___10.10.10.81___, GPU 32G V100 x 8
  1. **docker88**, ip=___10.10.10.88___, GPU 48G rtx8000 x 8
  1. **docker89**, ip=___10.10.10.89___, GPU 48G rtx8000 x 8
  1. **docker90**, ip=___10.10.10.90___, GPU 48G a6000 x 8

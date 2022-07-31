@@ -4,7 +4,7 @@
 import optparse
 from example.cv.edsr.header import *
 from example.cv.edsr import *
-from torch import nn 
+from torch import nn
 from param import Param
 from example.cv.edsr.dataset import get_batch_data
 from model_wrapper import ModelWrapper
@@ -12,23 +12,22 @@ from palframe.nlp import Logger
 from palframe.pytorch.estimator5.train import TrainerBase
 from palframe.pytorch import *
 
+
 class Trainer(TrainerBase):
   def __init__(self, param):
     model_wrapper = ModelWrapper(param)
 
     super(Trainer, self).__init__(
-      model_wrapper,
-      get_batch_data(param, param.train_files, param.epoch_num,
-               dist.get_rank(), dist.get_world_size(), True),
-      None
-    )
+        model_wrapper,
+        get_batch_data(param, param.train_files, param.epoch_num,
+                       dist.get_rank(), dist.get_world_size(), True), None)
 
   def train_one_batch(self, l8_imgs, s2_imgs):
     pred_l8_imgs = self._model_wrapper.predict(l8_imgs)
     print(pred_l8_imgs.shape)
     print(s2_imgs.shape)
     print(type(pred_l8_imgs))
-    print(pred_l8_imgs.dtype,s2_imgs.dtype)
+    print(pred_l8_imgs.dtype, s2_imgs.dtype)
     print(type(s2_imgs))
 
     loss = nn.L1Loss()

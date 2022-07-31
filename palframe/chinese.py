@@ -1,29 +1,31 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.nlp import *
 
 import jieba
 import jieba.posseg as pseg
 
-def join_ch_en_tokens(ch_list: list)-> str:
+
+def join_ch_en_tokens(ch_list: list) -> str:
   '''
   :param ch_list: ["我", "爱", "American", "English", "的", "感", "觉"]
   :return: "我爱American English的感觉"
   '''
   if len(ch_list) <= 1:
     return "".join(ch_list)
-  
+
   ret = ch_list[0]
   for ch in ch_list[1:]:
     if ord(ret[-1]) < 128 and ord(ch[0]) < 128:
       ret += " " + ch
     else:
       ret += ch
-      
+
   return ret
 
-def convert_full_to_half(s)-> str:
+
+def convert_full_to_half(s) -> str:
   '''全角转半角'''
   n = []
   for char in s:
@@ -38,6 +40,7 @@ def convert_full_to_half(s)-> str:
     n.append(num)
   return ''.join(n)
 
+
 def segment_sentence(text, pos_tagging=False):
   if pos_tagging:
     words, tags = [], []
@@ -47,14 +50,15 @@ def segment_sentence(text, pos_tagging=False):
     return words, tags
   else:
     return list(jieba.cut(text, cut_all=False))
-  
+
+
 def split_and_norm_string(text: str):
   '''
   Tokenization/string cleaning for Chinese and English mixed data
   :return: a list
   '''
   text = convert_full_to_half(text)
-  
+
   text = re.sub(r"[^A-Za-z0-9\u4e00-\u9fa5()（）！？，,!?\'\`:]", " ", text)
   text = re.sub(r"\'s", " \'s", text)
   text = re.sub(r"\'ve", " \'ve", text)
@@ -74,5 +78,5 @@ def split_and_norm_string(text: str):
     if re.findall(r"[\u4e00-\u9fa5]", char) != []:
       char = " " + char + " "
     new_string += char
-    
+
   return new_string.strip().lower().replace('\ufeff', '').split()

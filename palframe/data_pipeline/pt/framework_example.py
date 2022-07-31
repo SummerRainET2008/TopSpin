@@ -2,11 +2,11 @@
 #author: Tian Xia
 
 from palframe.data_pipeline.pt.framework import *
-
 '''
 run in cmd: 
 python3 palframe/data_pipeline/pt/framework_TEST.py
 '''
+
 
 class MyDataset(Dataset):
   def __init__(self):
@@ -22,6 +22,7 @@ class MyDataset(Dataset):
     for sample in self._data:
       yield sample
 
+
 class MyFramework(Framework):
   def __init__(self):
     dataset = MyDataset()
@@ -29,10 +30,8 @@ class MyFramework(Framework):
     super(MyFramework, self).__init__(dataset, output_folder, 100)
 
   def map(self, one_sample):
-    yield {
-      "in": one_sample,
-      "out": one_sample * one_sample
-    }
+    yield {"in": one_sample, "out": one_sample * one_sample}
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
@@ -44,6 +43,6 @@ def main():
   my_framework = MyFramework()
   my_framework.run()
 
+
 if __name__ == "__main__":
   main()
-

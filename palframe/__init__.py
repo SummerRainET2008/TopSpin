@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter

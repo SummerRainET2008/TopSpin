@@ -1,22 +1,21 @@
 from palframe.pytorch.estimator5.param import ParamBase
 
+
 class Param(ParamBase):
   def __init__(self):
-    super(Param, self).__init__(
-      "nlp_example.intent_detection",
-      experiment_folder="work"
-    )
+    super(Param, self).__init__("nlp_example.intent_detection",
+                                experiment_folder="work")
 
     ################ training related settings ################
     self.gpu_num = 2
-    self.gpus = [0]   # You should set it when running in the quick mode.
+    self.gpus = [0]  # You should set it when running in the quick mode.
     self.use_gpu = False
-    self.use_amp = False    # mixed precision based training
+    self.use_amp = False  # mixed precision based training
     self.optimizer_name = "Adam"
     self.lr = 5e-4
-    self.batch_size = 16    # for one GPU. If you have 2 GPUs, then actual batch
-                            # size would be 16x2=32.
-    self.iter_num_update_optimizer = 1 #
+    self.batch_size = 16  # for one GPU. If you have 2 GPUs, then actual batch
+    # size would be 16x2=32.
+    self.iter_num_update_optimizer = 1  #
 
     ################ model related settings ################
     self.path_feat = "feat/nlp/intent_detection"

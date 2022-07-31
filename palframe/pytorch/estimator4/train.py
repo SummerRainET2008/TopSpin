@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator4.model_wrapper import ModelWrapperBase
 from palframe.pytorch import *
@@ -9,11 +9,12 @@ from palframe.pytorch.dataset.offline_bigdataset import parse_feat_folder
 from palframe.pytorch.estimator4 import starter
 from torch import autograd
 
+
 class TrainerBase:
   def __init__(self,
                model_wrapper: ModelWrapperBase,
                train_data_iter,
-               optimizer: typing.Union[Optimizer, None]=None):
+               optimizer: typing.Union[Optimizer, None] = None):
     param = model_wrapper._param
     nlp.set_random_seeds(param.seed)
     torch.set_num_threads(param.num_threads_cpu)
@@ -25,9 +26,7 @@ class TrainerBase:
     self._rank = dist.get_rank()
     self._world_size = dist.get_world_size()
 
-    self._model_size = nlp_torch.display_model_parameters(
-      model_wrapper._model
-    )
+    self._model_size = nlp_torch.display_model_parameters(model_wrapper._model)
 
     if param.path_initial_model is not None and \
       os.path.isfile(param.path_initial_model):
@@ -51,16 +50,16 @@ class TrainerBase:
       self._optimizer = optimizer
     else:
       self._optimizer = getattr(torch.optim, param.optimizer_name)(
-        model_wrapper._model.parameters(), lr=param.lr,
-        weight_decay=param.weight_decay
-      )
+          model_wrapper._model.parameters(),
+          lr=param.lr,
+          weight_decay=param.weight_decay)
 
     if param.restore_from_last_train:
       Logger.info(f"{self._get_worker_info()} Restoring from last training...")
       info = model_wrapper._load_model_folder()
       if info is not None:
         self._model_seen_sample_num = info["model_seen_sample_num"]
-        self._opt_evaluate_error  = info["opt_evaluate_error"]
+        self._opt_evaluate_error = info["opt_evaluate_error"]
         self._last_evaluate_point = info["last_evaluate_point"]
     else:
       if self._rank == 0:
@@ -91,9 +90,9 @@ class TrainerBase:
 
   def _try_to_save_best_model(self):
     info = {
-      "model_seen_sample_num": self._model_seen_sample_num,
-      "opt_evaluate_error": self._opt_evaluate_error,
-      "last_evaluate_point": self._last_evaluate_point,
+        "model_seen_sample_num": self._model_seen_sample_num,
+        "opt_evaluate_error": self._opt_evaluate_error,
+        "last_evaluate_point": self._last_evaluate_point,
     }
     param = self._model_wrapper._param
 
@@ -107,9 +106,8 @@ class TrainerBase:
         if eval_error > 0:
           Logger.error(f"evaluate_file() should return a negative value")
           assert False
-        self._writer.add_scalar(
-          f"eval '{param.vali_file}'", eval_error, self._model_seen_sample_num
-        )
+        self._writer.add_scalar(f"eval '{param.vali_file}'", eval_error,
+                                self._model_seen_sample_num)
       if eval_error < self._opt_evaluate_error:
         self._opt_evaluate_error = eval_error
         self._model_wrapper._save_model(info)
@@ -123,17 +121,16 @@ class TrainerBase:
     for test_file in parse_feat_folder(self._model_wrapper._param.test_files):
       with torch.no_grad():
         eval_error = self._model_wrapper.evaluate_file(test_file)
-        self._writer.add_scalar(
-          f"eval '{test_file}'", eval_error, self._model_seen_sample_num
-        )
+        self._writer.add_scalar(f"eval '{test_file}'", eval_error,
+                                self._model_seen_sample_num)
 
     self._model_wrapper._set_train()
     torch.cuda.empty_cache()
 
-  def train_one_batch(self, *batch)-> float:
+  def train_one_batch(self, *batch) -> float:
     raise NotImplementedError()
 
-  def _train_one_batch_check(self, *batch)->float:
+  def _train_one_batch_check(self, *batch) -> float:
     def tracer(frame, event, arg):
       if event == "return":
         local_vars[0] = frame.f_locals
@@ -163,8 +160,7 @@ class TrainerBase:
       if not self._model_wrapper._quickrun_mode:
         sleep_time = random.randint(0, 1000) / 100
         Logger.info(
-          f"rank[{self._rank}] is sleeping for {sleep_time} seconds."
-        )
+            f"rank[{self._rank}] is sleeping for {sleep_time} seconds.")
         time.sleep(sleep_time)
 
       file_lock = f"{self._param.path_bug}/file.lock"
@@ -173,35 +169,32 @@ class TrainerBase:
 
         Logger.info(f"Saving debugging batch data to {self._param.path_bug}")
         pickle.dump(
-          batch,
-          open(
-            f"{self._param.path_bug}/"
-            f"batch.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
-            "wb"
-          )
-        )
+            batch,
+            open(
+                f"{self._param.path_bug}/"
+                f"batch.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
+                "wb"))
 
         Logger.info(f"Saving local_vars data to {self._param.path_bug}")
         if local_vars[0] is not None:
           local_vars = local_vars[0]
           clean_local_vars = {
-            k: v for k, v in local_vars.items()
-            if type(v) in {int, float, str, list, dict, tuple, torch.Tensor}
+              k: v
+              for k, v in local_vars.items()
+              if type(v) in {int, float, str, list, dict, tuple, torch.Tensor}
           }
           pickle.dump(
-            clean_local_vars,
-            open(
-              f"{self._param.path_bug}/"
-              f"local_vars.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
-              "wb"
-            )
-          )
+              clean_local_vars,
+              open(
+                  f"{self._param.path_bug}/"
+                  f"local_vars.{self._model_seen_sample_num}.rank_{self._rank}.pkl",
+                  "wb"))
 
         Logger.info("Saving debugging model")
         info = {
-          "model_seen_sample_num": self._model_seen_sample_num,
-          "opt_evaluate_error": self._opt_evaluate_error,
-          "last_evaluate_point": self._last_evaluate_point,
+            "model_seen_sample_num": self._model_seen_sample_num,
+            "opt_evaluate_error": self._opt_evaluate_error,
+            "last_evaluate_point": self._last_evaluate_point,
         }
         self._model_wrapper._save_model(info, f"rank_{self._rank}")
 
@@ -223,9 +216,8 @@ class TrainerBase:
         batch = [e.to(self._model_wrapper._device) for e in batch]
         yield batch
 
-    yield from nlp.next_batch(
-      get_one_batch(), self._param.iter_num_update_optimizer
-    )
+    yield from nlp.next_batch(get_one_batch(),
+                              self._param.iter_num_update_optimizer)
 
   def train(self):
     def run_minibatch(batch):
@@ -302,15 +294,12 @@ class TrainerBase:
         avg_mini_batch_time = \
           sum(mini_batch_train_time[: -1]) / (mini_batch_num - 1)
         est_net_time = mini_batch_train_time[-1] - avg_mini_batch_time
+        Logger.info(f"Average training time (forward and backward) for "
+                    f"{current_batch_size / mini_batch_num: .2f} samples is "
+                    f"{avg_mini_batch_time: .2f} seconds.")
         Logger.info(
-          f"Average training time (forward and backward) for "
-          f"{current_batch_size / mini_batch_num: .2f} samples is "
-          f"{avg_mini_batch_time: .2f} seconds."
-        )
-        Logger.info(
-          f"Estimated network gradient sync time: {est_net_time: .2f} seconds "
-          f"for {self._world_size} GPUs."
-        )
+            f"Estimated network gradient sync time: {est_net_time: .2f} seconds "
+            f"for {self._world_size} GPUs.")
 
       real_batch_size = self._sync_value(current_batch_size)
       self._model_seen_sample_num += real_batch_size
@@ -338,8 +327,7 @@ class TrainerBase:
             var.grad /= len(batches)
 
       total_norm = torch.nn.utils.clip_grad_norm_(
-        self._model_wrapper._model.parameters(), param.param_norm
-      )
+          self._model_wrapper._model.parameters(), param.param_norm)
       Logger.debug(f"total_norm(parameters.grad)={total_norm}")
 
       self._update_lr()
@@ -353,22 +341,21 @@ class TrainerBase:
       remaining_time = a * b
       progress = self._model_seen_sample_num / self._target_seen_sample_num
       if self._rank == 0:
-        self._writer.add_scalar("loss", batch_loss, self._model_seen_sample_num)
+        self._writer.add_scalar("loss", batch_loss,
+                                self._model_seen_sample_num)
 
       Logger.info(
-        f"Training time: {nlp.to_readable_time(train_duration)}, "
-        f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"Training time: {nlp.to_readable_time(train_duration)}, "
+          f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
       )
-      Logger.info(
-        f"{self._get_worker_info()}: "
-        f"*Epoch: {epoch_id:.2f}, "
-        f"batch_id: {batch_id:_}, "
-        f"progress: {progress * 100:.2f} %, "
-        f"sample_num: {self._model_seen_sample_num:_} "
-        f"batch_size: [{current_batch_size} {real_batch_size}], "
-        f"loss: {batch_loss:.4f}, "
-        f"batch time: {batch_duration:.4f}, "
-      )
+      Logger.info(f"{self._get_worker_info()}: "
+                  f"*Epoch: {epoch_id:.2f}, "
+                  f"batch_id: {batch_id:_}, "
+                  f"progress: {progress * 100:.2f} %, "
+                  f"sample_num: {self._model_seen_sample_num:_} "
+                  f"batch_size: [{current_batch_size} {real_batch_size}], "
+                  f"loss: {batch_loss:.4f}, "
+                  f"batch time: {batch_duration:.4f}, ")
       batch_id += 1
 
       if self._when_evaluate():
@@ -389,9 +376,8 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;" 
-      f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error"
-    )
+        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+        f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error")
     Logger.info(f"Training is Done.")
     os._exit(0)
 
@@ -400,17 +386,15 @@ class TrainerBase:
 
   def _early_stop(self):
     return self.early_stop(
-      self._model_seen_sample_num // self._param.train_sample_num,
-      self._loss_history,
-      self._vali_error_history
-    )
+        self._model_seen_sample_num // self._param.train_sample_num,
+        self._loss_history, self._vali_error_history)
 
   def _check_sync_stop_condition(self, bool_cond):
     value = 0 if bool_cond else 1
     value = self._sync_value(value)
     return value < self._world_size
 
-  def _sync_value(self, single_value, reduce_op: str="sum"):
+  def _sync_value(self, single_value, reduce_op: str = "sum"):
     ts = torch.tensor(single_value, device=self._model_wrapper._device)
     torch.distributed.all_reduce(ts)
     value = ts.item()
@@ -454,4 +438,3 @@ class TrainerBase:
       return True
 
     return False
-

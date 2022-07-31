@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 import torch.utils.data
 from palframe import nlp
@@ -10,15 +10,16 @@ import random
 from palframe.pytorch.dataset.offline_bigdataset import parse_feat_folder
 from palframe.pytorch.dataset.helper import get_batch_data_helper
 
+
 class Dataset(torch.utils.data.IterableDataset):
   '''
   When all workers can not accomendate the whole data, then use it.
   '''
   def __init__(self,
                feat_path,
-               world_size: int=1,
-               rank: int=0,
-               shuffle: bool=True,
+               world_size: int = 1,
+               rank: int = 0,
+               shuffle: bool = True,
                sample_filter_func=None):
     all_feat_files = sorted(parse_feat_folder(feat_path))
     assert world_size <= len(all_feat_files)
@@ -55,16 +56,22 @@ class Dataset(torch.utils.data.IterableDataset):
       files = self._feat_files[worker_id::num_workers]
       yield from self._gen_from_files(files)
 
-def get_batch_data(feat_path, epoch_num, batch_size, worker_num,
-                   shuffle: bool, rank, world_size, pad_batch_data_func,
+
+def get_batch_data(feat_path,
+                   epoch_num,
+                   batch_size,
+                   worker_num,
+                   shuffle: bool,
+                   rank,
+                   world_size,
+                   pad_batch_data_func,
                    sample_filter_func=None):
   for epoch_id in range(epoch_num):
-    dataset = Dataset(
-      feat_path, world_size, rank, shuffle, sample_filter_func
-    )
+    dataset = Dataset(feat_path, world_size, rank, shuffle, sample_filter_func)
     yield from get_batch_data_helper(
-      dataset, epoch_num=1, batch_size=batch_size,
-      worker_num=0 if nlp.is_debugging() else worker_num,
-      shuffle=False,
-      pad_batch_data_func=pad_batch_data_func
-    )
+        dataset,
+        epoch_num=1,
+        batch_size=batch_size,
+        worker_num=0 if nlp.is_debugging() else worker_num,
+        shuffle=False,
+        pad_batch_data_func=pad_batch_data_func)

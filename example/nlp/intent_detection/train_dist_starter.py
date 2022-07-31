@@ -6,6 +6,7 @@ from example.nlp.intent_detection.param import Param
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5 import starter
 
+
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
   # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
@@ -19,9 +20,10 @@ def main():
   # param.servers_file = "server_file.data"
 
   starter.start_distributed_train(
-    param,
-    "example/nlp/intent_detection/train.py",
+      param,
+      "example/nlp/intent_detection/train.py",
   )
+
 
 if __name__ == "__main__":
   main()

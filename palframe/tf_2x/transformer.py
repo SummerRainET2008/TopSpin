@@ -1,7 +1,8 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.tf_2x import *
+
 
 class PrePostProcessingWrapper:
   def __init__(self, layer, layer_postprocess_dropout):
@@ -15,17 +16,17 @@ class PrePostProcessingWrapper:
 
     return x + y
 
+
 class FFN(tf.keras.layers.Layer):
   def __init__(self, ffn_dim, hidden_size, relu_dropout):
     super(FFN, self).__init__()
 
     self._dropout = tf.keras.layers.Dropout(relu_dropout)
-    self._filter_dense_layer = tf.keras.layers.Dense(
-      ffn_dim, activation=tf.nn.relu, name="filter_layer"
-    )
-    self._output_dense_layer = tf.keras.layers.Dense(
-      hidden_size, name="output_layer"
-    )
+    self._filter_dense_layer = tf.keras.layers.Dense(ffn_dim,
+                                                     activation=tf.nn.relu,
+                                                     name="filter_layer")
+    self._output_dense_layer = tf.keras.layers.Dense(hidden_size,
+                                                     name="output_layer")
 
   def call(self, x, *args, **kwargs):
     '''
@@ -38,6 +39,7 @@ class FFN(tf.keras.layers.Layer):
 
     return output
 
+
 class MultiHeadAttention(tf.keras.layers.Layer):
   def __init__(self, hidden_size, num_heads, atten_dropout):
     assert hidden_size % num_heads == 0
@@ -48,19 +50,19 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     self._atten_dropout = tf.keras.layers.Dropout(atten_dropout)
 
     # Layers for linearly projecting the queries, keys, and values.
-    self._q_dense_layer = tf.keras.layers.Dense(
-      hidden_size, use_bias=False, name="q"
-    )
-    self._k_dense_layer = tf.keras.layers.Dense(
-      hidden_size, use_bias=False, name="k"
-    )
-    self._v_dense_layer = tf.keras.layers.Dense(
-      hidden_size, use_bias=False, name="v"
-    )
+    self._q_dense_layer = tf.keras.layers.Dense(hidden_size,
+                                                use_bias=False,
+                                                name="q")
+    self._k_dense_layer = tf.keras.layers.Dense(hidden_size,
+                                                use_bias=False,
+                                                name="k")
+    self._v_dense_layer = tf.keras.layers.Dense(hidden_size,
+                                                use_bias=False,
+                                                name="v")
 
-    self._output_layer = tf.keras.layers.Dense(
-      hidden_size, use_bias=False, name="output_transform"
-    )
+    self._output_layer = tf.keras.layers.Dense(hidden_size,
+                                               use_bias=False,
+                                               name="output_transform")
 
   def _split_heads(self, x):
     '''
@@ -84,9 +86,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     return tf.reshape(x, [-1, length, self._hidden_size])
 
   def _gen_padding_mask(self, seq_len, max_seq_len):
-    padding_mask = tf.sequence_mask(
-      seq_len, maxlen=max_seq_len, dtype=tf.float32
-    )
+    padding_mask = tf.sequence_mask(seq_len,
+                                    maxlen=max_seq_len,
+                                    dtype=tf.float32)
     padding_mask = (1 - padding_mask) * -1e10
     padding_mask = tf.expand_dims(tf.expand_dims(padding_mask, 1), 1)
 
@@ -108,7 +110,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     v = self._split_heads(v)
 
     depth = (self._hidden_size // self._num_heads)
-    q *= depth ** -0.5
+    q *= depth**-0.5
 
     logits = tf.matmul(q, k, transpose_b=True)
 
@@ -119,9 +121,8 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     # ) * -1e10
 
     assert "seq_len" in kwargs
-    padding_mask = self._gen_padding_mask(
-      kwargs["seq_len"], key_values.shape[1]
-    )
+    padding_mask = self._gen_padding_mask(kwargs["seq_len"],
+                                          key_values.shape[1])
     logits += padding_mask
     weights = tf.nn.softmax(logits)
 
@@ -136,37 +137,32 @@ class MultiHeadAttention(tf.keras.layers.Layer):
 
     return attention_output
 
+
 class SelfMultiHeadAttention(MultiHeadAttention):
   def call(self, query, *args, **kwargs):
     # kwargs["key_values"] = query
-    return super(SelfMultiHeadAttention, self).call(
-      query, query, *args, **kwargs
-    )
+    return super(SelfMultiHeadAttention, self).call(query, query, *args,
+                                                    **kwargs)
+
 
 class EncoderStack(tf.keras.layers.Layer):
-  def __init__(self,
-               layer_num, hidden_size, num_heads, ffn_dim,
-               relu_dropout, atten_dropout, layer_postprocess_dropout):
+  def __init__(self, layer_num, hidden_size, num_heads, ffn_dim, relu_dropout,
+               atten_dropout, layer_postprocess_dropout):
     super(EncoderStack, self).__init__()
     self._all_layer_blocks = []
     for _ in range(layer_num):
-      self_attention_layer = SelfMultiHeadAttention(
-        hidden_size, num_heads, atten_dropout
-      )
+      self_attention_layer = SelfMultiHeadAttention(hidden_size, num_heads,
+                                                    atten_dropout)
       ffn = FFN(ffn_dim, hidden_size, relu_dropout)
 
       self._all_layer_blocks.append([
-        PrePostProcessingWrapper(
-          self_attention_layer, layer_postprocess_dropout
-        ),
-        PrePostProcessingWrapper(
-          ffn, layer_postprocess_dropout
-        )
+          PrePostProcessingWrapper(self_attention_layer,
+                                   layer_postprocess_dropout),
+          PrePostProcessingWrapper(ffn, layer_postprocess_dropout)
       ])
 
     self._output_normalization = tf.keras.layers.LayerNormalization(
-      epsilon=1e-6
-    )
+        epsilon=1e-6)
 
   def call(self, encoder_inputs, *args, **kwargs):
     '''Return the output of the encoder layer stacks.
@@ -187,30 +183,28 @@ class EncoderStack(tf.keras.layers.Layer):
       self_attention_layer = layer[0]
       feed_forward_network = layer[1]
 
-      encoder_inputs = self_attention_layer(
-        encoder_inputs, *args, **kwargs
-      )
-      encoder_inputs = feed_forward_network(
-        encoder_inputs, *args, **kwargs
-      )
+      encoder_inputs = self_attention_layer(encoder_inputs, *args, **kwargs)
+      encoder_inputs = feed_forward_network(encoder_inputs, *args, **kwargs)
 
     return self._output_normalization(encoder_inputs)
 
+
 class Encoder(tf.keras.layers.Layer):
-  def __init__(self,
-               layer_num, hidden_size, num_heads, ffn_dim,
-               relu_dropout, atten_dropout, layer_postprocess_dropout):
+  def __init__(self, layer_num, hidden_size, num_heads, ffn_dim, relu_dropout,
+               atten_dropout, layer_postprocess_dropout):
     super(Encoder, self).__init__()
     self._input_dense = tf.keras.layers.Dense(hidden_size)
     self._encoder_stack = EncoderStack(
-      layer_num=layer_num, hidden_size=hidden_size, num_heads=num_heads,
-      ffn_dim=ffn_dim,
-      relu_dropout=relu_dropout, atten_dropout=atten_dropout,
-      layer_postprocess_dropout=layer_postprocess_dropout,
+        layer_num=layer_num,
+        hidden_size=hidden_size,
+        num_heads=num_heads,
+        ffn_dim=ffn_dim,
+        relu_dropout=relu_dropout,
+        atten_dropout=atten_dropout,
+        layer_postprocess_dropout=layer_postprocess_dropout,
     )
-    self._input_dense = tf.keras.layers.Dense(
-      hidden_size, activation=tf.nn.leaky_relu
-    )
+    self._input_dense = tf.keras.layers.Dense(hidden_size,
+                                              activation=tf.nn.leaky_relu)
 
   def call(self, input_x: tf.Tensor, seq_len: tf.Tensor, *args, **kwargs):
     '''
@@ -223,4 +217,3 @@ class Encoder(tf.keras.layers.Layer):
     x = self._encoder_stack(x, *args, **kwargs)
 
     return x
-

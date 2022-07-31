@@ -1,8 +1,9 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 import matplotlib.pyplot as pylab
+
 
 class FigureDrawer:
   def __init__(self, title: str, xlabel: str, ylabel: str):
@@ -14,7 +15,7 @@ class FigureDrawer:
     pylab.xlabel(xlabel)
     pylab.ylabel(ylabel)
 
-  def add_data(self, y_data: list, label: str, x_data: list=None):
+  def add_data(self, y_data: list, label: str, x_data: list = None):
     if x_data is None:
       self._ax.plot(y_data, label=label)
     else:
@@ -33,4 +34,3 @@ class FigureDrawer:
   def save_to_figure(self, out_figure: str):
     pylab.legend()
     pylab.savefig(out_figure, bbox_inches="tight")
-

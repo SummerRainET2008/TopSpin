@@ -74,30 +74,30 @@ from palframe.pytorch.dataset.offline_smalldataset import get_batch_data as \
 #     """
 #     return len(self.data_paths)
 
+
 def _coll_fn(batch):
   xvecs, labels = list(zip(*batch))
   xvecs = torch.FloatTensor(xvecs)
   labels = torch.FloatTensor(labels)
   return xvecs, labels
 
-def get_batch_data(param, feat_path, epoch_num, rank, world_size,
-                   is_training):
+
+def get_batch_data(param, feat_path, epoch_num, rank, world_size, is_training):
   if is_training:
     batch_size = param.batch_size
   else:
     batch_size = param.batch_size_inference
 
-  yield from _get_batch_data(
-    feat_path=feat_path,
-    epoch_num=epoch_num,
-    batch_size=batch_size,
-    worker_num=param.num_workers_loading_data,
-    shuffle=is_training,
-    rank=rank if is_training else 0,
-    world_size=world_size if is_training else 1,
-    pad_batch_data_func=_coll_fn,
-    sample_filter_func=None
-  )
+  yield from _get_batch_data(feat_path=feat_path,
+                             epoch_num=epoch_num,
+                             batch_size=batch_size,
+                             worker_num=param.num_workers_loading_data,
+                             shuffle=is_training,
+                             rank=rank if is_training else 0,
+                             world_size=world_size if is_training else 1,
+                             pad_batch_data_func=_coll_fn,
+                             sample_filter_func=None)
+
 
 def main():
   from speech.speaker_diarization.ver_1_xvector_cnn.param import Param
@@ -106,6 +106,7 @@ def main():
   for epoch, batch in data_iter:
     print(batch[0].shape)
     break
+
 
 if __name__ == "__main__":
   main()

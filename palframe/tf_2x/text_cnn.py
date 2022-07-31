@@ -1,7 +1,8 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.tf_2x import *
+
 
 class _CNNLayer(tf.keras.layers.Layer):
   def __init__(self, kernel: int, filter_num: int, dim):
@@ -14,28 +15,28 @@ class _CNNLayer(tf.keras.layers.Layer):
   def build(self, input_shape):
     seq_len = input_shape[1]
     self._cnn = tf.keras.layers.Conv2D(
-      filters=self._filter_num,
-      kernel_size=[self._kernel, self._dim],
-      strides=[1, 1],
-      dilation_rate=[1, 1],
-      activation=tf.keras.activations.relu,
+        filters=self._filter_num,
+        kernel_size=[self._kernel, self._dim],
+        strides=[1, 1],
+        dilation_rate=[1, 1],
+        activation=tf.keras.activations.relu,
     )
     self._max_pool = tf.keras.layers.MaxPool2D(
-      (seq_len - self._kernel + 1, 1),
-    )
+        (seq_len - self._kernel + 1, 1), )
 
   def call(self, inputs, *args, **kwargs):
     out = self._cnn(inputs)
-    out =  self._max_pool(out)
+    out = self._max_pool(out)
 
     return out
+
 
 class TextCNN(tf.keras.layers.Layer):
   def __init__(self, emb_size, filter_num, kernels: list, dropout: float):
     super(TextCNN, self).__init__()
 
     self._cnns = [
-      _CNNLayer(kernel, filter_num, emb_size) for kernel in kernels
+        _CNNLayer(kernel, filter_num, emb_size) for kernel in kernels
     ]
     self._dropout = tf.keras.layers.Dropout(dropout)
 
@@ -50,4 +51,3 @@ class TextCNN(tf.keras.layers.Layer):
     x = self._dropout(x, kwargs["training"])
 
     return x
-

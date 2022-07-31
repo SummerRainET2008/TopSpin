@@ -1,7 +1,8 @@
 #coding: utf8
-#author: Xinyi Wu 
+#author: Xinyi Wu
 
 from palframe.pytorch.estimator5.param import ParamBase, ParameterRange
+
 
 class Param(ParamBase):
   def __init__(self):
@@ -12,14 +13,14 @@ class Param(ParamBase):
     self.test_files = 'example/speech/speaker_change/feat/test.pkl'
 
     self.path_initial_model = None
-    self.path_inference_model = None # Put checkpoint path here for prediction
+    self.path_inference_model = None  # Put checkpoint path here for prediction
 
     # Training
     self.lr = ParameterRange([0.001, 0.005])
     self.epoch_num = 200
     self.gpu_num = 1
     self.use_gpu = True
-    self.use_amp =  False
+    self.use_amp = False
     self.ending_lr_ratio = 0.001
     self.batch_size = 16
     self.batch_size_inference = 8

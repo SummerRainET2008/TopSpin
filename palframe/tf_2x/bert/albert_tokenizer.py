@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.tf_2x import *
 from palframe.tf_2x.bert.open_source import bert
@@ -8,6 +8,7 @@ from palframe.tf_2x.bert.open_source.bert.tokenization.\
 from palframe.tf_2x.bert.bert_tokenizer import BertTokenizer
 from palframe.nlp import Logger
 import sentencepiece as spm
+
 
 class AlBertTokenizer(BertTokenizer):
   def __init__(self, model_dir):
@@ -32,12 +33,11 @@ class AlBertTokenizer(BertTokenizer):
 
   def _convert_one(self, sent: str):
     processed_text = bert.albert_tokenization.preprocess_text(
-      sent, lower=self._do_lower_case
-    )
-    pieces = encode_pieces(
-      self._sp, processed_text, return_unicode=False, sample=False
-    )
+        sent, lower=self._do_lower_case)
+    pieces = encode_pieces(self._sp,
+                           processed_text,
+                           return_unicode=False,
+                           sample=False)
     ids = [self._sp.PieceToId(piece) for piece in pieces]
 
     return pieces, ids
-

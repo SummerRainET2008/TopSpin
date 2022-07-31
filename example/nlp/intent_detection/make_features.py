@@ -5,6 +5,7 @@ from example.nlp.intent_detection import *
 from palframe.pytorch.pretrained.tokenizer import Tokenizer
 from palframe import nlp
 
+
 def process(data_files: list, out_file: str):
   def get_point():
     for ln in nlp.next_line_from_files(data_files):
@@ -26,20 +27,17 @@ def process(data_files: list, out_file: str):
   nlp.command(f"rm -r {out_file}")
   pickle.dump(data, open(out_file, "wb"))
 
+
 def main():
   feat_path = "feat/nlp/intent_detection"
   nlp.mkdir(feat_path, delete_first=False)
 
-  process(
-    [f"example/nlp/intent_detection/data/train.pydict"],
-    os.path.join(feat_path, "train.pkl")
-  )
+  process([f"example/nlp/intent_detection/data/train.pydict"],
+          os.path.join(feat_path, "train.pkl"))
 
-  process(
-    [f"example/nlp/intent_detection/data/test.pydict"],
-    os.path.join(feat_path, "vali.pkl")
-  )
+  process([f"example/nlp/intent_detection/data/test.pydict"],
+          os.path.join(feat_path, "vali.pkl"))
+
 
 if __name__ == "__main__":
   main()
-

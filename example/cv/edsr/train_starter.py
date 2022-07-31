@@ -6,6 +6,7 @@ import optparse
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5 import starter
 
+
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
   # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
@@ -14,9 +15,8 @@ def main():
 
   Logger.set_level(options.debug_level)
 
-  starter.start_train(Param.get_instance(),
-            "./example/cv/edsr/train.py",
-            [starter.Server(None, [0,1,2,3,4,5])])
+  starter.start_train(Param.get_instance(), "./example/cv/edsr/train.py",
+                      [starter.Server(None, [0, 1, 2, 3, 4, 5])])
 
 
 if __name__ == "__main__":

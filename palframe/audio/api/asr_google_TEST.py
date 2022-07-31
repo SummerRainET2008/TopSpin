@@ -10,8 +10,5 @@ Chinese please use language="Zh-cn"
 English please use language="US-en"
 '''
 if __name__ == '__main__':
-  data_path = os.path.join(
-    common.get_module_path("common"),
-    "audio/audio.wav"
-  )
+  data_path = os.path.join(common.get_module_path("common"), "audio/audio.wav")
   audio_recognition(data_path, language="Zh-cn")

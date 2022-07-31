@@ -3,6 +3,7 @@
 
 from palframe.data_pipeline.pt import *
 
+
 class Dataset:
   def __init__(self):
     '''You could read all time in one time into memory and then do the split by
@@ -32,4 +33,3 @@ class Dataset:
 
   def _get_next_sample(self):
     raise Exception("not implemented")
-

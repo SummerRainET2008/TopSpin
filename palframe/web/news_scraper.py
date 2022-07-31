@@ -6,6 +6,7 @@ import requests
 from newspaper import Article
 from bs4 import BeautifulSoup
 
+
 class NewsScraper(object):
   def __init__(self, url, language='zh'):
     self._url = url
@@ -26,9 +27,9 @@ class NewsScraper(object):
 
   def get_result(self):
     return {
-      'date': self._publish_time,
-      'title': self._article.title,
-      'summary': self._article.summary,
-      'url': self._url,
-      "text": self._article.text
+        'date': self._publish_time,
+        'title': self._article.title,
+        'summary': self._article.summary,
+        'url': self._url,
+        "text": self._article.text
     }

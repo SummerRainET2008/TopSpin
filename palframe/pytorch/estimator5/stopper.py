@@ -1,8 +1,9 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch import *
 from palframe.pytorch.estimator5 import starter
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [options]")
@@ -27,6 +28,7 @@ def main():
   elif not nlp.is_none_or_empty(options.servers_file):
     for ip in open(options.servers_file).read().replace(",", " ").split():
       starter.clear_server(ip)
+
 
 if __name__ == "__main__":
   main()

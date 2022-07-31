@@ -5,6 +5,7 @@
 # pip install SpeechRecognition
 import speech_recognition as sr
 
+
 def audio_file_recognize(audio_file, language_selection):
   '''
   :param audio_file: audio file to be recognized
@@ -19,6 +20,7 @@ def audio_file_recognize(audio_file, language_selection):
   with stock_audio as source:
     audio = r.record(source)
     print(r.recognize_google(audio, language=language_selection))
+
 
 def listen_and_recognize(time_out, language_selection):
   '''
@@ -35,6 +37,7 @@ def listen_and_recognize(time_out, language_selection):
     r.adjust_for_ambient_noise(source)
     audio = r.listen(source, timeout=time_out)
   try:
-    print(r.recognize_google(audio, show_all=True, language=language_selection))
+    print(r.recognize_google(audio, show_all=True,
+                             language=language_selection))
   except:
     print("Sorry, I cannot understand your questions.")

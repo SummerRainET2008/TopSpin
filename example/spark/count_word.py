@@ -12,6 +12,7 @@ from palframe import nlp
 import optparse
 import os
 
+
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
   # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
@@ -35,6 +36,7 @@ def main():
     print(f"word statistics: {word_stat}")
 
   spark.stop()
+
 
 if __name__ == "__main__":
   main()

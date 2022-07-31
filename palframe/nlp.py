@@ -1,10 +1,11 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 
-INF         = float("inf")
-EPSILON     = 1e-6
+INF = float("inf")
+EPSILON = 1e-6
+
 
 def load_module_from_full_path(path):
   import importlib.util
@@ -14,17 +15,18 @@ def load_module_from_full_path(path):
   spec.loader.exec_module(foo)
   return foo
 
+
 class TerminalColors:
-  HEADER    = '\033[95m'
-  OKBLUE    = '\033[94m'
-  OKCYAN    = '\033[96m'
-  OKGREEN   = '\033[92m'
-  WARNING   = '\033[93m'
-  FAIL      = '\033[91m'
-  BOLD      = '\033[1m'
+  HEADER = '\033[95m'
+  OKBLUE = '\033[94m'
+  OKCYAN = '\033[96m'
+  OKGREEN = '\033[92m'
+  WARNING = '\033[93m'
+  FAIL = '\033[91m'
+  BOLD = '\033[1m'
   UNDERLINE = '\033[4m'
 
-  ENDC      = '\033[0m'
+  ENDC = '\033[0m'
 
   @staticmethod
   def display_all_colors():
@@ -37,6 +39,7 @@ class TerminalColors:
     print(f"{TC.FAIL}This color is 'FAIL'{TC.ENDC}")
     print(f"{TC.BOLD}This color is 'BOLD'{TC.ENDC}")
     print(f"{TC.UNDERLINE}This color is 'UNDERLINE'{TC.ENDC}")
+
 
 def async_function(f):
   '''
@@ -53,30 +56,31 @@ def async_function(f):
 
   return wrapper
 
+
 def get_GPU_info(gpu_id):
   with Timer(f"get_GPU_info({gpu_id})"):
     nvidia_smi.nvmlInit()
     handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)
     info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    total = info.total / 1024 ** 2
-    free = info.free / 1024 ** 2
-    used = info.used / 1024 ** 2
+    total = info.total / 1024**2
+    free = info.free / 1024**2
+    used = info.used / 1024**2
     nvidia_smi.nvmlShutdown()
 
-    return {
-      "Total memory": total,
-      "Free memory": free,
-      "Used memory": used
-    }
+    return {"Total memory": total, "Free memory": free, "Used memory": used}
+
 
 def coloring(s, value=TerminalColors.HEADER):
   return f"{value}{s}{TerminalColors.ENDC}"
 
+
 def is_sys_mac():
   return sys.platform == "darwin"
 
+
 def is_os_linux():
   return "linux" in sys.platform
+
 
 def histogram_ascii(points) -> None:
   counted = Counter(points)
@@ -95,6 +99,7 @@ def histogram_ascii(points) -> None:
 
   print()
 
+
 def set_random_seeds(seed=0):
   '''
   :param seed: 0 means taking current time, or taking the seed value.
@@ -112,12 +117,14 @@ def set_random_seeds(seed=0):
   np.random.seed(seed)
   random.seed(seed)
 
+
 def is_debugging():
   gettrace = getattr(sys, 'gettrace', None)
   if gettrace is None:
     return False
   else:
     return not is_none_or_empty(gettrace())
+
 
 def next_batch(data: typing.Iterator, batch_size: int):
   _ = range(batch_size)
@@ -129,6 +136,7 @@ def next_batch(data: typing.Iterator, batch_size: int):
     batch_data = list(map(itemgetter(1), buff))
     yield batch_data
 
+
 def ensure_random_seed_for_one_time(buff={}):
   key = "randomized"
   status = buff.get(key, False)
@@ -136,23 +144,29 @@ def ensure_random_seed_for_one_time(buff={}):
     random.seed()
     buff[key] = True
 
+
 def get_file_line_count(file_name: str):
   return int(os.popen(f"wc -l {file_name}").read().split()[0])
+
 
 def get_files_line_count(file_names: list):
   return sum([get_file_line_count(f) for f in file_names])
 
+
 def get_new_temporay_file():
   return tempfile.NamedTemporaryFile(delete=False).name
 
-def next_line_from_file(file_name: str, max_count: int=-1):
+
+def next_line_from_file(file_name: str, max_count: int = -1):
   for idx, ln in enumerate(open(file_name)):
     if (max_count > 0 and idx < max_count) or max_count <= 0:
       yield ln.rstrip()
 
-def next_line_from_files(file_names: list, max_count: int=-1):
+
+def next_line_from_files(file_names: list, max_count: int = -1):
   for f in file_names:
     yield from next_line_from_file(f, max_count)
+
 
 def segment_contain(seg1: list, seg2: list):
   if seg1[0] <= seg2[0] and seg2[1] <= seg1[1]:
@@ -161,13 +175,16 @@ def segment_contain(seg1: list, seg2: list):
     return -1
   return 0
 
+
 def segment_intersec(seg1: list, seg2: list):
   return not segment_no_touch(seg1, seg2)
+
 
 def segment_no_touch(seg1: list, seg2: list):
   return seg1[1] <= seg2[0] or seg2[1] <= seg1[0]
 
-def uniq(data: list)->typing.Iterator:
+
+def uniq(data: list) -> typing.Iterator:
   '''
   :param data: must be sorted.
   '''
@@ -177,23 +194,28 @@ def uniq(data: list)->typing.Iterator:
       yield d
       prev = d
 
+
 def norm1(vec):
   vec = array(vec)
   nm = float(sum(abs(vec)))
   return vec if eq(nm, 0) else vec / nm
+
 
 def norm2(vec):
   vec = array(vec)
   nm = math.sqrt(sum(vec * vec))
   return vec if eq(nm, EPSILON) else vec / nm
 
-def cmp(a, b)-> int:
+
+def cmp(a, b) -> int:
   return (a > b) - (a < b)
+
 
 def get_home_dir():
   return os.environ["HOME"]
 
-def mkdir(folder: str, delete_first: bool=False)-> None:
+
+def mkdir(folder: str, delete_first: bool = False) -> None:
   # create folder recursively.
   if delete_first:
     execute_cmd(f"rm -r {folder}")
@@ -204,7 +226,8 @@ def mkdir(folder: str, delete_first: bool=False)-> None:
     if not os.path.exists(path):
       execute_cmd(f"mkdir {path}")
 
-def get_module_path(module_name)-> typing.Union[str, None]:
+
+def get_module_path(module_name) -> typing.Union[str, None]:
   '''
   This applys for use-defined moudules.
   e.g., get_module_path("NLP.translation.Translate")
@@ -214,14 +237,15 @@ def get_module_path(module_name)-> typing.Union[str, None]:
     path = path.strip()
     if path == "":
       path = os.getcwd()
-    
+
     file_name = os.path.join(path, module_name)
     if os.path.exists(file_name):
       return path
-  
+
   return None
 
-def norm_regex(regexExpr)-> str:
+
+def norm_regex(regexExpr) -> str:
   return regexExpr\
     .replace("*", "\*")\
     .replace("+", "\+")\
@@ -231,7 +255,8 @@ def norm_regex(regexExpr)-> str:
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
-def pydict_file_read(file_name, max_num: int=-1)-> typing.Iterator:
+
+def pydict_file_read(file_name, max_num: int = -1) -> typing.Iterator:
   assert file_name.endswith(".pydict")
   data_num = 0
   with open(file_name, encoding="utf-8") as fin:
@@ -251,7 +276,8 @@ def pydict_file_read(file_name, max_num: int=-1)-> typing.Iterator:
 
   Logger.info(f"{file_name}: #data={data_num:,}")
 
-def pydict_file_write(data: typing.Iterator, file_name: str, **kwargs)-> None:
+
+def pydict_file_write(data: typing.Iterator, file_name: str, **kwargs) -> None:
   assert file_name.endswith(".pydict")
   if isinstance(data, dict):
     data = [data]
@@ -269,16 +295,19 @@ def pydict_file_write(data: typing.Iterator, file_name: str, **kwargs)-> None:
   if kwargs.get("print_log", True):
     Logger.info(f"{file_name} has been written {num} lines totally")
 
-def get_file_extension(file_name: str)-> str:
+
+def get_file_extension(file_name: str) -> str:
   return file_name.split(".")[-1]
+
 
 def replace_file_name(file_name: str, old_suffix: str, new_suffix: str):
   assert old_suffix in file_name
-  return file_name[: len(file_name) - len(old_suffix)] + new_suffix
+  return file_name[:len(file_name) - len(old_suffix)] + new_suffix
+
 
 def get_files_in_folder(data_path,
-                        file_extensions: typing.Union[list, set]=None,
-                        resursive=False)-> list:
+                        file_extensions: typing.Union[list, set] = None,
+                        resursive=False) -> list:
   '''file_exts: should be a set, or None, e.g, ["wav", "flac"]
   return: a list, [fullFilePath]'''
   def legal_file(short_name):
@@ -291,11 +320,13 @@ def get_files_in_folder(data_path,
     assert isinstance(file_extensions, (list, set))
     file_extensions = set(file_extensions)
 
-  for path, folders, files in os.walk(data_path, topdown=resursive,
+  for path, folders, files in os.walk(data_path,
+                                      topdown=resursive,
                                       followlinks=False):
     for short_name in files:
       if legal_file(short_name):
         yield os.path.realpath(os.path.join(path, short_name))
+
 
 def split_data_by_func(data, func):
   data1, data2 = [], []
@@ -306,13 +337,15 @@ def split_data_by_func(data, func):
       data2.append(d)
   return data1, data2
 
-def is_none_or_empty(data)-> bool:
+
+def is_none_or_empty(data) -> bool:
   '''This applies to any data type which has a __len__ method'''
   if data is None:
     return True
   if isinstance(data, (str, list, set, dict)):
     return len(data) == 0
   return False
+
 
 def to_readable_time(seconds: float):
   if seconds < 0:
@@ -337,7 +370,8 @@ def to_readable_time(seconds: float):
 
   return " ".join(result)
 
-def get_log_time(utc_time: bool=True):
+
+def get_log_time(utc_time: bool = True):
   '''
   e.g., SF time is utf-8, then get_log_time(True) - 8 = get_log_time(False)
   '''
@@ -351,8 +385,9 @@ def get_log_time(utc_time: bool=True):
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
     return f"[local] {ts}"
 
+
 #deprecated
-def execute_cmd(*cmds)-> int:
+def execute_cmd(*cmds) -> int:
   cmd = " ".join(cmds)
   start = time.time()
   Logger.debug(f"[start] executing '{cmd}'")
@@ -364,6 +399,7 @@ def execute_cmd(*cmds)-> int:
   Logger.debug(f"[{status}] {readable_time}, executing '{cmd}'")
   return ret
 
+
 #deprecated
 def execute_remote_cmd(account, server, cmd, buff={}):
   current_IP = buff.setdefault("current_IP", get_server_ip())
@@ -372,6 +408,7 @@ def execute_remote_cmd(account, server, cmd, buff={}):
   else:
     assert "'" not in cmd
     return execute_cmd(f"ssh {account}@{server} '{cmd}'")
+
 
 #deprecated
 def execute_popen(cmd, server=None, account=None):
@@ -384,13 +421,18 @@ def execute_popen(cmd, server=None, account=None):
 
   return list(os.popen(cmd))
 
-def command(cmd: str, capture_output: bool=False, server=None, account=None,
+
+def command(cmd: str,
+            capture_output: bool = False,
+            server=None,
+            account=None,
             buff={}):
   '''return (status_code, stdout, stderror)'''
   current_IPs = buff.setdefault(
-    "current_IP",
-    set([attr[0].address for net_name, attr in psutil.net_if_addrs().items()])
-  )
+      "current_IP",
+      set([
+          attr[0].address for net_name, attr in psutil.net_if_addrs().items()
+      ]))
   if server == "127.0.0.1" or server is None or server in current_IPs:
     full_cmd = cmd
   else:
@@ -409,36 +451,41 @@ def command(cmd: str, capture_output: bool=False, server=None, account=None,
   else:
     return result.returncode, "", ""
 
-def to_utf8(line)-> typing.Union[str, None]:
+
+def to_utf8(line) -> typing.Union[str, None]:
   if type(line) is str:
     try:
       return line.encode("utf8")
     except:
       Logger.warn("in toUtf8(...)")
       return None
-    
+
   elif type(line) is bytes:
     return line
-  
+
   Logger.error("wrong type in toUtf8(...)")
   return None
 
-def print_flush(cont, stream=None)-> None:
+
+def print_flush(cont, stream=None) -> None:
   if stream is None:
     stream = sys.stdout
   print(cont, file=stream)
   stream.flush()
 
+
 def eq(v1, v2, prec=EPSILON):
   return abs(v1 - v2) < prec
 
-def discrete_sample(dists)-> int:
+
+def discrete_sample(dists) -> int:
   '''each probability must be greater than 0'''
   dists = array(dists)
   assert all(dists >= 0)
   accsum = scipy.cumsum(dists)
   expNum = accsum[-1] * random.random()
   return bisect.bisect(accsum, expNum)
+
 
 def log_sum(ds):
   '''input: [d1, d2, d3..] = [log(p1), log(p2), log(p3)..]
@@ -447,6 +494,7 @@ def log_sum(ds):
   dv = max(ds)
   e = math.log(sum([math.exp(d - dv) for d in ds]))
   return dv + e
+
 
 def group_by_key_fun(data, key_fun=None):
   '''Note, the spark.group_by_key requires the data is sorted by keys.
@@ -458,6 +506,7 @@ def group_by_key_fun(data, key_fun=None):
     result[key].append(d)
 
   return result
+
 
 def get_server_ip(buffer={}):
   if "ip" in buffer:
@@ -475,24 +524,30 @@ def get_server_ip(buffer={}):
   buffer["ip"] = ip
   return ip
 
+
 def display_server_info():
   host_name = socket.gethostname()
   ip = get_server_ip()
   Logger.info(f"server information: {host_name}({ip}), process: {os.getpid()}")
 
+
 def get_pretrained_model(model_name="roberta/roberta.large"):
   return os.path.expanduser(f"~/pretrained_models/{model_name}")
+
 
 def get_available_gpus(server_ip=None, account=None):
   def find():
     memory_regex = r'([0-9]+)MiB / .* Default'
 
-    res = command("nvidia-smi", capture_output=True, server=server_ip,
+    res = command("nvidia-smi",
+                  capture_output=True,
+                  server=server_ip,
                   account=account)[1]
     Logger.debug(f"server: {server_ip}, {res}")
     res = res.split("\n")
     if len(res) <= 6:
-      Logger.error(f"can not obtain correct nvidia-smi result: {' '.join(res)}")
+      Logger.error(
+          f"can not obtain correct nvidia-smi result: {' '.join(res)}")
       yield -1
       return
 
@@ -519,6 +574,7 @@ def get_available_gpus(server_ip=None, account=None):
     Logger.error(error)
     return []
 
+
 def timeout(func, args: list, max_time_seconds):
   class _MonitorThread(threading.Thread):
     def __init__(self, ret: list):
@@ -544,14 +600,17 @@ def timeout(func, args: list, max_time_seconds):
 
   raise TimeoutError()
 
+
 def is_wide_char(ch):
   return unicodedata.east_asian_width(ch) in ['W', "F"]
+
 
 def get_console_text_length(text):
   ext_len = sum([is_wide_char(e) for e in text])
   return len(text) + ext_len
 
-def full_justify_zh_en(article: str, max_width)-> list:
+
+def full_justify_zh_en(article: str, max_width) -> list:
   def split(text):
     text = text.strip()
     console_len_sum = 0
@@ -563,9 +622,9 @@ def full_justify_zh_en(article: str, max_width)-> list:
       # print(f"{console_len_sum}, {p}, '{e}', {char_type}, {text[: p + 1]}")
 
       if console_len_sum == max_width:
-        return text[: p + 1], text[p + 1:]
+        return text[:p + 1], text[p + 1:]
       elif console_len_sum == max_width + 1:
-        return text[: p], text[p:]
+        return text[:p], text[p:]
 
     return text, ""
 
@@ -578,7 +637,8 @@ def full_justify_zh_en(article: str, max_width)-> list:
 
   return ret
 
-def full_justify_en(article: str, max_width)-> list:
+
+def full_justify_en(article: str, max_width) -> list:
   words = article.split()
   buff, words_length = [], 0
   ret, p = [], 0
@@ -601,12 +661,13 @@ def full_justify_en(article: str, max_width)-> list:
       else:
         blank = (max_width - words_length) // (len(buff) - 1)
         mod = max_width - words_length - blank * (len(buff) - 1)
-        ret.append((" " * (blank + 1)).join(buff[: mod + 1]) +
-                   " " * blank + (" " * blank).join(buff[mod + 1:]))
+        ret.append((" " * (blank + 1)).join(buff[:mod + 1]) + " " * blank +
+                   (" " * blank).join(buff[mod + 1:]))
       buff = []
       words_length = 0
 
   return ret
+
 
 class Timer(object):
   def __init__(self, title="") -> None:
@@ -633,9 +694,9 @@ class Timer(object):
     self.__duration = time.time() - self.__starting
     if not is_none_or_empty(self.title):
       Logger.info(
-        f"Timer finishes:\t '{self.title}', takes {to_readable_time(self.duration)} "
-        f"seconds."
-      )
+          f"Timer finishes:\t '{self.title}', takes {to_readable_time(self.duration)} "
+          f"seconds.")
+
 
 class Logger:
   '''
@@ -680,7 +741,11 @@ class Logger:
       print(get_log_time(), "ERR:", *args, file=Logger.outstream)
       Logger.outstream.flush()
 
-def top_k_max_or_min(data: list, k, type="max", to_sort=False,
+
+def top_k_max_or_min(data: list,
+                     k,
+                     type="max",
+                     to_sort=False,
                      data_key_func=lambda d: d):
   def top_k_largest(key_func):
     if len(data) <= k:
@@ -705,6 +770,7 @@ def top_k_max_or_min(data: list, k, type="max", to_sort=False,
   elif type == "min":
     key_func = lambda item: -data_key_func(item)
     return top_k_largest(key_func)
+
 
 class DisjointSet:
   def __init__(self, n):
@@ -736,4 +802,3 @@ class DisjointSet:
 
   def get_cluster_num(self):
     return self._clusters_num
-

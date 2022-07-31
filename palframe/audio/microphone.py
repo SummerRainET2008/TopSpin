@@ -1,16 +1,17 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 import wave
 from pyaudio import PyAudio, paInt16
 import time
 
+
 class Microphone:
-  SAMPLE_RATE    = 44100
-  SAMPLE_NUM    = 8000
-  CHANNEL_NUM   = 1
-  SAMPLE_WIDTH  = 2
-  MAX_TIME      = 1
+  SAMPLE_RATE = 44100
+  SAMPLE_NUM = 8000
+  CHANNEL_NUM = 1
+  SAMPLE_WIDTH = 2
+  MAX_TIME = 1
 
   def _save_wave_file(self, export_audio_name: str, data: list):
     with wave.open(export_audio_name, 'wb') as wf:
@@ -50,12 +51,10 @@ class Microphone:
   def play(self, audio_file: str):
     wf = wave.open(audio_file, 'rb')
     p = PyAudio()
-    stream = p.open(
-      format=p.get_format_from_width(wf.getsampwidth()),
-      channels=wf.getnchannels(),
-      rate=wf.getframerate(),
-      output=True
-    )
+    stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+                    channels=wf.getnchannels(),
+                    rate=wf.getframerate(),
+                    output=True)
 
     while True:
       data = wf.readframes(self.SAMPLE_NUM)
@@ -65,4 +64,3 @@ class Microphone:
 
     stream.close()
     p.terminate()
-

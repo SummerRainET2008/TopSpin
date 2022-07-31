@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # coding: utf8
-# author: Zongcheng Ji 
+# author: Zongcheng Ji
 # date: 2020/10/27
-
 
 import torch
 from torch.optim.optimizer import Optimizer
@@ -46,34 +45,39 @@ class LambOptimizer(Optimizer):
       https://towardsdatascience.com/an-intuitive-understanding-of-the-lamb-optimizer-46f8c0ae4866
       https://developer.nvidia.com/blog/pretraining-bert-with-layer-wise-adaptive-learning-rates/
   """
-
   def __init__(
-    self,
-    params: Iterable[torch.nn.parameter.Parameter],
-    lr: float=1e-3,
-    betas: Tuple[float, float]=(0.9, 0.999),
-    eps: float=1e-6,
-    weight_decay: float=0.0,
-    clamp_value: float=10.0,
-    correct_bias: bool=True,
+      self,
+      params: Iterable[torch.nn.parameter.Parameter],
+      lr: float = 1e-3,
+      betas: Tuple[float, float] = (0.9, 0.999),
+      eps: float = 1e-6,
+      weight_decay: float = 0.0,
+      clamp_value: float = 10.0,
+      correct_bias: bool = True,
   ):
     if not 0.0 <= lr:
       raise ValueError('Invalid learning rate: {}'.format(lr))
     if not 0.0 <= betas[0] < 1.0:
-      raise ValueError('Invalid beta parameter at index 0: {}'.format(betas[0]))
+      raise ValueError('Invalid beta parameter at index 0: {}'.format(
+          betas[0]))
     if not 0.0 <= betas[1] < 1.0:
-      raise ValueError('Invalid beta parameter at index 1: {}'.format(betas[1]))
+      raise ValueError('Invalid beta parameter at index 1: {}'.format(
+          betas[1]))
     if not 0.0 <= eps:
       raise ValueError('Invalid epsilon value: {}'.format(eps))
     if not 0.0 <= weight_decay:
       raise ValueError('Invalid weight_decay value: {}'.format(weight_decay))
     if not 0.0 <= clamp_value:
       raise ValueError('Invalid clamp value: {}'.format(clamp_value))
-    defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay,
-                    clamp_value=clamp_value, correct_bias=correct_bias)
+    defaults = dict(lr=lr,
+                    betas=betas,
+                    eps=eps,
+                    weight_decay=weight_decay,
+                    clamp_value=clamp_value,
+                    correct_bias=correct_bias)
     super(LambOptimizer, self).__init__(params, defaults)
 
-  def step(self, closure: Callable=None):
+  def step(self, closure: Callable = None):
     """Performs a single optimization step.
 
     Arguments:
@@ -118,8 +122,8 @@ class LambOptimizer(Optimizer):
         # Appendix E of paper v4/v5 says "We can remove adam-correction from LAMB."
         # NVLAMB suggests to use bias-correction.
         if group['correct_bias']:
-          bias_correction1 = 1.0 - beta1 ** state['step']
-          bias_correction2 = 1.0 - beta2 ** state['step']
+          bias_correction1 = 1.0 - beta1**state['step']
+          bias_correction2 = 1.0 - beta2**state['step']
           exp_avg_hat = exp_avg / bias_correction1
           exp_avg_sq_hat = exp_avg_sq / bias_correction2
           adam_step = exp_avg_hat / (exp_avg_sq_hat.sqrt().add(group['eps']))

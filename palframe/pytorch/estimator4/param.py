@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 from palframe import nlp
@@ -7,9 +7,11 @@ from palframe.nlp import Logger
 import torch.distributed as dist
 from palframe.pytorch.dataset.helper import parse_feat_folder
 
+
 class ParameterRange:
   def __init__(self, value_iter):
     self.values = list(value_iter)
+
 
 class ParamBase(abc.ABC):
   instances = {}
@@ -28,8 +30,7 @@ class ParamBase(abc.ABC):
       dt_string = dt_string.replace("/", "_").replace(" ", ".")\
         .replace(":", "_")
       run_tag = f"{run_tag}.{dt_string}"
-      self.path_work  = f"work/run.{run_tag}"
-
+      self.path_work = f"work/run.{run_tag}"
     '''
     self.path_model, self.path_log, self.path_meta, are set automatically
     by path_work.
@@ -42,13 +43,13 @@ class ParamBase(abc.ABC):
     self.lr = 0.001
     self.weight_decay = 0
     self.param_norm = 1
-    self.seed = 0     # 0 means random.
+    self.seed = 0  # 0 means random.
 
-    self.bucket_cap_mb = 25   # 25 Mb. Default value for distributed training.
+    self.bucket_cap_mb = 25  # 25 Mb. Default value for distributed training.
     self.servers_file = None
     self.gpu_num = 1
     self.use_gpu = True
-    self.gpus = [0]      # Do not use it, as it will be allocated automatically.
+    self.gpus = [0]  # Do not use it, as it will be allocated automatically.
     self.use_amp = True
     self.backhand = "gloo"  # "nccl", "gloo"
     self.net_name = self._try_get_net_name()
@@ -56,20 +57,17 @@ class ParamBase(abc.ABC):
     self.batch_dim = 0
 
     # example on one gpu
-    self.variable_batch_size = {
-      "<=30": 100,
-      "<=128": 30
-    }
+    self.variable_batch_size = {"<=30": 100, "<=128": 30}
     self.batch_size = 10
 
     self.iter_num_update_optimizer = 1
 
-    self.train_files = None     # file num >= 1
-    self.vali_file = None       # file_num <= 1
-    self.test_files = None      # file_num >= 0
+    self.train_files = None  # file num >= 1
+    self.vali_file = None  # file_num <= 1
+    self.test_files = None  # file_num >= 0
 
     self.train_sample_num = None
-    self.epoch_num = None       # can be float.
+    self.epoch_num = None  # can be float.
 
     self.eval_gap_sample_num = None
 
@@ -92,9 +90,9 @@ class ParamBase(abc.ABC):
 
     self.true_gradient = False
 
-    self.debug_level = 1    # debug=0, info=1, warning=2, error=3
+    self.debug_level = 1  # debug=0, info=1, warning=2, error=3
 
-    self.detect_anomaly = False # only for debugging.
+    self.detect_anomaly = False  # only for debugging.
 
   def _check_validity(self):
     cls_str = str(type(self))
@@ -114,8 +112,7 @@ class ParamBase(abc.ABC):
     if value:
       self.use_amp = False
       Logger.info(
-        f"Automatically set use_amp=False, when true gradient is used."
-      )
+          f"Automatically set use_amp=False, when true gradient is used.")
     self.__true_gradient = value
 
   @property
@@ -183,10 +180,10 @@ class ParamBase(abc.ABC):
       assert False, "You can NOT set param.path_work after " \
                     "calling param.create_workspace()"
 
-    self.path_model  = f"{value}/model"
-    self.path_log    = f"{value}/log"
-    self.path_meta   = f"{value}/meta"
-    self.path_bug    = f"{value}/bug"
+    self.path_model = f"{value}/model"
+    self.path_log = f"{value}/log"
+    self.path_meta = f"{value}/meta"
+    self.path_bug = f"{value}/bug"
 
     self.__path_work = value
 
@@ -254,7 +251,7 @@ class ParamBase(abc.ABC):
 
   def size_divided_by_16(self, size, unit=16):
     return math.ceil(size / unit) * unit
-    
+
   def display(self):
     assert self.train_files is not None
     assert self.train_sample_num is not None
@@ -283,13 +280,10 @@ class ParamBase(abc.ABC):
         if ip == attr[0].address:
           return net_name
       else:
-        Logger.error(
-          "Cannot find a suitable net_name, please set manually."
-        )
+        Logger.error("Cannot find a suitable net_name, please set manually.")
 
     except ImportError:
       Logger.error(
-        "No package psutil installed, and You have to mannually set "
-        "param.net_name. You can use 'ifconfig' command, or 'ip a' command, or "
-        "'ls /sys/class/net/' to find a suitable one"
-      )
+          "No package psutil installed, and You have to mannually set "
+          "param.net_name. You can use 'ifconfig' command, or 'ip a' command, or "
+          "'ls /sys/class/net/' to find a suitable one")

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 # from mutagen.mp3 import MP3
 # import audioread
@@ -13,17 +13,18 @@ import os
 import typing
 import numpy
 
+
 class AudioHelper:
   AUDIO_EXTENSIONS = [
-    "mp3",      # converted to wav
-    "flac",     # target format
-    "wav",
-    "sph"       # converted to wav
+      "mp3",  # converted to wav
+      "flac",  # target format
+      "wav",
+      "sph"  # converted to wav
   ]
 
   @staticmethod
   def segment_audio(flac_or_wav_file: str, time_segments: list,
-                    dest_folder: str)-> typing.Iterator:
+                    dest_folder: str) -> typing.Iterator:
     '''
     time_segments: [(12,97, 18.89), (18.43, 27.77) ...] in seconds.
     return: an iterator retuning a new segment file. If one time segment is
@@ -48,13 +49,11 @@ class AudioHelper:
         continue
 
       seg_name = os.path.join(
-        dest_folder,
-        nlp.replace_file_name(
-          base_name, f".{file_ext}", f".{file_id:04}.{file_ext}"
-        )
-      )
+          dest_folder,
+          nlp.replace_file_name(base_name, f".{file_ext}",
+                                f".{file_id:04}.{file_ext}"))
       try:
-        audio[t_from: t_to].export(seg_name, format=file_ext)
+        audio[t_from:t_to].export(seg_name, format=file_ext)
         yield seg_name
 
       except Exception as error:
@@ -62,17 +61,17 @@ class AudioHelper:
         yield None
 
   @staticmethod
-  def get_detailed_audio_info(audio_file: str)-> dict:
+  def get_detailed_audio_info(audio_file: str) -> dict:
     return mediainfo(audio_file)
 
   @staticmethod
-  def get_basic_audio_info(audio_file: str)-> dict:
+  def get_basic_audio_info(audio_file: str) -> dict:
     file_ext = nlp.get_file_extension(audio_file)
 
     audio = AudioSegment.from_file(audio_file, file_ext)
-    channels = audio.channels    #Get channels
-    sample_width = audio.sample_width #Get sample width
-    duration_in_sec = len(audio) / 1000 #Length of audio in sec
+    channels = audio.channels  #Get channels
+    sample_width = audio.sample_width  #Get sample width
+    duration_in_sec = len(audio) / 1000  #Length of audio in sec
     sample_rate = audio.frame_rate
     bit_per_sample = sample_width * 8
     bit_rate = sample_rate * bit_per_sample * channels
@@ -81,17 +80,17 @@ class AudioHelper:
     # print(f"audio file size: {file_size} bytes")
 
     return {
-      "file": audio_file,
-      "channels": channels,
-      "sample_width": sample_width,
-      "duration": duration_in_sec,
-      "sample_rate": sample_rate,
-      "bit_per_sample": bit_per_sample,
-      "bit_rate": bit_rate,
+        "file": audio_file,
+        "channels": channels,
+        "sample_width": sample_width,
+        "duration": duration_in_sec,
+        "sample_rate": sample_rate,
+        "bit_per_sample": bit_per_sample,
+        "bit_rate": bit_rate,
     }
 
   @staticmethod
-  def _convert_flac_to_wav(flac_file: str)-> typing.Union[str, None]:
+  def _convert_flac_to_wav(flac_file: str) -> typing.Union[str, None]:
     assert flac_file.endswith(".flac")
     out_file = nlp.replace_file_name(flac_file, ".flac", ".wav")
     if os.path.exists(out_file):
@@ -106,9 +105,8 @@ class AudioHelper:
   @staticmethod
   def preemphasize_wav(standard_wav_file: str):
     assert standard_wav_file.endswith(".norm.wav")
-    new_file = nlp.replace_file_name(
-      standard_wav_file, ".norm.wav", ".norm.amp.wav"
-    )
+    new_file = nlp.replace_file_name(standard_wav_file, ".norm.wav",
+                                     ".norm.amp.wav")
     if os.path.exists(new_file):
       return new_file
 
@@ -116,16 +114,16 @@ class AudioHelper:
     assert sample_rate == 16000
 
     pre_emphasis = 0.97
-    emphasized_signal = numpy.append(
-      signal[0], signal[1:] - pre_emphasis * signal[:-1]
-    )
+    emphasized_signal = numpy.append(signal[0],
+                                     signal[1:] - pre_emphasis * signal[:-1])
     amplified_signal = emphasized_signal * (32768 / emphasized_signal.max())
     wavfile.write(new_file, sample_rate, amplified_signal.astype(numpy.int16))
 
     return new_file
 
   @staticmethod
-  def convert_to_standard_wav(wav_or_flac_file: str)-> typing.Union[str, None]:
+  def convert_to_standard_wav(
+      wav_or_flac_file: str) -> typing.Union[str, None]:
     '''
     :return: sample-width=2 Bytes, sample rating=16K.
     '''
@@ -133,8 +131,8 @@ class AudioHelper:
       return wav_or_flac_file
 
     file_ext = nlp.get_file_extension(wav_or_flac_file)
-    new_file = nlp.replace_file_name(wav_or_flac_file,
-                                     f".{file_ext}", ".norm.wav")
+    new_file = nlp.replace_file_name(wav_or_flac_file, f".{file_ext}",
+                                     ".norm.wav")
     if os.path.exists(new_file):
       return new_file
 
@@ -145,10 +143,10 @@ class AudioHelper:
     return None
 
   @staticmethod
-  def convert_to_16bits(wav_or_flac_file: str)-> typing.Union[str, None]:
+  def convert_to_16bits(wav_or_flac_file: str) -> typing.Union[str, None]:
     file_ext = nlp.get_file_extension(wav_or_flac_file)
-    new_file = nlp.replace_file_name(wav_or_flac_file,
-                                     f".{file_ext}", ".16bits.wav")
+    new_file = nlp.replace_file_name(wav_or_flac_file, f".{file_ext}",
+                                     ".16bits.wav")
     if os.path.exists(new_file):
       return new_file
 
@@ -158,7 +156,7 @@ class AudioHelper:
     return None
 
   @staticmethod
-  def convert_to_wav(in_file: str)-> typing.Union[str, None]:
+  def convert_to_wav(in_file: str) -> typing.Union[str, None]:
     file_ext = nlp.get_file_extension(in_file)
 
     if file_ext == "mp3":
@@ -178,7 +176,7 @@ class AudioHelper:
         f"{in_file} extension is not in {AudioHelper.AUDIO_EXTENSIONS}"
 
   @staticmethod
-  def convert_to_flac(in_file: str)-> typing.Union[str, None]:
+  def convert_to_flac(in_file: str) -> typing.Union[str, None]:
     ''' Return in_file: return flac format.
     Only convert files appearing in AUDIO_EXTENSIONS'''
     file_ext = nlp.get_file_extension(in_file)
@@ -209,7 +207,7 @@ class AudioHelper:
         f"{in_file} extension is not in {AudioHelper.AUDIO_EXTENSIONS}"
 
   @staticmethod
-  def _convert_wav_to_flac(wav_file: str)-> typing.Union[str, None]:
+  def _convert_wav_to_flac(wav_file: str) -> typing.Union[str, None]:
     assert wav_file.endswith(".wav")
     out_file = nlp.replace_file_name(wav_file, ".wav", ".flac")
     if os.path.exists(out_file):
@@ -222,7 +220,7 @@ class AudioHelper:
     return None
 
   @staticmethod
-  def _convert_mp3_to_wav(map3_file: str)-> typing.Union[str, None]:
+  def _convert_mp3_to_wav(map3_file: str) -> typing.Union[str, None]:
     assert map3_file.endswith(".mp3")
     out_file = nlp.replace_file_name(map3_file, ".mp3", ".wav")
     if os.path.exists(out_file):
@@ -235,7 +233,7 @@ class AudioHelper:
     return None
 
   @staticmethod
-  def _convert_sph_to_wav(sph_file: str)-> typing.Union[str, None]:
+  def _convert_sph_to_wav(sph_file: str) -> typing.Union[str, None]:
     assert sph_file.endswith(".sph")
     out_file = nlp.replace_file_name(sph_file, ".sph", ".wav")
     if os.path.exists(out_file):
@@ -250,4 +248,3 @@ class AudioHelper:
       return out_file
 
     return None
-

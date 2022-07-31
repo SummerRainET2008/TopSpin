@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.nlp import *
 from palframe.measure import *
@@ -28,21 +28,18 @@ if __name__ == "__main__":
   assert nlp.eq(Measure.calc_WER(refs, hyps, True), 0)
   duration = time.time() - time_start
 
-  data = [
-    {
+  data = [{
       "qid": 1,
       "ranks": [4, 3, 2, 1],
-    }
-  ]
+  }]
   ndcg = Measure.calc_ndcg(data)
   assert nlp.eq(ndcg[9], 1)
 
-  data =  [
-    {
-      "qid": 2,
-      "ranks": [1, 2, 3, 4],
-    },
+  data = [
+      {
+          "qid": 2,
+          "ranks": [1, 2, 3, 4],
+      },
   ]
   ndcg = Measure.calc_ndcg(data)
   assert nlp.eq(ndcg[9], 0.6020905336291366)
-

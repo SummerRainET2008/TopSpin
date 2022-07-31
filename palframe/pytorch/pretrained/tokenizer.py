@@ -1,8 +1,9 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from pytorch_transformers import AutoTokenizer
 from palframe.pytorch import *
+
 
 class Tokenizer:
   _inst = None
@@ -18,17 +19,16 @@ class Tokenizer:
 
     self.bos_idx = inst.bos_token_id
     self.eos_idx = inst.eos_token_id
-    self.unk_idx = inst.unk_token_id
+    # self.unk_idx = inst.unk_token_id
+    self.unk_idx = inst.unk_token_is
 
-    Logger.info(
-      f"cls_id: {self.cls_idx} "
-      f"sep_id: {self.sep_idx} "
-      f"pad_id: {self.pad_idx} "
-      f"mask_id: {self.mask_idx} "
-      f"bos_id: {self.bos_idx} "
-      f"eos_id: {self.eos_idx} "
-      f"unk_id: {self.unk_idx} "
-    )
+    Logger.info(f"cls_id: {self.cls_idx} "
+                f"sep_id: {self.sep_idx} "
+                f"pad_id: {self.pad_idx} "
+                f"mask_id: {self.mask_idx} "
+                f"bos_id: {self.bos_idx} "
+                f"eos_id: {self.eos_idx} "
+                f"unk_id: {self.unk_idx} ")
 
   @staticmethod
   def get_instance(pretrained_model: typing.Union[str, None]):
@@ -39,7 +39,7 @@ class Tokenizer:
   def tokenize1(self, s1, max_len: int):
     ids1 = self._tokenizer.encode(s1)
     word_ids = [self.cls_idx] + ids1
-    word_ids = word_ids[: max_len]
+    word_ids = word_ids[:max_len]
     diff = max_len - len(word_ids)
     word_ids = word_ids + [self.pad_idx] * diff
 
@@ -51,8 +51,8 @@ class Tokenizer:
     word_ids = [self.cls_idx] + ids1 + [self.sep_idx] + ids2 + [self.sep_idx]
     seg_ids = [0] * (1 + len(ids1) + 1) + [1] * (len(ids2) + 1)
 
-    word_ids = word_ids[: max_len]
-    seg_ids = seg_ids[: max_len]
+    word_ids = word_ids[:max_len]
+    seg_ids = seg_ids[:max_len]
     diff = max_len - len(word_ids)
     word_ids = word_ids + [self.pad_idx] * diff
     seg_ids = seg_ids + [0] * diff
@@ -62,6 +62,7 @@ class Tokenizer:
 
   def get_vob_size(self):
     return len(self._tokenizer)
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons]")
@@ -79,6 +80,7 @@ def main():
   print(tokenizer.get_vob_size())
   print(tokenizer.tokenize1(s1, 32))
   print(tokenizer.tokenize1(s2, 32))
+
 
 if __name__ == "__main__":
   main()

@@ -5,24 +5,22 @@ from example.nlp.intent_detection.model_wrapper import ModelWrapper
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5.train import TrainerBase
 
+
 class Trainer(TrainerBase):
   def __init__(self, param):
     model_wrapper = ModelWrapper(param)
 
     super(Trainer, self).__init__(
-      model_wrapper,
-      get_batch_data(param, param.train_files, param.epoch_num,
-                     dist.get_rank(), dist.get_world_size(), True),
-      None
-    )
+        model_wrapper,
+        get_batch_data(param, param.train_files, param.epoch_num,
+                       dist.get_rank(), dist.get_world_size(), True), None)
 
   def train_one_batch(self, b_word_ids, b_label):
     logits, pred_labels = self._model_wrapper.predict(b_word_ids)
     loss = nn.functional.cross_entropy(logits, b_label, reduction="mean")
 
-    return {
-      "loss": loss
-    }
+    return {"loss": loss}
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
@@ -33,6 +31,7 @@ def main():
   Logger.set_level(options.debug_level)
 
   Trainer(Param.get_instance()).train()
+
 
 if __name__ == "__main__":
   main()

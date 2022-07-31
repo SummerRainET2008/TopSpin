@@ -1,8 +1,9 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.nlp import *
 import stanza
+
 
 def postagging_en(text: str, buff={}):
   if "nlp_lib" not in buff:
@@ -18,7 +19,4 @@ def postagging_en(text: str, buff={}):
     for ent in sent.ents:
       ents_dict[ent.type].add(ent.text)
 
-  return {
-    "words": segs_list,
-    "entities": ents_dict
-  }
+  return {"words": segs_list, "entities": ents_dict}

@@ -4,11 +4,12 @@
 from palframe.data_pipeline.pt import *
 from palframe.data_pipeline.pt.dataset import Dataset
 
+
 class Framework:
   def __init__(self,
                dataset: Dataset,
                output_folder,
-               feat_size_per_file: int=sys.maxsize):
+               feat_size_per_file: int = sys.maxsize):
     if nlp.is_debugging():
       current_env = os.environ
       current_env["MASTER_ADDR"] = "127.0.0.1"
@@ -52,4 +53,3 @@ class Framework:
     :return: an iterator of resulting instances.
     '''
     raise Exception("not implemented")
-

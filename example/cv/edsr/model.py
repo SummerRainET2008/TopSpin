@@ -6,6 +6,7 @@ from palframe.nlp import *
 import torch.nn as nn
 import torch
 
+
 class MeanShift(nn.Conv2d):
   def __init__(self, rgb_mean, sign):
     super(MeanShift, self).__init__(3, 3, kernel_size=1)
@@ -22,18 +23,18 @@ class _Residual_Block(nn.Module):
     super(_Residual_Block, self).__init__()
 
     self.conv1 = nn.Conv2d(in_channels=256,
-                 out_channels=256,
-                 kernel_size=3,
-                 stride=1,
-                 padding=1,
-                 bias=False)
+                           out_channels=256,
+                           kernel_size=3,
+                           stride=1,
+                           padding=1,
+                           bias=False)
     self.relu = nn.ReLU(inplace=True)
     self.conv2 = nn.Conv2d(in_channels=256,
-                 out_channels=256,
-                 kernel_size=3,
-                 stride=1,
-                 padding=1,
-                 bias=False)
+                           out_channels=256,
+                           kernel_size=3,
+                           stride=1,
+                           padding=1,
+                           bias=False)
 
   def forward(self, x):
     identity_data = x
@@ -45,51 +46,51 @@ class _Residual_Block(nn.Module):
 
 
 class Net(nn.Module):
-  def __init__(self,param):
+  def __init__(self, param):
     super(Net, self).__init__()
 
     # rgb_mean = (0.4488, 0.4371, 0.4040)
     # self.sub_mean = MeanShift(rgb_mean, -1)
 
     self.conv_input = nn.Conv2d(in_channels=4,
-                  out_channels=256,
-                  kernel_size=3,
-                  stride=1,
-                  padding=1,
-                  bias=False)
+                                out_channels=256,
+                                kernel_size=3,
+                                stride=1,
+                                padding=1,
+                                bias=False)
 
     self.residual = self.make_layer(_Residual_Block, 32)
 
     self.conv_mid = nn.Conv2d(in_channels=256,
-                  out_channels=256,
+                              out_channels=256,
+                              kernel_size=3,
+                              stride=1,
+                              padding=1,
+                              bias=False)
+
+    self.upscale3x = nn.Sequential(
+        nn.Conv2d(in_channels=256,
+                  out_channels=256 * 9,
                   kernel_size=3,
                   stride=1,
                   padding=1,
-                  bias=False)
-
-    self.upscale3x = nn.Sequential(
-      nn.Conv2d(in_channels=256,
-            out_channels=256 * 9,
-            kernel_size=3,
-            stride=1,
-            padding=1,
-            bias=False),
-      nn.PixelShuffle(3),
-      # nn.Conv2d(in_channels=256,
-      #       out_channels=256,
-      #       kernel_size=3,
-      #       stride=1,
-      #       padding=1,
-      #       bias=False),
-      # # nn.PixelShuffle(2),
+                  bias=False),
+        nn.PixelShuffle(3),
+        # nn.Conv2d(in_channels=256,
+        #       out_channels=256,
+        #       kernel_size=3,
+        #       stride=1,
+        #       padding=1,
+        #       bias=False),
+        # # nn.PixelShuffle(2),
     )
 
     self.conv_output = nn.Conv2d(in_channels=256,
-                   out_channels=4,
-                   kernel_size=3,
-                   stride=1,
-                   padding=1,
-                   bias=False)
+                                 out_channels=4,
+                                 kernel_size=3,
+                                 stride=1,
+                                 padding=1,
+                                 bias=False)
 
     # self.add_mean = MeanShift(rgb_mean, 1)
 

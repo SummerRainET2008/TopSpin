@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 #todo: check all ERR, WARN infor
 
@@ -7,15 +7,18 @@ from palframe.pytorch.estimator6.param import ParamBase
 from palframe.pytorch import *
 import threading
 
+
 def _check_server_disk_path(server_ips, current_path):
   for ip in server_ips:
-    result = nlp.command(f"cd {current_path}; pwd", capture_output=True,
+    result = nlp.command(f"cd {current_path}; pwd",
+                         capture_output=True,
                          server=ip)[1]
     if current_path not in result:
       Logger.error(f"'{current_path}' is unaccessible in '{ip}'")
       return False
 
   return True
+
 
 def _check_server_gpus(server_gpu_info: list):
   '''
@@ -29,11 +32,12 @@ def _check_server_gpus(server_gpu_info: list):
       return False
     elif not expected_gpus.issubset(avail_gpus):
       Logger.error(
-        f"[{ip}]: available GPUs: {avail_gpus}, expected GPUs: {expected_gpus}"
+          f"[{ip}]: available GPUs: {avail_gpus}, expected GPUs: {expected_gpus}"
       )
       return False
 
   return True
+
 
 def _get_vali_error(log_file):
   '''
@@ -51,12 +55,14 @@ def _get_vali_error(log_file):
     Logger.warn(f"No evaluation found in '{log_file}'")
     return 0
 
+
 def _get_netport(buffer=set()):
   while True:
     port = random.randint(1000, 10_000)
     if port not in buffer:
       buffer.add(port)
       return port
+
 
 class _MonitorStopThread(threading.Thread):
   def __init__(self, monitor_file, action_func=None, sleep_time=1):
@@ -75,6 +81,7 @@ class _MonitorStopThread(threading.Thread):
         break
       time.sleep(self._sleep_time)
 
+
 class Server:
   def __init__(self, ip, gpus):
     assert isinstance(gpus, list)
@@ -88,11 +95,12 @@ class Server:
   def acquire_gpus(self, num):
     assert 0 < num <= len(self._avail_gpus)
     ret = self._avail_gpus[-num:]
-    self._avail_gpus = self._avail_gpus[: -num]
+    self._avail_gpus = self._avail_gpus[:-num]
     return ret
 
   def release_gpus(self, gpus):
     self._avail_gpus.extend(gpus)
+
 
 class Task:
   def __init__(self, param: ParamBase, source_script_and_params):
@@ -115,6 +123,7 @@ class Task:
     self._avail_server = None
     self._avail_gpus = None
 
+
 class _MonitorResultThread(threading.Thread):
   def __init__(self, monitor_file, lock, title, sleep_time=10):
     threading.Thread.__init__(self, daemon=True)
@@ -130,10 +139,11 @@ class _MonitorResultThread(threading.Thread):
         vali_error = -_get_vali_error(self._monitor_file)
         if vali_error != 0 and vali_error != prev_error:
           with self._lock:
-            Logger.info(self._title %vali_error)
+            Logger.info(self._title % vali_error)
           prev_error = vali_error
 
       time.sleep(self._sleep_time)
+
 
 class _RunTaskThread(threading.Thread):
   def __init__(self, thread_id, task, shared, lock):
@@ -152,7 +162,7 @@ class _RunTaskThread(threading.Thread):
   def run(self):
     param = self._task._param
     param.working_server = self._task._avail_server._ip
-    param.working_GPUs   = self._task._avail_gpus
+    param.working_GPUs = self._task._avail_gpus
     param.create_workspace()
 
     param_file = f"{param.path_meta}/param.pkl"
@@ -164,10 +174,10 @@ class _RunTaskThread(threading.Thread):
                 f"'{param.path_work}' starts.")
 
     _MonitorResultThread(
-      f"{param.path_log}/log.rank_0",
-      self._lock,
-      f"Task[{self._thread_id}] '{param.path_work}' running, "
-      f"best vali_error: %f",
+        f"{param.path_log}/log.rank_0",
+        self._lock,
+        f"Task[{self._thread_id}] '{param.path_work}' running, "
+        f"best vali_error: %f",
     ).start()
 
     cmd = f"cd {os.getcwd()}; " \
@@ -211,10 +221,9 @@ class _RunTaskThread(threading.Thread):
       self._task.release_server()
       self._is_alive = False
 
+
 class RunManager:
-  avail_opts = [
-    "no_GPU_check"
-  ]
+  avail_opts = ["no_GPU_check", "run_tag"]
 
   def __init__(self, tasks, servers, **kwargs):
     Logger.info("-" * 80)
@@ -233,24 +242,28 @@ class RunManager:
     Logger.info(f"#task: {len(tasks)}, #gpu: {num_gpu}")
 
     nlp.set_random_seeds(0)
-    run_tag = tasks[0]._param.run_tag
     self._run_id = random.randint(0, 1024 * 1024)
-    run_root_path = f"work/batch_task.{run_tag}.run_id_{self._run_id}"
+    run_root_path = [f"work/batch_task", f"run_id_{self._run_id}"]
+    run_tag = kwargs.get("run_tag", "")
+    if not nlp.is_none_or_empty(run_tag):
+      run_root_path.append(run_tag)
+    run_root_path = ".".join(run_root_path)
+
     nlp.mkdir(run_root_path)
     self._run_lock_file = f"{run_root_path}/.run.lock"
     for task in tasks:
-      task._param.path_work = task._param.path_work.replace("work",
-                                                            run_root_path)
+      task._param.path_work = task._param.path_work.replace(
+          "work", run_root_path)
 
     self._tasks = tasks
     self._servers = servers
     self._all_threads = []
     self._lock = threading.Lock()
     self._shared = {
-      "num_task": len(tasks),
-      "finished_task": 0,
-      "starting_time": time.time(),
-      "run_lock_file": self._run_lock_file,
+        "num_task": len(tasks),
+        "finished_task": 0,
+        "starting_time": time.time(),
+        "run_lock_file": self._run_lock_file,
     }
 
   def _check_servers(self, servers, tasks):
@@ -263,7 +276,8 @@ class RunManager:
 
     use_gpu = tasks[0]._param.use_gpu
     if use_gpu:
-      server_gpu_info = [[server._ip, server._avail_gpus] for server in servers]
+      server_gpu_info = [[server._ip, server._avail_gpus]
+                         for server in servers]
       if not self._options.get("no_GPU_check", False):
         assert _check_server_gpus(server_gpu_info)
 
@@ -327,9 +341,7 @@ class RunManager:
                     f"#free GPU: {free_gpu_num}")
 
         if len(self._tasks) > 0 and free_gpu_num > 0:
-          max_gpu_num = max(
-            [len(s._avail_gpus) for s in self._servers]
-          )
+          max_gpu_num = max([len(s._avail_gpus) for s in self._servers])
           Logger.debug(f"max available #GPU per server: {max_gpu_num}")
           min_gpu_num = min(t._gpu_num for t in self._tasks)
           Logger.debug(f"min required #GPU per task: {min_gpu_num}")
@@ -345,9 +357,8 @@ class RunManager:
         time.sleep(sleep_time)
 
       else:
-        run_thread = _RunTaskThread(
-          len(self._all_threads), task, self._shared, self._lock
-        )
+        run_thread = _RunTaskThread(len(self._all_threads), task, self._shared,
+                                    self._lock)
         run_thread.start()
         self._all_threads.append(run_thread)
 
@@ -360,10 +371,9 @@ class RunManager:
 
     Logger.info(f"RunManager.run() is done")
 
-def start_train(param: ParamBase,
-                source_script_and_params: str,
-                servers: typing.List[Server],
-                **kwargs):
+
+def start_train(param: ParamBase, source_script_and_params: str,
+                servers: typing.List[Server], **kwargs):
   tasks = []
   for param_var in param.generate_all_variants():
     tasks.append(Task(param_var, source_script_and_params))
@@ -371,11 +381,12 @@ def start_train(param: ParamBase,
   run_manager = RunManager(tasks, servers, **kwargs)
   run_manager.run()
 
+
 def stop_train(run_id):
   nlp.execute_cmd(f"rm work/batch_task.run_id_{run_id}/.run.lock")
 
-def start_distributed_train(param: ParamBase,
-                            source_script_and_params):
+
+def start_distributed_train(param: ParamBase, source_script_and_params):
   def start(param_file, server_ips):
     master_node_ip = server_ips[-1]
     port = _get_netport()
@@ -453,13 +464,13 @@ def start_distributed_train(param: ParamBase,
   else:
     vali_error = _get_vali_error(f"{param.path_log}/log.rank_0")
     duration = time.time() - whole_run_starting_time
-    Logger.info(
-      f"best vali_error: {-vali_error}, "
-      f"taking {nlp.to_readable_time(duration)}."
-    )
+    Logger.info(f"best vali_error: {-vali_error}, "
+                f"taking {nlp.to_readable_time(duration)}.")
+
 
 def stop_distributed_train(path_work):
   nlp.command(f"rm {path_work}/meta/run.lock")
+
 
 def clear_server(ip):
   '''
@@ -467,12 +478,12 @@ def clear_server(ip):
   '''
   Logger.info(f"cleaning {ip}")
   info = nlp.execute_popen(
-    f"ps -Af | grep -i nproc_per_node | grep -i distributed", server=ip
-  )
+      f"ps -Af | grep -i nproc_per_node | grep -i distributed", server=ip)
   for ln in info:
     pid = int(ln.split()[1])
     if pid != os.getpid():
       nlp.command(f"kill -9 {pid}", server=ip)
+
 
 def exception_stop(class_func):
   def f(*args, **kwargs):

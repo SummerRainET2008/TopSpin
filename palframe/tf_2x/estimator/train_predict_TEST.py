@@ -1,11 +1,12 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.tf_2x import *
 from palframe.tf_2x.estimator.param import ParamBase
 from palframe.tf_2x.estimator.train import TrainerBase
 from palframe.tf_2x import nlp_tf
 from palframe.nlp import Logger
+
 
 class Model(tf.keras.Model):
   def __init__(self):
@@ -20,11 +21,12 @@ class Model(tf.keras.Model):
     pred_y = self._a * input_x + self._b
     return pred_y
 
+
 def get_batch_data(data_file, epoch_num, batch_size, shuffle: bool):
   def parse_example(serialized_example):
     data_fields = {
-      "x": tf.io.FixedLenFeature((), tf.float32, 0),
-      "y": tf.io.FixedLenFeature((), tf.float32, 0),
+        "x": tf.io.FixedLenFeature((), tf.float32, 0),
+        "y": tf.io.FixedLenFeature((), tf.float32, 0),
     }
     parsed = tf.io.parse_single_example(serialized_example, data_fields)
 
@@ -33,14 +35,12 @@ def get_batch_data(data_file, epoch_num, batch_size, shuffle: bool):
 
     return x, y
 
-  dataset = nlp_tf.tfrecord_read(
-    file_pattern=data_file,
-    parse_example_func=parse_example,
-    epoch_num=epoch_num,
-    batch_size=batch_size,
-    shuffle=shuffle,
-    file_sequential=True
-  )
+  dataset = nlp_tf.tfrecord_read(file_pattern=data_file,
+                                 parse_example_func=parse_example,
+                                 epoch_num=epoch_num,
+                                 batch_size=batch_size,
+                                 shuffle=shuffle,
+                                 file_sequential=True)
 
   yield from dataset
   # for epoch_id, batch_id, batch in dataset:
@@ -49,13 +49,14 @@ def get_batch_data(data_file, epoch_num, batch_size, shuffle: bool):
   #   batch_feat = tf.reshape(batch_feat, [batch_num, -1, feat_num])
   #   yield epoch_id, batch_id, (batch_qid, batch_label, batch_feat)
 
+
 class Trainer(TrainerBase):
   def __init__(self, param, model):
     data_reader_iter = get_batch_data(
-      data_file=param.train_files,
-      epoch_num=param.epoch_num,
-      batch_size=param.batch_size,
-      shuffle=True,
+        data_file=param.train_files,
+        epoch_num=param.epoch_num,
+        batch_size=param.batch_size,
+        shuffle=True,
     )
     super(Trainer, self).__init__(param, model, data_reader_iter)
 
@@ -67,18 +68,14 @@ class Trainer(TrainerBase):
 
   def train_one_batch(self, *batch_data):
     Logger.info(
-      f"current: {self._model._a.numpy()} x + {self._model._b.numpy()}"
-    )
+        f"current: {self._model._a.numpy()} x + {self._model._b.numpy()}")
     batch_x, batch_y = batch_data
     with tf.GradientTape() as tape:
       pred_labels = self.predict(batch_x)
-      loss = tf.reduce_sum(
-        tf.losses.mean_squared_error(
-          batch_y, pred_labels
-        )
-      )
+      loss = tf.reduce_sum(tf.losses.mean_squared_error(batch_y, pred_labels))
 
     return self._apply_optimizer(tape, loss)
+
 
 def gen_train_data(tf_file: str):
   class Serializer:
@@ -86,12 +83,11 @@ def gen_train_data(tf_file: str):
       for sample in seg_samples:
         x, y = sample
         feature = {
-          "x": nlp_tf.tf_feature_float(x),
-          "y": nlp_tf.tf_feature_float(y),
+            "x": nlp_tf.tf_feature_float(x),
+            "y": nlp_tf.tf_feature_float(y),
         }
-        example_proto = tf.train.Example(
-          features=tf.train.Features(feature=feature)
-        )
+        example_proto = tf.train.Example(features=tf.train.Features(
+            feature=feature))
 
         yield example_proto.SerializeToString()
 
@@ -104,6 +100,7 @@ def gen_train_data(tf_file: str):
       yield [(x, y)]
 
   nlp_tf.tfrecord_write(get_file_record(), Serializer(), tf_file)
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
@@ -130,6 +127,6 @@ def main():
   trainer = Trainer(param, model)
   trainer.train()
 
+
 if __name__ == '__main__':
   main()
-

@@ -1,20 +1,16 @@
 #!/usr/bin/env python
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.audio.audio_helper import AudioHelper
 from palframe import common as nlp
 import os
 
 if __name__ == '__main__':
-  data_path = os.path.join(
-    nlp.get_module_path("common"),
-    "audio/audio"
-  )
+  data_path = os.path.join(nlp.get_module_path("common"), "audio/audio")
 
-  files = nlp.get_files_in_folder(
-    data_path, file_extensions=AudioHelper.AUDIO_EXTENSIONS
-  )
+  files = nlp.get_files_in_folder(data_path,
+                                  file_extensions=AudioHelper.AUDIO_EXTENSIONS)
 
   for in_file in files:
     # out_file = AudioHelper.convert_to_flac(in_file)
@@ -28,4 +24,3 @@ if __name__ == '__main__':
     else:
       print(f"[ERR] {in_file}")
       assert False
-

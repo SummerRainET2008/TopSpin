@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 from palframe.pytorch import *
@@ -9,6 +9,7 @@ from palframe.pytorch.dataset.offline_bigdataset import parse_feat_folder
 from palframe.pytorch.estimator5 import starter
 from torch import autograd
 from filelock import FileLock
+
 
 def draw_figure(figure_data, out_file):
   try:
@@ -46,6 +47,7 @@ def draw_figure(figure_data, out_file):
   except Exception as error:
     Logger.warn(error)
     traceback.print_exc()
+
 
 def main():
   parser = optparse.OptionParser(usage="cmd [optons] ..]")
@@ -85,11 +87,12 @@ def main():
       values = [(x - options.x_from, y) for x, y in figure_data[key]
                 if options.x_from <= x <= options.x_to]
     else:
-      values = figure_data[key][options.x_from: options.x_to]
+      values = figure_data[key][options.x_from:options.x_to]
 
     cut_figure_data[f"{line_id}.{key}"] = values
 
   draw_figure(cut_figure_data, options.out_file)
+
 
 if __name__ == "__main__":
   main()

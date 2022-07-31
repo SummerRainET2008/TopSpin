@@ -1,12 +1,12 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe.pytorch import *
 from palframe.pytorch.estimator4.model_wrapper import ModelWrapperBase
 
+
 class PredictorBase:
-  def __init__(self,
-               model_wrapper: ModelWrapperBase):
+  def __init__(self, model_wrapper: ModelWrapperBase):
     param = model_wrapper._param
     model_wrapper._load_model_file(param.path_inference_model)
     model_wrapper._set_inference()
@@ -20,4 +20,3 @@ class PredictorBase:
   def predict(self, batch_data):
     with torch.no_grad():
       return self._model_wrapper.predict(batch_data)
-

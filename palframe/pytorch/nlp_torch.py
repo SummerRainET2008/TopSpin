@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia 
+#author: Tian Xia
 
 from palframe import *
 from palframe.nlp import Logger
@@ -7,26 +7,26 @@ from palframe import nlp
 from torch.nn import functional as func
 from palframe.pytorch import *
 import torch
-from pytorch_transformers import (
-  RobertaModel as RoBERTaModel_en,
-  RobertaTokenizer as RoBERTaTokenizer_en
-)
+from pytorch_transformers import (RobertaModel as RoBERTaModel_en,
+                                  RobertaTokenizer as RoBERTaTokenizer_en)
 # From HuggingFace
-from transformers import (
-  BertModel as RoBERTaModel_zh,
-  BertTokenizer as RoBERTaTokenizer_zh
-)
+from transformers import (BertModel as RoBERTaModel_zh, BertTokenizer as
+                          RoBERTaTokenizer_zh)
+
 
 def nan_tensor():
   return torch.tensor(float("NaN"))
+
 
 def uniform_sample(probs: torch.Tensor):
   samples = func.gumbel_softmax(torch.log(probs), tau=1, hard=True)
   return torch.argmax(samples, -1)
 
+
 def isabnormal(x: torch.Tensor):
   return not nlp.is_none_or_empty(x) and \
          torch.any(torch.logical_or(torch.isinf(x), torch.isnan(x))).item()
+
 
 def norm_0_1(x: torch.Tensor):
   shape = x.shape
@@ -38,6 +38,7 @@ def norm_0_1(x: torch.Tensor):
 
   return x
 
+
 def norm_mean(x: torch.Tensor):
   shape = x.shape
   x = x.view(-1, shape[-1])
@@ -47,15 +48,19 @@ def norm_mean(x: torch.Tensor):
 
   return x
 
+
 def check_nan(tensor, name):
   ret = torch.any(torch.isnan(tensor))
   if ret:
     Logger.error(f"{name} is_nan")
 
+
 def reverse_sequence(inputs, lengths):
   batch_size, max_len = inputs.size(0), inputs.size(1)
-  ind = [list(reversed(range(0, length))) + list(range(length, max_len))
-         for length in lengths]
+  ind = [
+      list(reversed(range(0, length))) + list(range(length, max_len))
+      for length in lengths
+  ]
   ind = torch.LongTensor(ind)
   for dim in range(2, inputs.dim()):
     ind = ind.unsqueeze(dim)
@@ -65,9 +70,10 @@ def reverse_sequence(inputs, lengths):
 
   return reversed_inputs
 
+
 def sequence_mask(real_len: torch.Tensor,
-                  max_size: typing.Union[int, None]=None,
-                  key_padding_mask: bool=False):
+                  max_size: typing.Union[int, None] = None,
+                  key_padding_mask: bool = False):
   '''
   real_len: [batch]
   return: [batch, max_size]
@@ -82,7 +88,8 @@ def sequence_mask(real_len: torch.Tensor,
     return torch.logical_not(mask)
   return mask
 
-def display_model_parameters(model: nn.Module)-> int:
+
+def display_model_parameters(model: nn.Module) -> int:
   Logger.info("-" * 64)
   Logger.info(f"module parameters:")
   total_num = 0
@@ -106,6 +113,7 @@ def display_model_parameters(model: nn.Module)-> int:
 
   return total_num
 
+
 def run_rnn_seq(layer: torch.nn.Module, x, real_len, hidden,
                 packed_input: bool):
   '''
@@ -118,14 +126,18 @@ def run_rnn_seq(layer: torch.nn.Module, x, real_len, hidden,
     return output
 
   x1 = torch.nn.utils.rnn.pack_padded_sequence(
-    x, real_len, batch_first=True, enforce_sorted=False,
+      x,
+      real_len,
+      batch_first=True,
+      enforce_sorted=False,
   )
   output, _ = layer(x1, hidden)
-  output, _ = torch.nn.utils.rnn.pad_packed_sequence(
-    output, batch_first=True, total_length=x.size(1)
-  )
+  output, _ = torch.nn.utils.rnn.pad_packed_sequence(output,
+                                                     batch_first=True,
+                                                     total_length=x.size(1))
 
   return output
+
 
 def one_hot(batch, label_num, y, value=1):
   '''
@@ -136,7 +148,10 @@ def one_hot(batch, label_num, y, value=1):
 
   return y_onehot
 
-def label_smoothing_loss(logits, labels, smoothing_factor,
+
+def label_smoothing_loss(logits,
+                         labels,
+                         smoothing_factor,
                          reduction="batchmean"):
   '''
   :param logits:  [batch, label_num]
@@ -152,8 +167,8 @@ def label_smoothing_loss(logits, labels, smoothing_factor,
   input = torch.log_softmax(logits, 1)
   label_num = logits.size(1)
   smoothing_value = smoothing_factor / (label_num - 1)
-  labels_prob1 = smoothing_value * torch.ones(logits.size(0), logits.size(1),
-                                              device=logits.device)
+  labels_prob1 = smoothing_value * torch.ones(
+      logits.size(0), logits.size(1), device=logits.device)
   labels_prob2 = one_hot(logits.size(0), logits.size(1), labels,
                          (1 - smoothing_factor) - smoothing_value)
   labels_prob = labels_prob1 + labels_prob2
@@ -161,6 +176,7 @@ def label_smoothing_loss(logits, labels, smoothing_factor,
   loss = torch.nn.functional.kl_div(input, labels_prob, reduction=reduction)
 
   return loss
+
 
 class FocalLoss(nn.Module):
   def __init__(self, gamma=2):
@@ -180,8 +196,9 @@ class FocalLoss(nn.Module):
     logpt = logpt.gather(1, labels).view(-1)
     pt = torch.exp(logpt)
 
-    loss = -1 * (1 - pt) ** self._gamma * logpt
+    loss = -1 * (1 - pt)**self._gamma * logpt
     return loss.mean()
+
 
 class PrePostProcessingWrapper(nn.Module):
   def __init__(self, layer, input_dim, dropout_to_drop_prob=0):
@@ -197,35 +214,37 @@ class PrePostProcessingWrapper(nn.Module):
 
     return y
 
+
 class PenalizedTanh(torch.nn.Module):
   def forward(self, x):
     return 0.75 * func.relu(func.tanh(x)) + 0.25 * func.tanh(x)
+
 
 class Swish(nn.Module):
   def forward(self, x):
     return x * torch.sigmoid(x)
 
+
 class Gelu(nn.Module):
   def forward(self, x):
     return x * 0.5 * (1.0 + torch.erf(x / math.sqrt(2.0)))
+
 
 class FFN(nn.Module):
   def __init__(self,
                input_dim,
                hidden_dim,
                output_dim,
-               activation: nn.Module=Gelu(),
+               activation: nn.Module = Gelu(),
                dropout=0):
     super(FFN, self).__init__()
-    self._layer = nn.Sequential(
-      torch.nn.Linear(input_dim, hidden_dim),
-      activation,
-      torch.nn.Dropout(dropout),
-      torch.nn.Linear(hidden_dim, output_dim)
-    )
+    self._layer = nn.Sequential(torch.nn.Linear(input_dim, hidden_dim),
+                                activation, torch.nn.Dropout(dropout),
+                                torch.nn.Linear(hidden_dim, output_dim))
 
   def forward(self, x: torch.Tensor):
     return self._layer(x)
+
 
 class Dense(nn.Module):
   def __init__(self, linear_layer: nn.Linear, activation=nn.LeakyReLU()):
@@ -233,16 +252,18 @@ class Dense(nn.Module):
     if activation is None:
       self._layer = linear_layer
     else:
-      self._layer = nn.Sequential(
-        linear_layer, activation
-      )
+      self._layer = nn.Sequential(linear_layer, activation)
 
   def forward(self, x: torch.Tensor):
     return self._layer(x)
 
+
 class AttenDense(nn.Module):
-  def __init__(self, linear_layer: nn.Linear, activation=nn.LeakyReLU(),
-               max_emb_num=None, dropout=0.0):
+  def __init__(self,
+               linear_layer: nn.Linear,
+               activation=nn.LeakyReLU(),
+               max_emb_num=None,
+               dropout=0.0):
     super(AttenDense, self).__init__()
 
     self._in_features = linear_layer.in_features
@@ -251,16 +272,13 @@ class AttenDense(nn.Module):
     else:
       self._out_features = min(linear_layer.out_features, max_emb_num)
     self._atten_emb = nn.Parameter(
-      torch.Tensor(self._out_features, self._in_features)
-    )
+        torch.Tensor(self._out_features, self._in_features))
     self._dropout = nn.Dropout(dropout)
 
     if activation is None:
       self._layer = linear_layer
     else:
-      self._layer = nn.Sequential(
-        linear_layer, activation
-      )
+      self._layer = nn.Sequential(linear_layer, activation)
 
     self._reset_parameters()
 
@@ -281,6 +299,7 @@ class AttenDense(nn.Module):
     x = x.view(shape)
 
     return self._layer(x)
+
 
 class Attention(nn.Module):
   def __init__(self, query_dim, values_dim, atten_dim):
@@ -305,12 +324,13 @@ class Attention(nn.Module):
 
     return output
 
+
 class MultiHeadAttention(nn.Module):
   def __init__(self, dim, multihead=4, dropout=0.0):
     super(MultiHeadAttention, self).__init__()
-    self._multihead_att = nn.MultiheadAttention(
-      dim, multihead, dropout=dropout
-    )
+    self._multihead_att = nn.MultiheadAttention(dim,
+                                                multihead,
+                                                dropout=dropout)
 
   def forward(self, query, values, real_len=None):
     '''
@@ -327,13 +347,15 @@ class MultiHeadAttention(nn.Module):
       key_padding_mask = sequence_mask(real_len, values.shape[1], True)
 
     query = query.transpose(0, 1)
-    values = values.transpose(0, 1) # delete a ','
-    output, weights = self._multihead_att(
-      query, values, values, key_padding_mask=key_padding_mask
-    )
+    values = values.transpose(0, 1)  # delete a ','
+    output, weights = self._multihead_att(query,
+                                          values,
+                                          values,
+                                          key_padding_mask=key_padding_mask)
     output = output.transpose(0, 1)
 
     return output, weights
+
 
 class InnerAttention(nn.Module):
   def __init__(self, dim, atten_dim=512, multihead=4):
@@ -361,111 +383,25 @@ class InnerAttention(nn.Module):
 
     return output.squeeze(1)
 
-# google's style
-class RNNEncoder1(nn.Module):
-  def __init__(self,
-               layer_num,
-               input_dim,
-               hidden_dim,
-               out_dropout: float=0):
-    super(RNNEncoder1, self).__init__()
-
-    self._input_dense = Dense(nn.Linear(input_dim, hidden_dim))
-
-    for layer_id in range(layer_num):
-      if layer_id == 0:
-        self._layer_0_left = nn.GRU(
-          input_size=hidden_dim, hidden_size=hidden_dim, num_layers=1,
-          batch_first=True, bidirectional=False,
-        )
-        self._layer_0_right = nn.GRU(
-          input_size=hidden_dim, hidden_size=hidden_dim, num_layers=1,
-          batch_first=True, bidirectional=False,
-        )
-
-      else:
-        layer = nn.GRU(
-          input_size=hidden_dim, hidden_size=hidden_dim, num_layers=1,
-          batch_first=True, bidirectional=False
-        )
-        self.add_module(f"_layer_{layer_id}", layer)
-
-      self.add_module(f"_pre_process_{layer_id}", nn.LayerNorm(hidden_dim))
-      self.add_module(f"_post_process_{layer_id}", nn.Dropout(out_dropout))
-
-    self._combine_dense = Dense(nn.Linear(2 * hidden_dim, hidden_dim))
-    self._out_dropout = nn.Dropout(out_dropout)
-
-    self._layer_num = layer_num
-    self._hidden_dim = hidden_dim
-
-  def _init_hidden(self, batch_size):
-    weight = next(self.parameters())
-    hiddens = []
-    hiddens.append([
-      weight.new_zeros(1, batch_size, self._hidden_dim),
-      weight.new_zeros(1, batch_size, self._hidden_dim),
-    ])
-    for _ in range(1, self._layer_num):
-      hiddens.append(weight.new_zeros(1, batch_size, self._hidden_dim))
-
-    return hiddens
-
-  def forward(self, x, real_len, packed_input=False):
-    '''
-    x:        [batch, max-seq, emb-dim]
-    real_len: [batch]
-    '''
-    hiddens = self._init_hidden(x.size(0))
-    x = self._input_dense(x)
-    for layer_id in range(self._layer_num):
-      x = getattr(self, f"_pre_process_{layer_id}")(x)
-
-      if layer_id == 0:
-        output_left = run_rnn_seq(
-          self._layer_0_left,
-          x,
-          real_len, hiddens[0][0], packed_input
-        )
-        output_right = run_rnn_seq(
-          self._layer_0_right,
-          reverse_sequence(x, real_len),
-          real_len, hiddens[0][1], packed_input
-        )
-
-        output_right = reverse_sequence(output_right, real_len)
-        output = self._combine_dense(torch.cat([output_left, output_right], 2))
-
-      else:
-        output = run_rnn_seq(
-          getattr(self, f"_layer_{layer_id}"),
-          x, real_len, hiddens[layer_id], packed_input
-        )
-
-      x = getattr(self, f"_post_process_{layer_id}")(output + x)
-
-    return x
 
 class ResidualGRU(nn.Module):
   def __init__(self, hidden_size, dropout=0.1, num_layers=2):
     super(ResidualGRU, self).__init__()
-    self._enc_layer = nn.GRU(
-      input_size=hidden_size, hidden_size=hidden_size // 2,
-      num_layers=num_layers, batch_first=True, dropout=dropout,
-      bidirectional=True
-    )
+    self._enc_layer = nn.GRU(input_size=hidden_size,
+                             hidden_size=hidden_size // 2,
+                             num_layers=num_layers,
+                             batch_first=True,
+                             dropout=dropout,
+                             bidirectional=True)
     self._out_norm = nn.LayerNorm(hidden_size)
 
   def forward(self, input):
     output, _ = self._enc_layer(input)
     return self._out_norm(output + input)
 
+
 class VallinaDecoder(nn.Module):
-  def __init__(self,
-               emb_dim,
-               hidden_dim,
-               enc_outputs_dim,
-               out_dropout):
+  def __init__(self, emb_dim, hidden_dim, enc_outputs_dim, out_dropout):
     super(VallinaDecoder, self).__init__()
 
     self._rnn_cell1 = nn.GRUCell(emb_dim, hidden_dim)
@@ -485,12 +421,11 @@ class VallinaDecoder(nn.Module):
     hidden = self._rnn_cell1(x, hidden)
     attn_enc = self._enc_attn(hidden, enc_outputs, enc_real_len)
     hidden = self._rnn_cell2(attn_enc, hidden)
-    output = torch.tanh(
-      self._x_dense(x) + attn_enc + hidden
-    )
+    output = torch.tanh(self._x_dense(x) + attn_enc + hidden)
     output = self._out_dropout(output)
 
     return output, hidden
+
 
 class TextCNN(nn.Module):
   def __init__(self,
@@ -504,12 +439,11 @@ class TextCNN(nn.Module):
     super(TextCNN, self).__init__()
 
     cnns = [
-      nn.Sequential(
-        nn.Conv2d(in_channel, out_channel, (kernel, dim)),
-        activation,
-        nn.MaxPool2d((max_seq_len - kernel + 1, 1)),
-      )
-      for kernel in kernels
+        nn.Sequential(
+            nn.Conv2d(in_channel, out_channel, (kernel, dim)),
+            activation,
+            nn.MaxPool2d((max_seq_len - kernel + 1, 1)),
+        ) for kernel in kernels
     ]
     self._cnn_num = len(cnns)
     for idx, cnn in enumerate(cnns):
@@ -532,10 +466,16 @@ class TextCNN(nn.Module):
 
     return out
 
+
 #todo: not finished. Do NOT use it.
 class SLSTM(nn.Module):
-  def __init__(self, dim_input, dim_hidden, window_size,
-               num_sent_nodes=1, bias=True, init_method='normal'):
+  def __init__(self,
+               dim_input,
+               dim_hidden,
+               window_size,
+               num_sent_nodes=1,
+               bias=True,
+               init_method='normal'):
     super(SLSTM, self).__init__()
     self._dim_input = dim_input
     self._dim_hidden = dim_hidden
@@ -547,18 +487,15 @@ class SLSTM(nn.Module):
     self._all_gate_weights = []
 
     # define parameters for word nodes
-    word_gate_dict = dict([('input_gate', 'i'),
-                           ('left_forget_gate', 'l'),
-                           ('right_forget_gate', 'r'),
-                           ('forget_gate', 'f'),
-                           ('sentence_forget_gate', 's'),
-                           ('output_gate', 'o'),
+    word_gate_dict = dict([('input_gate', 'i'), ('left_forget_gate', 'l'),
+                           ('right_forget_gate', 'r'), ('forget_gate', 'f'),
+                           ('sentence_forget_gate', 's'), ('output_gate', 'o'),
                            ('recurrent_input', 'u')])
 
     for (gate_name, gate_tag) in word_gate_dict.items():
       # weight: (out_features, in_features)
-      w_w = nn.Parameter(torch.Tensor(dim_hidden,
-                                      (window_size * 2 + 1) * dim_hidden))
+      w_w = nn.Parameter(
+          torch.Tensor(dim_hidden, (window_size * 2 + 1) * dim_hidden))
       w_u = nn.Parameter(torch.Tensor(dim_hidden, dim_input))
       w_v = nn.Parameter(torch.Tensor(dim_hidden, dim_hidden))
       w_b = nn.Parameter(torch.Tensor(dim_hidden))
@@ -607,11 +544,15 @@ class SLSTM(nn.Module):
     slices = torch.unbind(hx, dim=0)
     zeros = torch.unbind(torch.zeros_like(hx), dim=0)
 
-    context_left = [torch.stack(zeros[:i] + slices[: -i], dim=0)
-                    for i in range(window_size, 0, -1)]
+    context_left = [
+        torch.stack(zeros[:i] + slices[:-i], dim=0)
+        for i in range(window_size, 0, -1)
+    ]
     context_left.append(hx)
-    context_right = [torch.stack(slices[i + 1:] + zeros[: i + 1], dim=0)
-                     for i in range(0, window_size)]
+    context_right = [
+        torch.stack(slices[i + 1:] + zeros[:i + 1], dim=0)
+        for i in range(0, window_size)
+    ]
 
     context = context_left + context_right
     # context is a list of length window size*2+1,
@@ -643,13 +584,15 @@ class SLSTM(nn.Module):
 
     # update sentence node
     h_hat = prev_h_wt.mean(dim=0)
-    fg = func.sigmoid(func.linear(prev_h_gt, self.s_wg) +
-                      func.linear(h_hat, self.s_ug) + self.s_bg)
-    output_gate = func.sigmoid(func.linear(prev_h_gt, self.s_wo) +
-                               func.linear(h_hat, self.s_uo) + self.s_bo)
-    fi = func.sigmoid(func.linear(prev_h_gt, self.s_wf) +
-                      func.linear(prev_h_wt, self.s_uf) +
-                      self.s_bf).masked_fill(seq_mask, -1e25)
+    fg = func.sigmoid(
+        func.linear(prev_h_gt, self.s_wg) + func.linear(h_hat, self.s_ug) +
+        self.s_bg)
+    output_gate = func.sigmoid(
+        func.linear(prev_h_gt, self.s_wo) + func.linear(h_hat, self.s_uo) +
+        self.s_bo)
+    fi = func.sigmoid(
+        func.linear(prev_h_gt, self.s_wf) + func.linear(prev_h_wt, self.s_uf) +
+        self.s_bf).masked_fill(seq_mask, -1e25)
     fi_normalized = func.softmax(fi, dim=0)
     c_gt = fg.mul(prev_c_gt).add(fi_normalized.mul(prev_c_wt).sum(dim=0))
     h_gt = output_gate.mul(func.tanh(c_gt))
@@ -658,44 +601,29 @@ class SLSTM(nn.Module):
     epsilon = self._in_window_context(prev_h_wt, window_size=self._window_size)
     # epsilon: (l, b, d_word or emb_size * (2 * window_size + 1)
     input_gate = func.sigmoid(
-      func.linear(epsilon, self.w_wi) +
-      func.linear(src_seq, self.w_ui) +
-      func.linear(prev_h_gt, self.w_vi) + self.w_bi
-    )
+        func.linear(epsilon, self.w_wi) + func.linear(src_seq, self.w_ui) +
+        func.linear(prev_h_gt, self.w_vi) + self.w_bi)
     left_gate = func.sigmoid(
-      func.linear(epsilon, self.w_wl) +
-      func.linear(src_seq, self.w_ul) +
-      func.linear(prev_h_gt, self.w_vl) + self.w_bl
-    )
+        func.linear(epsilon, self.w_wl) + func.linear(src_seq, self.w_ul) +
+        func.linear(prev_h_gt, self.w_vl) + self.w_bl)
     right_gate = func.sigmoid(
-      func.linear(epsilon, self.w_wr) +
-      func.linear(src_seq, self.w_ur) +
-      func.linear(prev_h_gt, self.w_vr) + self.w_br
-    )
+        func.linear(epsilon, self.w_wr) + func.linear(src_seq, self.w_ur) +
+        func.linear(prev_h_gt, self.w_vr) + self.w_br)
     forget_gate = func.sigmoid(
-      func.linear(epsilon, self.w_wf) +
-      func.linear(src_seq, self.w_uf) +
-      func.linear(prev_h_gt, self.w_vf) + self.w_bf
-    )
+        func.linear(epsilon, self.w_wf) + func.linear(src_seq, self.w_uf) +
+        func.linear(prev_h_gt, self.w_vf) + self.w_bf)
     sent_gate = func.sigmoid(
-      func.linear(epsilon, self.w_ws) +
-      func.linear(src_seq, self.w_us) +
-      func.linear(prev_h_gt, self.w_vs) + self.w_bs
-    )
+        func.linear(epsilon, self.w_ws) + func.linear(src_seq, self.w_us) +
+        func.linear(prev_h_gt, self.w_vs) + self.w_bs)
     output_gate = func.sigmoid(
-      func.linear(epsilon, self.w_wo) +
-      func.linear(src_seq, self.w_uo) +
-      func.linear(prev_h_gt, self.w_vo) + self.w_bo
-    )
+        func.linear(epsilon, self.w_wo) + func.linear(src_seq, self.w_uo) +
+        func.linear(prev_h_gt, self.w_vo) + self.w_bo)
     current_update = func.tanh(
-      func.linear(epsilon, self.w_wu) +
-      func.linear(src_seq, self.w_uu) +
-      func.linear(prev_h_gt, self.w_vu) + self.w_bu
-    )
+        func.linear(epsilon, self.w_wu) + func.linear(src_seq, self.w_uu) +
+        func.linear(prev_h_gt, self.w_vu) + self.w_bu)
 
     gates = torch.stack(
-      (left_gate, forget_gate, right_gate, sent_gate, input_gate), dim=0
-    )
+        (left_gate, forget_gate, right_gate, sent_gate, input_gate), dim=0)
     # gates: (5*l,b,d)
     gates_normalized = func.softmax(gates.masked_fill(seq_mask, -1e25), dim=0)
 
@@ -703,10 +631,9 @@ class SLSTM(nn.Module):
       self._in_window_context(prev_c_wt).chunk(3, dim=2) # split by dim 2
     # c_wt_: (l, b, d_word)
     c_mergered = torch.stack(
-      (c_wt_l, prev_c_wt, c_wt_r, prev_c_gt.expand_as(prev_c_wt.data),
-       current_update),
-      dim=0
-    )
+        (c_wt_l, prev_c_wt, c_wt_r, prev_c_gt.expand_as(
+            prev_c_wt.data), current_update),
+        dim=0)
 
     c_wt = gates_normalized.mul(c_mergered).sum(dim=0)
     c_wt = c_wt.masked_fill(seq_mask, 0)
@@ -716,6 +643,7 @@ class SLSTM(nn.Module):
     c_t = torch.cat((c_wt, c_gt), dim=0)
 
     return h_t, c_t
+
 
 class TranformerEncoder(nn.Module):
   '''A simplified version'''
@@ -729,7 +657,7 @@ class TranformerEncoder(nn.Module):
                multi_head_num,
                pos_emb_dim=0,
                add_first_token=True,
-               out_dropout: float=0):
+               out_dropout: float = 0):
     super(TranformerEncoder, self).__init__()
 
     self._layer_num = layer_num
@@ -739,8 +667,7 @@ class TranformerEncoder(nn.Module):
     self._add_first_token = add_first_token
     assert pos_emb_dim > 0
     self._pos_emb_weight = torch.nn.Parameter(
-      torch.Tensor(self.MAX_LEN + 1, pos_emb_dim)
-    )
+        torch.Tensor(self.MAX_LEN + 1, pos_emb_dim))
 
     for _ in range(layer_num):
       setattr(self, f"_preprocess_layernorm_{_}", nn.LayerNorm(hidden_dim))
@@ -770,10 +697,9 @@ class TranformerEncoder(nn.Module):
       first_toekn = self._first_token.expand(batch, 1, dim)
       x = torch.cat([first_toekn, x], 1)
 
-    pos_emb = self._pos_emb_weight[: x.size(1)]
+    pos_emb = self._pos_emb_weight[:x.size(1)]
     pos_emb = pos_emb.unsqueeze(0).expand(
-      [x.size(0), x.size(1), pos_emb.size(1)]
-    )
+        [x.size(0), x.size(1), pos_emb.size(1)])
     x = torch.cat([x, pos_emb], 2)
 
     x = self._input_dense(x)
