@@ -16,27 +16,22 @@ py_modules = [
     if name.endswith('.py') and name not in ['__init__.py']
 ]
 
-
-setup(
-    name='palframe',
-    version=about.__version__,
-    author=about.__author__,
-    author_email=about.__email__,
-    description='palframe',
-    packages=[f'palframe.{p}' for p in find_packages('palframe')],
-    package_dir={'palframe': 'palframe'},
-    py_modules=py_modules,
-    include_package_data=True,
-    long_description=read('README.palframe.md'),
-    install_requires=open('requirements.txt').readlines(),
-    license='MIT',
-    python_requires='>=3.7',
-    entry_points={
-      'console_scripts':[
-        'palframe = palframe.command_tools.launch:main'
-      ]
-    }
-)
+setup(name='palframe',
+      version=about.__version__,
+      author=about.__author__,
+      author_email=about.__email__,
+      description='palframe',
+      packages=[f'palframe.{p}' for p in find_packages('palframe')],
+      package_dir={'palframe': 'palframe'},
+      py_modules=py_modules,
+      include_package_data=True,
+      long_description=read('README.palframe.md'),
+      install_requires=open('requirements.txt').readlines(),
+      license='MIT',
+      python_requires='>=3.7',
+      entry_points={
+          'console_scripts': ['palframe = palframe.command_tools.launch:main']
+      })
 
 if __name__ == '__main__':
   pass

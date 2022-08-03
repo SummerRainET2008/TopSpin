@@ -123,7 +123,7 @@ class TrainerBase:
     if param.epoch_num is not None:
       self._target_seen_sample_num = param.epoch_num * param.train_sample_num
     else:
-      self._target_seen_sample_num = param.max_train_step * self._world_size * param.batch_size
+      self._target_seen_sample_num = param.max_train_step * self._world_size * param.batch_size * param.iter_num_update_optimizer
       param.epoch_num = math.ceil(self._target_seen_sample_num /
                                   param.train_sample_num)
 

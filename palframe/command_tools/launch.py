@@ -96,9 +96,7 @@ def param_init_fn_decorator(run_tag):
   """
     modify init funciton's run_tag keyword
     """
-
   def wrapper1(fn):
-
     def wrapper2(*args, **kwargs):
       kwargs['run_tag'] = run_tag
       fn(*args, **kwargs)
