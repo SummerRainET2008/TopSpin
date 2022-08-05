@@ -178,7 +178,7 @@ class TrainerBase:
 
     if int(param.epoch_num is None) + int(param.max_train_step is None) != 1:
       assert False, \
-        "param.epoch_num and param.max_train_step can not be None or not None " \
+        "param.epoch_num and param.max_train_step can not be None or not None "\
         "AT THE SAME TIME"
 
     assert param.train_sample_num is not None
