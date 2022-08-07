@@ -16,7 +16,7 @@ class ModelWrapperBase:
     if self._quickrun_mode:
       current_env = os.environ
       current_env["MASTER_ADDR"] = "127.0.0.1"
-      current_env["MASTER_PORT"] = f"{random.randint(1024, 1024 * 1024)}"
+      current_env["MASTER_PORT"] = f"{random.randint(1000, 10_000)}"
       current_env["WORLD_SIZE"] = "1"
       current_env["RANK"] = "0"
       current_env["LOCAL_RANK"] = "0"
