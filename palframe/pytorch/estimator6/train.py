@@ -56,7 +56,8 @@ class TrainerBase:
     nlp.command(f"cp {param_file} {param.path_work}")
 
     if not debug_mode:
-      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}")
+      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
+                             append=param.restore_from_last_train)
     if dist.get_rank() == 0:
       Logger.set_level(param.debug_level)
     else:

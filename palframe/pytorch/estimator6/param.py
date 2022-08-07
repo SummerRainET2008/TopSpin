@@ -38,8 +38,10 @@ class ParamBase(abc.ABC):
     if not nlp.is_none_or_empty(path_work_restored_training):
       self.path_work = path_work_restored_training
       assert os.path.isdir(self.path_work), self.path_work
+      self.restore_from_last_train = True
     else:
       assert not nlp.is_none_or_empty(run_tag)
+      self.restore_from_last_train = False
 
       date_str = nlp.get_log_time(True)
       date_str = date_str.replace(" ", "_").replace(":", "-")\
@@ -119,8 +121,6 @@ class ParamBase(abc.ABC):
     # Evaluation would be conducted every eval_gap_sample_num samples.
     self.eval_gap_sample_num = None
 
-    self.restore_from_last_train = \
-      not nlp.is_none_or_empty(path_work_restored_training)
     self.find_unused_parameters = True
 
     self.model_saved_num = 3
@@ -290,7 +290,7 @@ class ParamBase(abc.ABC):
     nlp.mkdir("work")
     nlp.mkdir(self.path_work)
     nlp.mkdir(self.path_model)
-    nlp.mkdir(self.path_log, True)
+    nlp.mkdir(self.path_log, not self.restore_from_last_train)
     nlp.mkdir(self.path_meta, True)
     nlp.mkdir(self.path_bug)
 

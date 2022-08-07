@@ -706,8 +706,9 @@ class Logger:
   outstream = sys.stdout
 
   @staticmethod
-  def reset_outstream(out_file: str):
-    Logger.outstream = open(out_file, "w")
+  def reset_outstream(out_file: str, append=False):
+    mode = "a" if append else "w"
+    Logger.outstream = open(out_file, mode)
 
   @staticmethod
   def set_level(level):
