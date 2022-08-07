@@ -23,26 +23,18 @@ class ModelBase(nn.Module):
     try:
       assert model_file.endswith(".pt")
       info = torch.load(model_file, map_location=self._device)
-      if isinstance(info, list):
-        # estimator3 model
-        # extral_info = [
-        #   self._global_step_id,
-        #   self._opt_vali_error,
-        #   self._run_sample_num
-        # ]
-        state_dict = info[3]
-      else:
-        assert isinstance(info, dict)
-        state_dict = info["model"]
+      assert isinstance(info, dict)
+      state_dict = info["model"]
 
-      clean_state_dict = collections.OrderedDict()
-      prefix = "module."
-      for key, value in state_dict.items():
-        if key.startswith(prefix):
-          key = key[len(prefix):]
-        clean_state_dict[key] = value
+      # clean_state_dict = collections.OrderedDict()
+      # prefix = "module."
+      # for key, value in state_dict.items():
+      #   if key.startswith(prefix):
+      #     key = key[len(prefix):]
+      #   clean_state_dict[key] = value
 
-      incompatible_keys = self.load_state_dict(clean_state_dict, strict=False)
+      # incompatible_keys = self.load_state_dict(clean_state_dict, strict=False)
+      incompatible_keys = self.load_state_dict(state_dict, strict=False)
       Logger.info(f"Incompatible keys: {incompatible_keys}")
       Logger.info(f"Model load succeeds: {model_file}")
 
