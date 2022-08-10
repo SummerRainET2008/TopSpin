@@ -177,6 +177,26 @@ def label_smoothing_loss(logits,
 
   return loss
 
+def topK_mask_logits(logits, topk: int=-1, acum_prob_limit: float=-1):
+  c_num = logits.size(-1)
+  dim = len(logits.shape)
+  if 0 < topk < c_num:
+    topk_indexes = torch.topk(-logits, c_num - topk)[1]
+    ret = logits + torch.scatter(logits, dim - 1, topk_indexes, -10000)
+    return ret
+
+  elif 0 < acum_prob_limit < 1:
+    topk_scores, topk_indexes = torch.topk(logits, c_num)
+    topk_probs = nn.Softmax(dim=-1)(topk_scores)
+    bottom_mask = torch.cumsum(topk_probs, dim=dim - 1) > acum_prob_limit
+    topk_scores = bottom_mask * -10000 + topk_scores
+    orignal_indexes = torch.sort(topk_indexes)[1]
+    ret = torch.gather(topk_scores, dim - 1, orignal_indexes)
+    return ret
+
+  else:
+    return logits
+
 
 class FocalLoss(nn.Module):
   def __init__(self, gamma=2):
