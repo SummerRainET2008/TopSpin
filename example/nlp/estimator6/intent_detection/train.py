@@ -39,9 +39,7 @@ class Trainer(TrainerBase):
                               pad_batch_data_func=_pad_batch_data)
 
   # def _train_one_batch(self, b_word_ids, b_label, memo):
-  def _train_one_batch(self, batch):
-    b_word_ids = batch["x"]
-    b_label = batch["y"]
+  def _train_one_batch(self, b_word_ids, b_label, readme=""):
     logits, pred_labels = self._model(b_word_ids)
     loss = nn.functional.cross_entropy(logits, b_label, reduction="mean")
     return {"loss": loss}

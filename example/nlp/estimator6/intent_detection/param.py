@@ -11,7 +11,7 @@ class Param(ParamBase):
 
     # self.path_initial_model = "/tmp/model.init.pt"
 
-    self.path_feat = "feat/ver_2_textcnn"
+    self.path_feat = "feat/textcnn"
     self.train_files = [f"{self.path_feat}/train.pydict"]
     self.vali_file = f"{self.path_feat}/vali.pydict"
     self.test_files = []

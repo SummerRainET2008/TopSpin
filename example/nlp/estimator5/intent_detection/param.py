@@ -18,7 +18,7 @@ class Param(ParamBase):
     self.iter_num_update_optimizer = 1  #
 
     ################ model related settings ################
-    self.path_feat = "feat/nlp/intent_detection"
+    self.path_feat = "feat/textcnn"
     self.train_files = [f"{self.path_feat}/train.pkl"]
     self.vali_file = f"{self.path_feat}/vali.pkl"
     self.test_files = []
