@@ -195,10 +195,23 @@ class TrainerBase:
       self._model_wrapper._set_train()
       torch.cuda.empty_cache()
 
-  def train_one_batch(self, *batch) -> dict:
+  def train_one_batch(self, *args, **kwargs) -> dict:
     raise NotImplementedError()
 
-  def _train_one_batch_check(self, *batch) -> dict:
+  def _extract_real_batch_num(self, batch):
+    for v in batch["args"]:
+      if isinstance(v, torch.Tensor):
+        return v.size(0)
+
+    for k, v in batch["kwargs"].items():
+      if isinstance(v, torch.Tensor):
+        return v.size(0)
+
+    assert False
+
+    return None
+
+  def _train_one_batch_check(self, batch) -> dict:
     def tracer(frame, event, arg):
       if event == "return":
         local_vars[0] = frame.f_locals
@@ -206,14 +219,14 @@ class TrainerBase:
     try:
       local_vars = [None]
       sys.setprofile(tracer)
-      ret = self.train_one_batch(*batch)
+      ret = self.train_one_batch(*batch["args"], **batch["kwargs"])
       if type(ret) is not dict:
         raise Exception(f"train_one_batch(...) should return a dict.")
 
       sys.setprofile(None)
 
       if "batch_num" not in ret:
-        ret["batch_num"] = batch[0].size(0)
+        ret["batch_num"] = self._extract_real_batch_num(batch)
 
       if self._param.true_gradient:
         ret["loss"] *= ret["batch_num"]
@@ -274,7 +287,18 @@ class TrainerBase:
   def _get_batches_data(self):
     def get_one_batch():
       for _, batch in self._train_data_iter:
-        yield nlp_torch.to_device(batch, self._model_wrapper._device)
+        batch = batch if isinstance(batch, (list, tuple)) else [batch]
+        batch = nlp_torch.to_device(batch, self._model_wrapper._device)
+        if not isinstance(batch[-1], dict):
+          yield {
+            "args": batch,
+            "kwargs": {}
+          }
+        else:
+          yield {
+            "args": batch[: -1],
+            "kwargs": batch[-1]
+          }
 
     yield from nlp.next_batch(get_one_batch(),
                               self._param.iter_num_update_optimizer)
@@ -285,10 +309,10 @@ class TrainerBase:
       def run():
         if self._use_amp:
           with amp.autocast():
-            ret = self._train_one_batch_check(*batch)
+            ret = self._train_one_batch_check(batch)
           self._grad_scaler.scale(ret["loss"]).backward()
         else:
-          ret = self._train_one_batch_check(*batch)
+          ret = self._train_one_batch_check(batch)
           ret["loss"].backward()
 
         ret["loss"] = ret["loss"].item()
@@ -357,7 +381,6 @@ class TrainerBase:
 
       batch_accum_loss = []
       current_batch_size = 0
-      current_sum_loss_num = 0
       mini_batch_train_time = []
       batch_figure = []
       for iter_num, batch in enumerate(batches):
@@ -371,8 +394,7 @@ class TrainerBase:
 
         mini_batch_train_time.append(mini_timer.duration)
         batch_accum_loss.append(batch_train_result["loss"])
-        current_batch_size += batch[0].size(0)
-        current_sum_loss_num += batch_train_result["batch_num"]
+        current_batch_size += batch_train_result["batch_num"]
         batch_figure.append(batch_train_result.get("figure", {}))
 
       real_batch_size = self._sync_value(current_batch_size)
@@ -383,14 +405,13 @@ class TrainerBase:
         self._grad_scaler.unscale_(self._optimizer)
 
       if param.true_gradient:
-        sum_loss_num = self._sync_value(current_sum_loss_num)
         batch_loss = sum(batch_accum_loss)
-        batch_loss = self._sync_value(batch_loss) / sum_loss_num
+        batch_loss = self._sync_value(batch_loss) / real_batch_size
         self._loss_history.append(batch_loss)
 
         for var in self._model_wrapper._model.parameters():
           if var.grad is not None:
-            var.grad *= self._world_size / sum_loss_num
+            var.grad *= self._world_size / real_batch_size
       else:
         batch_loss = sum(batch_accum_loss) / len(batch_accum_loss)
         batch_loss = self._sync_value(batch_loss, "mean")

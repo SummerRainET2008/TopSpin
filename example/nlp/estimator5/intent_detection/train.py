@@ -1,6 +1,7 @@
 from example.nlp.estimator5.intent_detection import *
 from example.nlp.estimator5.intent_detection.param import Param
-from example.nlp.estimator5.intent_detection.dataset import get_batch_data
+from example.nlp.estimator5.intent_detection.dataset import get_batch_data, \
+  _pad_batch_data
 from example.nlp.estimator5.intent_detection.model_wrapper import ModelWrapper
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5.train import TrainerBase
@@ -12,10 +13,12 @@ class Trainer(TrainerBase):
 
     super(Trainer, self).__init__(
         model_wrapper,
-        get_batch_data(param, param.train_files, param.epoch_num,
-                       dist.get_rank(), dist.get_world_size(), True), None)
+        get_batch_data(param.train_files, param.epoch_num,
+                       param.batch_size, 4, True,
+                       dist.get_rank(), dist.get_world_size(),
+                       _pad_batch_data), None)
 
-  def train_one_batch(self, b_word_ids, b_label):
+  def train_one_batch(self, b_word_ids, b_label, readme=""):
     logits, pred_labels = self._model_wrapper.predict(b_word_ids)
     loss = nn.functional.cross_entropy(logits, b_label, reduction="mean")
 
