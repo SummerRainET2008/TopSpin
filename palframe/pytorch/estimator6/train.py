@@ -254,7 +254,7 @@ class TrainerBase:
       self._model.train()
       torch.cuda.empty_cache()
 
-  def _train_one_batch(self, *args, **kwargs) -> dict:
+  def train_one_batch(self, *args, **kwargs) -> dict:
     raise NotImplementedError()
 
   def _extract_real_batch_num(self, batch):
@@ -279,7 +279,7 @@ class TrainerBase:
     try:
       local_vars = [None]
       sys.setprofile(tracer)
-      ret = self._train_one_batch(*batch["args"], **batch["kwargs"])
+      ret = self.train_one_batch(*batch["args"], **batch["kwargs"])
       if type(ret) is not dict:
         raise Exception(f"train_one_batch(...) should return a dict.")
 
@@ -341,7 +341,7 @@ class TrainerBase:
 
   def _get_batches_data(self):
     def get_one_batch():
-      train_data_iter = self._get_training_data(
+      train_data_iter = self.get_training_data(
           rank=dist.get_rank(),
           world_size=dist.get_world_size(),
       )
@@ -362,7 +362,7 @@ class TrainerBase:
     yield from nlp.next_batch(get_one_batch(),
                               self._param.iter_num_update_optimizer)
 
-  def _get_training_data(self, rank: int, world_size: int):
+  def get_training_data(self, rank: int, world_size: int):
     '''
     :param rank:  GPU worker ID
     :param world_size: number of all GPU workers

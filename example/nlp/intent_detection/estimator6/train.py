@@ -27,7 +27,7 @@ class Trainer(TrainerBase):
 
     super(Trainer, self).__init__(model, Predictor, optimizer)
 
-  def _get_training_data(self, rank: int, world_size: int):
+  def get_training_data(self, rank: int, world_size: int):
     param = self._param
     yield from get_batch_data(feat_path=param.train_files,
                               epoch_num=param.epoch_num,
@@ -39,7 +39,7 @@ class Trainer(TrainerBase):
                               pad_batch_data_func=_pad_batch_data)
 
   # def _train_one_batch(self, b_word_ids, b_label, memo):
-  def _train_one_batch(self, b_word_ids, b_label, readme=""):
+  def train_one_batch(self, b_word_ids, b_label, readme=""):
     logits, pred_labels = self._model(b_word_ids)
     loss = nn.functional.cross_entropy(logits, b_label, reduction="mean")
     return {"loss": loss}
