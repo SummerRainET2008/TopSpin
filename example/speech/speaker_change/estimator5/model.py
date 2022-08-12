@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from example.speech.speaker_change import *
+from example.speech.speaker_change.estimator5 import *
 
 
 class ConvBNBlock(nn.Module):

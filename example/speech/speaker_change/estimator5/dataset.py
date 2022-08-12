@@ -2,7 +2,7 @@
 #author: Xinyi Wu
 
 import torch.utils.data
-from example.speech.speaker_change import *
+from example.speech.speaker_change.estimator5 import *
 from palframe.pytorch.dataset.offline_smalldataset import get_batch_data as \
   _get_batch_data
 

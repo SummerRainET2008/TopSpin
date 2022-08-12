@@ -2,7 +2,7 @@
 #author: Hongchen Liu
 #author: Tian Xia
 
-from example.cv.edsr.header import *
+from example.cv.edsr.estimator5.header import *
 import torch
 from param import Param
 from palframe.pytorch.dataset.offline_smalldataset import Dataset as _Dataset,\

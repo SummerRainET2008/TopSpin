@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from example.cv.edsr.header import *
+from example.cv.edsr.estimator5.header import *
 from palframe.nlp import *
 import torch.nn as nn
 import torch

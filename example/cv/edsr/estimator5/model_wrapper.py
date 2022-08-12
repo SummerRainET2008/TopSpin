@@ -1,12 +1,12 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from example.cv.edsr.header import *
+from example.cv.edsr.estimator5.header import *
 from palframe.nlp import *
 from palframe.pytorch import *
-from example.cv.edsr.param import Param
-from example.cv.edsr.model import Net
-from example.cv.edsr.dataset import get_batch_data
+from example.cv.edsr.estimator5.param import Param
+from example.cv.edsr.estimator5.model import Net
+from example.cv.edsr.estimator5.dataset import get_batch_data
 from palframe.measure import Measure
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 

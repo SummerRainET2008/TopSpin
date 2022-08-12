@@ -2,8 +2,8 @@
 #author: Xinyi Wu
 
 from palframe.pytorch.estimator5 import starter
-from example.speech.speaker_change import *
-from example.speech.speaker_change.param import Param
+from example.speech.speaker_change.estimator5 import *
+from example.speech.speaker_change.estimator5.param import Param
 
 
 def main():

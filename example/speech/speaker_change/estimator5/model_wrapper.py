@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from example.speech.speaker_change import *
-from example.speech.speaker_change.dataset import get_batch_data
+from example.speech.speaker_change.estimator5 import *
+from example.speech.speaker_change.estimator5.dataset import get_batch_data
 from palframe.measure import Measure
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 

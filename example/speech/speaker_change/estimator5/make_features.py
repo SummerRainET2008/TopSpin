@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from example.speech.speaker_change import *
+from example.speech.speaker_change.estimator5.estimator5 import *
 
 
 def process_xvector_data(scp_file, output_path, sc_loc):

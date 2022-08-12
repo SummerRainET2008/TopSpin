@@ -2,10 +2,10 @@
 #author: Xinyi Wu
 
 from palframe.pytorch.estimator5.predict import PredictorBase
-from example.speech.speaker_change import *
-from example.speech.speaker_change.param import Param
-from example.speech.speaker_change.model_wrapper import ModelWrapper
-from example.speech.speaker_change.model import SCDetConv as Model
+from example.speech.speaker_change.estimator5 import *
+from example.speech.speaker_change.estimator5.param import Param
+from example.speech.speaker_change.estimator5.model_wrapper import ModelWrapper
+from example.speech.speaker_change.estimator5.model import SCDetConv as Model
 
 
 class Predictor(PredictorBase):

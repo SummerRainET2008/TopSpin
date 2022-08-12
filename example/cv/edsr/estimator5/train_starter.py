@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from example.cv.edsr.param import Param
+from example.cv.edsr.estimator5.param import Param
 import optparse
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5 import starter
