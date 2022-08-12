@@ -274,6 +274,7 @@ class TrainerBase:
   def _get_batches_data(self):
     def get_one_batch():
       for _, batch in self._train_data_iter:
+        batch = batch if isinstance(batch, (list, tuple)) else [batch]
         yield nlp_torch.to_device(batch, self._model_wrapper._device)
 
     yield from nlp.next_batch(get_one_batch(),
