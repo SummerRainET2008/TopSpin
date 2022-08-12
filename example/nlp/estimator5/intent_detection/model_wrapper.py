@@ -1,7 +1,7 @@
-from example.nlp.intent_detection import *
-from example.nlp.intent_detection.param import Param
-from example.nlp.intent_detection.model import Model
-from example.nlp.intent_detection.dataset import get_batch_data
+from example.nlp.estimator5.intent_detection import *
+from example.nlp.estimator5.intent_detection.param import Param
+from example.nlp.estimator5.intent_detection.model import Model
+from example.nlp.estimator5.intent_detection.dataset import get_batch_data
 from palframe.measure import Measure
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 

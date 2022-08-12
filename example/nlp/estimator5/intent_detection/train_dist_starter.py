@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from example.nlp.intent_detection import *
-from example.nlp.intent_detection.param import Param
+from example.nlp.estimator5.intent_detection import *
+from example.nlp.estimator5.intent_detection.param import Param
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5 import starter
 

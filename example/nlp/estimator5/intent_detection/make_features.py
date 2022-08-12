@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Shuang Zhao
 
-from example.nlp.intent_detection import *
+from example.nlp.estimator5.intent_detection import *
 from palframe.pytorch.pretrained.tokenizer import Tokenizer
 from palframe import nlp
 

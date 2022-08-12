@@ -1,10 +1,14 @@
-from example.nlp.intent_detection import *
-from example.nlp.intent_detection.param import Param
+#coding: utf8
+#author: Shuang Zhao
+
+from example.nlp.estimator6.intent_detection import *
+from example.nlp.estimator6.intent_detection.param import Param
+from palframe.pytorch.estimator6.model import ModelBase
 
 
-class Model(nn.Module):
-  def __init__(self, param: Param):
-    super(Model, self).__init__()
+class Model(ModelBase):
+  def __init__(self, param):
+    super(Model, self).__init__(param)
 
     self._embedding = nn.Embedding(param.vocab_size, param.embedding_size)
 
@@ -18,6 +22,10 @@ class Model(nn.Module):
 
     self._dense = nlp_torch.Dense(
         nn.Linear(self._textcnn_output_size, param.class_number))
+    self._reset_weights()
+
+  def _reset_weights(self):
+    pass
 
   def forward(self, word_ids):
     word_ids = word_ids.unsqueeze(1)
