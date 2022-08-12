@@ -197,6 +197,21 @@ def topK_mask_logits(logits, topk: int=-1, acum_prob_limit: float=-1):
   else:
     return logits
 
+def to_device(v, device):
+  '''
+  :param v: any type
+  :param device:
+  :return:
+  '''
+  if isinstance(v, list):
+    return [to_device(e, device) for e in v]
+  elif isinstance(v, dict):
+    return {k: to_device(v, device) for k, v in v.items()}
+  elif isinstance(v, torch.Tensor):
+    return v.to(device)
+  else:
+    return v
+
 
 class FocalLoss(nn.Module):
   def __init__(self, gamma=2):

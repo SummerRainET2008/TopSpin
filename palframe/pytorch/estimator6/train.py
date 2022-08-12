@@ -330,8 +330,7 @@ class TrainerBase:
           world_size=dist.get_world_size(),
       )
       for epoch_id, batch in train_data_iter:
-        batch = [e.to(self._device) for e in batch]
-        yield batch
+        yield nlp_torch.to_device(batch, self._device)
 
     yield from nlp.next_batch(get_one_batch(),
                               self._param.iter_num_update_optimizer)
