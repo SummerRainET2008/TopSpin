@@ -203,7 +203,7 @@ def to_device(v, device):
   :param device:
   :return:
   '''
-  if isinstance(v, list):
+  if isinstance(v, (list, tuple)):
     return [to_device(e, device) for e in v]
   elif isinstance(v, dict):
     return {k: to_device(v, device) for k, v in v.items()}
