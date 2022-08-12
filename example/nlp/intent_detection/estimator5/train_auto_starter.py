@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from example.nlp.estimator5.intent_detection import *
-from example.nlp.estimator5.intent_detection.param import Param
+from example.nlp.intent_detection.estimator5 import *
+from example.nlp.intent_detection.estimator5.param import Param
 from palframe.nlp import Logger
 from palframe.pytorch.estimator5 import starter
 
@@ -15,14 +15,9 @@ def main():
 
   Logger.set_level(options.debug_level)
 
-  param = Param.get_instance()
-  # Put your cluster IPs into this file, splitted by ' ' or '\n'.
-  # param.servers_file = "server_file.data"
-
-  starter.start_distributed_train(
-      param,
-      "example/nlp/intent_detection/train.py",
-  )
+  starter.start_train(Param.get_instance(),
+                      "example/nlp/intent_detection/train.py",
+                      [starter.Server(None, [1, 3, 4, 6, 7])])
 
 
 if __name__ == "__main__":

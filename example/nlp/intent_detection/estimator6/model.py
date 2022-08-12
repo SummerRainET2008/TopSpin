@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Shuang Zhao
 
-from example.nlp.estimator6.intent_detection import *
-from example.nlp.estimator6.intent_detection.param import Param
+from example.nlp.intent_detection.estimator6 import *
+from example.nlp.intent_detection.estimator6.param import Param
 from palframe.pytorch.estimator6.model import ModelBase
 
 

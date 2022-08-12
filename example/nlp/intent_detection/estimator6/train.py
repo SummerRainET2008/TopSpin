@@ -1,11 +1,11 @@
 #coding: utf8
 #author: Shuang Zhao
 
-from example.nlp.estimator6.intent_detection import *
-from example.nlp.estimator6.intent_detection.param import Param
-from example.nlp.estimator6.intent_detection.model import Model
-from example.nlp.estimator6.intent_detection.predict import Predictor
-from example.nlp.estimator6.intent_detection.dataset import \
+from example.nlp.intent_detection.estimator6 import *
+from example.nlp.intent_detection.estimator6.param import Param
+from example.nlp.intent_detection.estimator6.model import Model
+from example.nlp.intent_detection.estimator6.predict import Predictor
+from example.nlp.intent_detection.estimator6.dataset import \
   get_batch_data, _pad_batch_data
 from palframe.nlp import Logger
 from palframe.pytorch.estimator6.train import TrainerBase

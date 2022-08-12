@@ -1,7 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from example.nlp.estimator5.intent_detection import *
+from example.nlp.intent_detection.estimator5 import *
+from example.nlp.intent_detection.estimator5.param import Param
 from palframe.pytorch.pretrained.tokenizer import Tokenizer
 from palframe import nlp
 from palframe import spark_helper
@@ -27,11 +28,11 @@ def process(data_file: str, out_file: str):
 
 
 def main():
-  feat_path = "feat/nlp/intent_detection"
-  nlp.mkdir(feat_path, delete_first=False)
+  param = Param.get_instance()
+  nlp.mkdir(param.feat_path, delete_first=False)
 
   process(f"example/nlp/intent_detection/data/train.pydict",
-          os.path.join(feat_path, "train.spark.pkl"))
+          os.path.join(param.feat_path, "train.spark.pkl"))
 
   # process(
   #   [f"example/nlp/intent_detection/data/test.pydict"],

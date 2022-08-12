@@ -1,5 +1,5 @@
-from example.nlp.estimator5.intent_detection import *
-from example.nlp.estimator5.intent_detection.param import Param
+from example.nlp.intent_detection.estimator5 import *
+from example.nlp.intent_detection.estimator5.param import Param
 
 
 class Model(nn.Module):

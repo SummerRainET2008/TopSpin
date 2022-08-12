@@ -1,0 +1,801 @@
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'teaching guide'}
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'what kind of teaching materials do you provide'}
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'teaching materials'}
+{'class': 0, 'id': 'Curriculum001', 'is_standard_q': False, 'text': 'do i need to prepare teaching plans before the session'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'i think this student should be at a lower level what can i do'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'my student does not know this grammar can i downgrade him'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'how to upgrade student'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'may i upgrade my student i do not know what to do on the system'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'how can i downgrade students'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'what can i do to upgrade a student'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'my student is more suitable for a higher level can i upgrade him'}
+{'class': 1, 'id': 'Curriculum002', 'is_standard_q': False, 'text': 'how should i downgrade a student'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'the student is way below or above the level of the lesson material'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'the student is lower than the level of today s session'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'i had 2 students one fluent and should be upgraded the other needed a lot of help to engage in the session'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'the student is struggling on level 4 when he should be on level 1'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'she was in a level 2 class and it is too advanced for her as she is only just learning her alphabet'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'she is currently at the 3rd level but this level is to hard for her please put her in a lower level'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'she came as a level 5 client ready for the material on her first session but she was not able to handle this material because it was much harder for her'}
+{'class': 2, 'id': 'Curriculum003', 'is_standard_q': False, 'text': 'i feel sorry for the student at the wrong level and i hope we can help him'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': True, 'text': 'this lesson is inappropriate for the students'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'please revise the material it is too long'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'the chosen lesson is far far too easy and short for him'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'we need to explain in details plenty of activities and exercises will be the way to go'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'it was very blatantly sexist and i think it needs to be removed from circulation or edited'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'the lesson was related to skeletal system which was just not appropriate for the clients'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'please remove the super specific lessons they are not helping anyone'}
+{'class': 3, 'id': 'Curriculum004', 'is_standard_q': False, 'text': 'the content is insufficient please add some discuss questions'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i am writing to apply for a writing position'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i would like to participate to your writing projects'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'can you please explain how i can become a writer for itoturgroup'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'are you hiring the material writer'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'is it possible for me to become a writer'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i am interested in becoming a writer what is the criteria and how do i apply'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i can produce material specific to the uk britain as well as interesting lessons relating to the legal industry poetry and a wide range of social topics and contexts'}
+{'class': 4, 'id': 'Curriculum005', 'is_standard_q': False, 'text': 'i am interested in your writer position'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': True, 'text': 'where can i submit my lesson plan'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'how to sumbit a lesson plan'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'please let me know how to upload lesson plans'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'where can i view my submitted materials'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'where can i sumbit the material'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'how should i submit a lesson plan'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'i was wondering how to upload lesson plans'}
+{'class': 5, 'id': 'Curriculum006', 'is_standard_q': False, 'text': 'i want to submit a lesson plan to the adult portal'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how to resubmit my lesson plan'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'i made the necessary revisions can i log back onto the consultant page and re upload my changed lesson plan'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how can i resubmit a lesson'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'where should i resubmit it'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how should i resubmit my lesson'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'i made the necessary revisions how can i resubmit'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'how can i go to the upload page again'}
+{'class': 6, 'id': 'Curriculum007', 'is_standard_q': False, 'text': 'could you please let me know how to reupload'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': True, 'text': 'do you have the instructions for uploading lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'what can i do to upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i want to upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i was told that i could upload lesson plans what can i do'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'who can instruct me on how to upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i was asked to upload lesson plans but i did not get any instructions'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'how can i upload lesson plans'}
+{'class': 7, 'id': 'Curriculum008', 'is_standard_q': False, 'text': 'i want to know how to upload lesson plans'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'before i do my task i want to read writer guidelines if there are any'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'do you have any guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'is there a place where i can see the writer guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'please tell me where can i find writer guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'may i know the guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'are there any guidelines for writers'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'i am wondering where i can see the writer guidelines'}
+{'class': 8, 'id': 'Curriculum009', 'is_standard_q': False, 'text': 'could you tell me the writer guidelines'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'what do you require for the lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'i am about to write the lesson what are your requirements'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'could you tell me the requirements of writing lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'i want to know the requirements of writing lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'i would like to know the requirements of writing lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'is there a link where i can see requirements of lesson plans'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'please let me know what i need to do to apply for a writer position'}
+{'class': 9, 'id': 'Curriculum010', 'is_standard_q': False, 'text': 'are there any requirements for the writers'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'my computer is down i can not check in'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'when do i need to check in'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'wrong no checkin record'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'how do i check in for lvp session'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'can you add back my hour'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'how do i check in for lvp hour'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'my checkin time is wrong'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'the check in popup keeps showing what should i do'}
+{'class': 10, 'id': 'DEMO001', 'is_standard_q': False, 'text': 'i forget to check in'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'invalid noshow record for lvp hours'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'why am i getting error no show records'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'i failed to check in twice in a row can you check my absense'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'i can not enter classroom due to power outage can you remove my noshow'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'my computer is frozen i can not enter session i do not want to be marked as no show'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'please appeal all demo no shows because i have not made any mistake that is mentioned in my record'}
+{'class': 11, 'id': 'DEMO002', 'is_standard_q': False, 'text': 'i want to keep track of my demo record please send me the details'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i want to know something about dynamic materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i want to have a look at all the dynamic materials so i can get prepared for it to teach'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'can you return the old materials back'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'how can i find the dynamic materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i am very confused about how to use the new dynamic material with the kids'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'show me how to use demo dynamic materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'tell me how to use demo materials'}
+{'class': 12, 'id': 'DEMO003', 'is_standard_q': False, 'text': 'i do not want to use dynamic materials'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'i do not think that i have the right student in the class it supposed to be an adult'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'i think the client has entered the wrong classroom'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'the client is adult but i got wrong materials for junior students'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'i do not have the suitable material to teach for adult'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'there is a junior materials for the adult client'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'i can not do this class since there is no suitable material in the classroom for adult'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'it seems like i have the wrong material in the classroom'}
+{'class': 13, 'id': 'DEMO004', 'is_standard_q': False, 'text': 'what should i do the material for demo session is wrong'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': True, 'text': 'why there is no agent in the session'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': False, 'text': 'i have entered the classroom but there is no agent in the demo session'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': False, 'text': 'i did not see the agent in demo session'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': False, 'text': 'how could i teach if there is no agent in the classroom'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': False, 'text': 'the agent did not show up in the demo session'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': False, 'text': 'why the agent left the classroom'}
+{'class': 14, 'id': 'DEMO005', 'is_standard_q': False, 'text': 'student is there but the agent does not show up'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'i can not hear the client s voice'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'the client s connection is bad'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'the client has technical issues'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'does the client know how to do the demo'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'what i could do if the client have technical issues in the demo session'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'what i could do to help the agent in demo session'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'the client s background is too noisy'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'can you confirm is the client in the classroom'}
+{'class': 15, 'id': 'DEMO006', 'is_standard_q': False, 'text': 'the client has bad connection'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'i can not start my class cause the agent keeps talking with the client'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'it is the time to start the demo but the agent still talking with the client'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'can anyone let the agent stop talking with the client i need to start the session'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'there was one agent who intentionally and constantly tried to distract me'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'even though i muted agent s mic he keeps activiting it and speaking more and more'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'agent keeps talking with the client time is runnng out'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'agent takes too much time to help the client solve issue when should i continue the demo'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'can i leave the session agent has taken too much time with the client'}
+{'class': 16, 'id': 'DEMO007', 'is_standard_q': False, 'text': 'why the agent keeps talking to the client can i interrput and start my session'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'i can not finish this demo cause the video keeps playing'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'the agent ignore my message and still playing the video'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'the agent keeps playing the video i can not teach the demo now'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'there is a video playing in the class should i close it'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'the agent keeps playing the video with the client i can not start my demo'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'the video takes too much time there is not enough time left to teach'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'how can i turn off the video and start the demo session'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'can i close the video that the agent keeps playing'}
+{'class': 17, 'id': 'DEMO008', 'is_standard_q': False, 'text': 'the video takes too much time can i close it time is running out'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': True, 'text': 'what if the agent tells me to leave'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'can i leave the demo as agent s request'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'the agent left specific instruction to leave the demo session'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'when agent told me to leave the session because there is no cleint'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'agent posted this message to me the demo cannot be completed due to an unforeseeable reason please leave the session and fill in the incomplete report i will reschedule the session'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'the agent was late and kept saying sorry teacher'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'as soon as i joined the agent informed me that this demo cannot be completed and asked me to leave the session so he could reschedule'}
+{'class': 18, 'id': 'DEMO009', 'is_standard_q': False, 'text': 'he mocked me at the end of the session and asked me to leave the session'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'who should i contact to complain about the agent'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'agents do not know how to do their job'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'i have to complain about the agent'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'i have some advices for the agents'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'the agent is very impolite'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'i do not need the agent tell me how to do my job'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'i want to complain about the unfair ratting that i got'}
+{'class': 19, 'id': 'DEMO010', 'is_standard_q': False, 'text': 'i have to complain the agent i met in the demo session'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': True, 'text': 'what if i received a notification for a class but cannot see on my page'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'where is my session at xx xx it was on my page five mins ago'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'where is my xx demo session was it cancelled'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'do you know why my class went missing was i switched will that be a record'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'i cannot enter the session which the notification said i have right now can you send me a link'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'the system told me i have a class but it disappeared when i went to my session page do you know what is going on'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'do i have a demo at xx'}
+{'class': 20, 'id': 'DEMO011', 'is_standard_q': False, 'text': 'i got a class notification but i can not find it on my session page'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'there has a mice in my house sry for the inconvenience i must catch it'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'the agent is making fun of me show rudeness i cant endure in such situation pls let me go'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'my throat feels not good today'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'my pc is freezing i need to restart first'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'my wife is pregnant i need to take care of her'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'my chest is uncomfortable suddenly'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'my son always crying beside me i cant concerntrate'}
+{'class': 21, 'id': 'DEMO012', 'is_standard_q': False, 'text': 'a fire broke out in the next building im in danger'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'where are my demo hours for today'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'did you cancel my demo hours for today what happened'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'why you always cancel my demos you did it on purpose'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'can you help me check my schedule today is there something wrong with your system'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'if i did something wrong i noticed all my lvps gone'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'i have been scheduled demo hours but they are cancelled several hours before and no enough time for other sessions to be filled with'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'kind dt schedulers can you help me set demo fixed schedule so that my sessions wouldnt disappeared again'}
+{'class': 22, 'id': 'DEMO013', 'is_standard_q': False, 'text': 'my best partner can you check the reason why my all lvps gone'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'what if there is no student in the session'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'may i have a break before my next regualr sessions no break in regular sessions'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'is it possible to get more sign ups in demo'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'how long is a demo session'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'may i get some information about the demo sessions'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'how to enter in the session'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'whats the first step to be a demo teacher'}
+{'class': 23, 'id': 'DEMO014', 'is_standard_q': False, 'text': 'can i use a freepass in demos which can appeal the no show that i dont have at all'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'where can i provide my available time to do demos'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'what do the green yellow purple pink grey and half pink half grey dots mean'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'where can i find booking list button'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'i need more demo sessions'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'what if there is more than one student in the session'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'how can i set my demo schedule'}
+{'class': 24, 'id': 'DEMO015', 'is_standard_q': False, 'text': 'can i book some extra demo hour'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'what if i do not have a cancellation system'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'what if the materials not load keeps loading there are no materials'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'please remove my demo hours'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'i have some personal issue today'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'can i remove some of my demo hours'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'if i need to cancel my demo hour due to emergency who should i contact'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'i have family meeting tonight pls help me cancel my last hour if possible'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'can i refuse to teach demo sessions'}
+{'class': 25, 'id': 'DEMO016', 'is_standard_q': False, 'text': 'i do not want to teach demo sessions'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'i have received an email said that my account has been onhold due to frequent noshow no check in and i have to do the training to reactivate my account do you guys know how to do it'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'somebody could tell me how do i accomplish demo training'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'where can i do the training'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'i lost the access for the demo training'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'i have got an email said that i need to do the training may i know where can i do the training'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'could you please tell me how can i be a demo consultant'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'i want to teach demo'}
+{'class': 26, 'id': 'DEMO017', 'is_standard_q': False, 'text': 'could you please tell me how can i do my demo training'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'where is my lost demo pay'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'how can i know my demo pay'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'i want to know the demo pay'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'there is some mistake of my demo pay who can help me'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'my demo pay is incorrect'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'can you tell me the demo pay'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'can you help to check my demo pay'}
+{'class': 27, 'id': 'DEMO018', 'is_standard_q': False, 'text': 'please tell me the demo pay'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': True, 'text': 'i got a low rating for demo session'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': False, 'text': 'the agent gave me an unfair rating can you help to remove it'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': False, 'text': 'who can i contact if i received an unfair rating for demo class'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': False, 'text': 'i did not get a rating from my demo sessions'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': False, 'text': 'i got a bad rating for an empty demo can you change this'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': False, 'text': 'the agent rated me badly 6 and that 6 although appealed in my payroll it is still affecting my average rating it is an unfair rating and i wish it to be removed from my rating record'}
+{'class': 28, 'id': 'DEMO019', 'is_standard_q': False, 'text': 'i submited an incomplete report but the agent changed it to complete and gave me a rating 7 it is so unfair'}
+{'class': 29, 'id': 'PMIT001', 'is_standard_q': False, 'text': 'could you give me an it test now'}
+{'class': 29, 'id': 'PMIT001', 'is_standard_q': False, 'text': 'i will need to have pmit check my internet connection could you arrange this for me please'}
+{'class': 29, 'id': 'PMIT001', 'is_standard_q': False, 'text': 'i just switched my isp'}
+{'class': 30, 'id': 'PMIT002', 'is_standard_q': False, 'text': 'tutorchat is not opening'}
+{'class': 30, 'id': 'PMIT002', 'is_standard_q': False, 'text': 'what are the instructions to access tutorchat'}
+{'class': 31, 'id': 'PMIT003', 'is_standard_q': False, 'text': 'what should i do if i cannot log in to my tutorchat application'}
+{'class': 31, 'id': 'PMIT003', 'is_standard_q': False, 'text': 'i have downloaded the tutorchat application but when it asks me to log in it says the password is incorrect'}
+{'class': 32, 'id': 'PMIT004', 'is_standard_q': False, 'text': 'i would like to test my new headset'}
+{'class': 32, 'id': 'PMIT004', 'is_standard_q': False, 'text': 'i need to do a check for my microphone'}
+{'class': 34, 'id': 'PMIT006', 'is_standard_q': False, 'text': 'can you give me the webcam list'}
+{'class': 34, 'id': 'PMIT006', 'is_standard_q': False, 'text': 'what is the recommend microphone'}
+{'class': 35, 'id': 'PMIT007', 'is_standard_q': False, 'text': 'can you confirm what other requirements my computer laptop must have please'}
+{'class': 36, 'id': 'PMIT008', 'is_standard_q': False, 'text': 'can i use brave browser'}
+{'class': 37, 'id': 'PMIT009', 'is_standard_q': False, 'text': 'an error message pops up saying config server error and the test menu appears to keep loading'}
+{'class': 37, 'id': 'PMIT009', 'is_standard_q': False, 'text': 'i am trying to run the itutorgroup system requirement scanner but it keeps coming up that there is a config server error how can i fix this'}
+{'class': 37, 'id': 'PMIT009', 'is_standard_q': False, 'text': 'i am trying to complete the it test and after downloading from the link i keep getting config server error'}
+{'class': 38, 'id': 'PMIT011', 'is_standard_q': False, 'text': 'what is the minimum speed'}
+{'class': 39, 'id': 'PMIT012', 'is_standard_q': False, 'text': 'i went to speediest and got a download and upload speed of 4 77mbs find attached this is good right'}
+{'class': 39, 'id': 'PMIT012', 'is_standard_q': False, 'text': 'i recently tried to complete my it test and failed during the connection test because my computer exceeded the maximum response time see forwarded email below when i test my internet speed and stability myself it appears that the connection is very strong could you please advise me of what i need to do'}
+{'class': 41, 'id': 'Schedule018', 'is_standard_q': True, 'text': 'what should i know about my first session'}
+{'class': 41, 'id': 'TM018', 'is_standard_q': False, 'text': 'student s dad was speaking chinese'}
+{'class': 41, 'id': 'TM018', 'is_standard_q': False, 'text': 'student s mom was speaking chinese'}
+{'class': 41, 'id': 'TM018', 'is_standard_q': False, 'text': 'student s parents are speaking chinese'}
+{'class': 41, 'id': 'Schedule027', 'is_standard_q': True, 'text': 'how can i check whether my session cancellation request have been approved or not'}
+{'class': 42, 'id': 'PMIT015', 'is_standard_q': False, 'text': 'helo can u help i entered the class just now they said it was not a valid class'}
+{'class': 42, 'id': 'PMIT015', 'is_standard_q': False, 'text': 'i can not get in the session'}
+{'class': 42, 'id': 'PMIT015', 'is_standard_q': False, 'text': 'hi i am on standby but can not enter my session'}
+{'class': 42, 'id': 'PMIT015', 'is_standard_q': False, 'text': 'i have trouble entering my session and got switched'}
+{'class': 42, 'id': 'PMIT015', 'is_standard_q': False, 'text': 'i was at my desk and unable to get into the class'}
+{'class': 42, 'id': 'PMIT015', 'is_standard_q': False, 'text': 'hi i cant log into the class my chrome as crashed and i am still waiting for the page to open'}
+{'class': 43, 'id': 'PMIT016', 'is_standard_q': False, 'text': 'when should i attend the session'}
+{'class': 43, 'id': 'PMIT016', 'is_standard_q': False, 'text': 'where should i enter the classroom'}
+{'class': 43, 'id': 'PMIT016', 'is_standard_q': False, 'text': 'i missed my last lesson today due to flash being blocked on chrome'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': True, 'text': 'i was swithed out from the session'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'why am i switched out'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'there are two tutors in a class'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'why did you kick me out when i was talking to the client'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'i have technical difficulties i cannot enter my coming session'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'i was kicking out of the session'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'i just got a broadcast message saying i was removed from session please explain why when i am waiting for student to arrive all this time'}
+{'class': 44, 'id': 'PMIT017', 'is_standard_q': False, 'text': 'i was just removed from a session i could not enter had an issue entering'}
+{'class': 47, 'id': 'PMIT020', 'is_standard_q': False, 'text': 'i can not get into log in the classroom the session page is frozen'}
+{'class': 47, 'id': 'PMIT020', 'is_standard_q': False, 'text': 'i lost the connection'}
+{'class': 47, 'id': 'PMIT020', 'is_standard_q': False, 'text': 'i have some internet connection'}
+{'class': 47, 'id': 'PMIT020', 'is_standard_q': False, 'text': 'there is something wrong with my microphone'}
+{'class': 47, 'id': 'PMIT020', 'is_standard_q': False, 'text': 'there is something wrong with my connection microphone camera what if the materials not load keeps loading there are no materials'}
+{'class': 47, 'id': 'PMIT020', 'is_standard_q': False, 'text': 'there is something wrong with my connection i can not get in log in the classroom'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'will it effect my payment if the client is no show'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'there is no students in my session today'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'my client can not see the whiteboard'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'any advices for late client'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'what should i do when clients are late'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'can i check the lesson plan in advance'}
+{'class': 47, 'id': 'PMIT022', 'is_standard_q': False, 'text': 'the client is not in the classroom what should i do'}
+{'class': 47, 'id': 'PMIT024', 'is_standard_q': False, 'text': 'student can not see the material anymore and we are in the middle of the lesson'}
+{'class': 47, 'id': 'PMIT024', 'is_standard_q': False, 'text': 'the name of the client is wrong could you assist to have it updated'}
+{'class': 47, 'id': 'PMIT024', 'is_standard_q': False, 'text': 'please update the name of client in my session i cannot teach without a name'}
+{'class': 47, 'id': 'PMIT025', 'is_standard_q': True, 'text': 'consultant cannot be able to hear the student'}
+{'class': 47, 'id': 'PMIT026', 'is_standard_q': True, 'text': 'student cannot be able to hear the consultant'}
+{'class': 47, 'id': 'PMIT026', 'is_standard_q': False, 'text': 'i am having problems with video'}
+{'class': 47, 'id': 'PMIT026', 'is_standard_q': False, 'text': 'i cannot hear any of my students but they can hear me'}
+{'class': 48, 'id': 'PMIT021', 'is_standard_q': True, 'text': 'my student is disconnected from the session'}
+{'class': 49, 'id': 'PMIT027', 'is_standard_q': True, 'text': 'what should i do if i have trouble submitting the progress report'}
+{'class': 49, 'id': 'PMIT027', 'is_standard_q': False, 'text': 'one of my students was a no show but the progress report will not allow me to select miss the class'}
+{'class': 49, 'id': 'PMIT027', 'is_standard_q': False, 'text': 'i can not update the progress report'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'i can not submit my report is everyhthing goes on well'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'i can not submit my report can you help me'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'when i was trying to submit the report it kept saying errors what should i do'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'my demo report was filled by someone else i do not know what happened'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'i can not yield my report do you know how to yield a report'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'can agant change the demo report'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'why does my incomplete report become complete report'}
+{'class': 50, 'id': 'PMIT028', 'is_standard_q': False, 'text': 'what should i do if i get errors when i try to submit the demo feedback report'}
+{'class': 51, 'id': 'Payroll001', 'is_standard_q': False, 'text': 'what is the minimum pay that i can get for an hour'}
+{'class': 51, 'id': 'Payroll001', 'is_standard_q': False, 'text': 'i would like to know your payment first'}
+{'class': 51, 'id': 'Payroll001', 'is_standard_q': False, 'text': 'may i know the pay structure'}
+{'class': 52, 'id': 'Payroll002', 'is_standard_q': False, 'text': 'how do you pay'}
+{'class': 52, 'id': 'Payroll002', 'is_standard_q': False, 'text': 'may i know when the payday is'}
+{'class': 52, 'id': 'Payroll002', 'is_standard_q': False, 'text': 'how often do you pay'}
+{'class': 52, 'id': 'Payroll002', 'is_standard_q': False, 'text': 'when will i receive the payment'}
+{'class': 52, 'id': 'Payroll002', 'is_standard_q': False, 'text': 'how do i know if you pay me'}
+{'class': 52, 'id': 'Payroll002', 'is_standard_q': False, 'text': 'how long does it take for the transaction'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'in light of this background i honestly would have assumed that i would have qualified for your highest pay scale'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'negotiate the base rate'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'i want to raise my payment'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'i have taught more than 1000 hours why no pay raise'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'the base pay is too low i would be glad if we can work something out about the base pay'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'when is the effective date of the new base rate computation in my payroll'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'i am holding a tesol certificate now can i get raise'}
+{'class': 53, 'id': 'Payroll003', 'is_standard_q': False, 'text': 'the pay is too low'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'do you know any bank in my country that i can use'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'can i use my parent relatives friend s bank account'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'any bank that other consultant use in my country'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'any bank in my location that you suggest'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'when should i submit for the bank information'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'what is the last day i can provide the bank information to receive the payment'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'any bank in my location that you recommend'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'can i provide the bank information to you after i start teaching'}
+{'class': 54, 'id': 'Payroll004', 'is_standard_q': False, 'text': 'what should i pay attention to when i provide my bank informaiton'}
+{'class': 54, 'id': 'Recruiting040', 'is_standard_q': False, 'text': 'when can i pass the probation'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'can you guide me to fill out the bank information'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'where should i provide the sort code'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'what should i do if i have some bank information missing'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'do i need to provide the intermediary bank information to you'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'can i give you some bank information first'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'what if there is a correspondent bank to receive the pay'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'why do you ask me to put iban in the account number'}
+{'class': 55, 'id': 'Payroll005', 'is_standard_q': False, 'text': 'what is the other information do you need to pay me'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': True, 'text': 'what if my bank information is incorrect'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'i just found my account number incorrect'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'can i change bank account'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'can you recall my payment as my account number incorrect'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'please contact me if my bank information is incorrect'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'who should i contact if i provided a wrong bank information'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'will i receive the email if my bank information is not correct'}
+{'class': 56, 'id': 'Payroll006', 'is_standard_q': False, 'text': 'why i receive a disapproval message'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'can you transfer my pay to the bank information i provide'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'how long is bank information checking process'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'can you please let me know if you have receive my bank information'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'what can i do if my bank account information is not approved'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'did you approved my bank information'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'can you approve my bank information'}
+{'class': 57, 'id': 'Payroll007', 'is_standard_q': False, 'text': 'i want to know if my bank information is accepted'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': True, 'text': 'what is swift code'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'my bank does not have a swift code'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'how do i know if my swift code correct'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'how long is a swift number'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'is it nessary to provide swift code'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'the system is not letting me submit the swift code'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'the swift code i submitted was rejected'}
+{'class': 58, 'id': 'Payroll008', 'is_standard_q': False, 'text': 'can you make sure that my bank has a swift code'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': True, 'text': 'what is a b a only applicable in united states'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'i called my bank many times to confirm the swift code and the a b a number'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'my bank does not use an a b a number for wire transfers'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'the a b a number is not required by uk banks'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'my bank has informed me they do not have or use an a b a'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'i do not have a b a'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'how many digits is an a b a'}
+{'class': 59, 'id': 'Payroll009', 'is_standard_q': False, 'text': 'is it nessary to provide an a b a'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'how many digits is iban'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'where can i check if my iban is correct'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'my bank changed my iban'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'my bank told me that my account is active and the iban i provided you guys with is correct'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'what dose iban mean'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'which country s bank has iban'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'is iban same as account number'}
+{'class': 60, 'id': 'Payroll010', 'is_standard_q': False, 'text': 'when i enter my iban into my account details it says my iban must match my account number'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'any other recommended channels to receive payment'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'can i use paypal receiving my payment'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'i was not given the option for paypal how do i get this option please'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'i was wondering if it is possible for me to receive my payment through paypal or payoneer'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'can i change the payment method i have used by far and start using payoneer instead'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'i just want to use other method to receive the payment can i'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'is there any alternative payment method'}
+{'class': 61, 'id': 'Payroll011', 'is_standard_q': False, 'text': 'a hire is asking me if she can be pad via paypal'}
+{'class': 62, 'id': 'Payroll012', 'is_standard_q': False, 'text': 'i am currently overseas can you transfer my pay to my parent s account'}
+{'class': 62, 'id': 'Payroll012', 'is_standard_q': False, 'text': 'i can take the risk can you just transfer my payment to whoever i want'}
+{'class': 62, 'id': 'Payroll012', 'is_standard_q': False, 'text': 'if it is possible for me to use someone else s account since i do not have another banking account that i can provide'}
+{'class': 62, 'id': 'Payroll012', 'is_standard_q': False, 'text': 'may i use my parent friends partner relatives bank account'}
+{'class': 62, 'id': 'Payroll012', 'is_standard_q': False, 'text': 'i want to use someone else s bank account'}
+{'class': 62, 'id': 'Payroll012', 'is_standard_q': False, 'text': 'i used my partner s account to receive the pay before why cannot i use it now'}
+{'class': 63, 'id': 'Payroll013', 'is_standard_q': True, 'text': 'what is my base rate'}
+{'class': 63, 'id': 'Payroll013', 'is_standard_q': False, 'text': 'what is my offering'}
+{'class': 63, 'id': 'Payroll013', 'is_standard_q': False, 'text': 'i have bachelor degree i should get higher pay'}
+{'class': 63, 'id': 'Payroll013', 'is_standard_q': False, 'text': 'i think my offering pay is low'}
+{'class': 64, 'id': 'Payroll014', 'is_standard_q': False, 'text': 'the bonuses seems wrong as i receive same rating for two sessions'}
+{'class': 65, 'id': 'Payroll015', 'is_standard_q': False, 'text': 'why there are unfilled progress reports showing on payroll page'}
+{'class': 65, 'id': 'Payroll015', 'is_standard_q': False, 'text': 'can you please check if there is any mistake showing i have unfilled report on the payroll page'}
+{'class': 67, 'id': 'Payroll017', 'is_standard_q': False, 'text': 'i do not see a higher pay for s1on1 session'}
+{'class': 68, 'id': 'Payroll018', 'is_standard_q': True, 'text': 'what is the pay police of the standby consultant'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'how much do i get paid for writing a lesson'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'do i get paid twice for resubmitting a lesson'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'may i know the pay rate of writing a lesson'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'what is the pay rate of submitting lessons'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'could you please tell me how much i will be paid for writing a lesson'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'do i get paid for revising my session plan'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'how do i get paid as a session plan writer'}
+{'class': 69, 'id': 'Payroll019', 'is_standard_q': False, 'text': 'could i get some information on the pay rate of writing lessons'}
+{'class': 70, 'id': 'Payroll020', 'is_standard_q': True, 'text': 'what is the pay raise policy'}
+{'class': 70, 'id': 'Payroll020', 'is_standard_q': False, 'text': 'my average rating is very high can i just get a pay raise'}
+{'class': 71, 'id': 'Payroll021', 'is_standard_q': False, 'text': 'how to get 5 raise'}
+{'class': 72, 'id': 'Payroll022', 'is_standard_q': False, 'text': 'what should i do if i want to hold my payment'}
+{'class': 72, 'id': 'Payroll022', 'is_standard_q': False, 'text': 'can you please not pay me this time'}
+{'class': 73, 'id': 'Payroll023', 'is_standard_q': False, 'text': 'why have not i receive the previous holding payment'}
+{'class': 74, 'id': 'Payroll024', 'is_standard_q': False, 'text': 'did you send my payment'}
+{'class': 74, 'id': 'Payroll024', 'is_standard_q': False, 'text': 'did you transfer my payment yet'}
+{'class': 74, 'id': 'Payroll024', 'is_standard_q': False, 'text': 'i did not see my payment'}
+{'class': 74, 'id': 'Payroll024', 'is_standard_q': False, 'text': 'you did not pay me i have not received the pay'}
+{'class': 75, 'id': 'Payroll025', 'is_standard_q': False, 'text': 'why you take away my full participation bonus'}
+{'class': 75, 'id': 'Payroll025', 'is_standard_q': False, 'text': 'i did not cancel any session why my full participation bonus disappeared'}
+{'class': 76, 'id': 'Payroll026', 'is_standard_q': False, 'text': 'the penalty is not true'}
+{'class': 77, 'id': 'Payroll027', 'is_standard_q': False, 'text': 'do you cover the transaction fee'}
+{'class': 77, 'id': 'Payroll027', 'is_standard_q': False, 'text': 'why my payment is a little bit less than payroll page'}
+{'class': 78, 'id': 'Payroll028', 'is_standard_q': True, 'text': 'do i need to pay tax'}
+{'class': 79, 'id': 'Payroll029', 'is_standard_q': False, 'text': 'can you send a pay slip to me'}
+{'class': 80, 'id': 'Payroll030', 'is_standard_q': False, 'text': 'i would like to request a letter of confirmation of service rendered with someone s signature'}
+{'class': 81, 'id': 'Payroll031', 'is_standard_q': False, 'text': 'i think my other pay is less than it should be'}
+{'class': 82, 'id': 'Payroll032', 'is_standard_q': False, 'text': 'i am traveling to overseas i want to receive my payment before i go out'}
+{'class': 83, 'id': 'Payroll033', 'is_standard_q': False, 'text': 'can you transfer a part of my payment to another bank account'}
+{'class': 84, 'id': 'Payroll034', 'is_standard_q': False, 'text': 'do you still provide withholding statements'}
+{'class': 85, 'id': 'Payroll035', 'is_standard_q': False, 'text': 'where can i check my payroll history'}
+{'class': 86, 'id': 'Payroll036', 'is_standard_q': True, 'text': 'how come some of my pay details are not shown'}
+{'class': 87, 'id': 'Payroll037', 'is_standard_q': False, 'text': 'i am trying to find out what my pay will be for this upcoming payday can you please assist'}
+{'class': 89, 'id': 'Payroll039', 'is_standard_q': True, 'text': 'the payroll page does not update'}
+{'class': 89, 'id': 'Payroll039', 'is_standard_q': False, 'text': 'i do not see the rating bonus showing on the payroll page'}
+{'class': 90, 'id': 'Payroll040', 'is_standard_q': False, 'text': 'i cannot teach for a while can you please transfer my payment first'}
+{'class': 91, 'id': 'Recruiting000', 'is_standard_q': False, 'text': 'why my friend s application was rejected by seconds'}
+{'class': 91, 'id': 'Recruiting000', 'is_standard_q': False, 'text': 'is it something wrong that i was rejected by seconds'}
+{'class': 92, 'id': 'Recruiting001', 'is_standard_q': True, 'text': 'am i qualified'}
+{'class': 92, 'id': 'Recruiting001', 'is_standard_q': False, 'text': 'how can i become a teacher in itutorgroup'}
+{'class': 92, 'id': 'Recruiting001', 'is_standard_q': False, 'text': 'i would like to know the requirements of this online teaching positon'}
+{'class': 92, 'id': 'Recruiting001', 'is_standard_q': False, 'text': 'what is the qualifications for being a teacher in itutorgroup'}
+{'class': 92, 'id': 'Recruiting001', 'is_standard_q': False, 'text': 'what is the requirement of this position'}
+{'class': 92, 'id': 'Recruiting001', 'is_standard_q': False, 'text': 'can i teach with you'}
+{'class': 93, 'id': 'Recruiting002', 'is_standard_q': True, 'text': 'can i become a teacher in itutorgroup without bachelor s degree'}
+{'class': 93, 'id': 'Recruiting002', 'is_standard_q': False, 'text': 'bachelor s degree'}
+{'class': 93, 'id': 'Recruiting002', 'is_standard_q': False, 'text': 'can i use my official transcript instead of the ba'}
+{'class': 93, 'id': 'Recruiting002', 'is_standard_q': False, 'text': 'i do not have a diploma can i teach'}
+{'class': 94, 'id': 'Recruiting003', 'is_standard_q': False, 'text': 'can i teach without teaching certificates'}
+{'class': 94, 'id': 'Recruiting003', 'is_standard_q': False, 'text': 'teaching certifications'}
+{'class': 94, 'id': 'Recruiting003', 'is_standard_q': False, 'text': 'what kind of teaching certificates does this position require'}
+{'class': 95, 'id': 'Recruiting004', 'is_standard_q': False, 'text': 'i do not have any teaching experiences can i teach'}
+{'class': 95, 'id': 'Recruiting004', 'is_standard_q': False, 'text': 'i never taught kids before'}
+{'class': 96, 'id': 'Recruiting005', 'is_standard_q': False, 'text': 'where is the sign up button in your website'}
+{'class': 96, 'id': 'Recruiting005', 'is_standard_q': False, 'text': 'how long will it take to apply'}
+{'class': 96, 'id': 'Recruiting005', 'is_standard_q': False, 'text': 'i would like to know the apply process first'}
+{'class': 97, 'id': 'Recruiting006', 'is_standard_q': False, 'text': 'can i choose the students'}
+{'class': 97, 'id': 'Recruiting006', 'is_standard_q': False, 'text': 'what is the purpose of your students to learn english'}
+{'class': 97, 'id': 'Recruiting006', 'is_standard_q': False, 'text': 'what kind of students do i need to teach'}
+{'class': 98, 'id': 'Recruiting007', 'is_standard_q': False, 'text': 'how can i apply to this position'}
+{'class': 98, 'id': 'Recruiting007', 'is_standard_q': False, 'text': 'which website do i use to apply for the position'}
+{'class': 98, 'id': 'Recruiting007', 'is_standard_q': False, 'text': 'where should i send my resum'}
+{'class': 98, 'id': 'Recruiting007', 'is_standard_q': False, 'text': 'how to apply for this position'}
+{'class': 99, 'id': 'Recruiting008', 'is_standard_q': False, 'text': 'do you hire chinese bilingual teachers'}
+{'class': 99, 'id': 'Recruiting008', 'is_standard_q': False, 'text': 'do you hire black people'}
+{'class': 99, 'id': 'Recruiting008', 'is_standard_q': False, 'text': 'i am a british living in south korea can i apply fot the position'}
+{'class': 100, 'id': 'Recruiting009', 'is_standard_q': False, 'text': 'help me with my application form'}
+{'class': 100, 'id': 'Recruiting009', 'is_standard_q': False, 'text': 'fail to submit the application form'}
+{'class': 100, 'id': 'Recruiting009', 'is_standard_q': False, 'text': 'the application form cannot submitted'}
+{'class': 101, 'id': 'Recruiting010', 'is_standard_q': False, 'text': 'teach in china'}
+{'class': 101, 'id': 'Recruiting010', 'is_standard_q': False, 'text': 'can i apply for the position if i am living in shanghai'}
+{'class': 101, 'id': 'Recruiting010', 'is_standard_q': False, 'text': 'i cannot open my consultant portal while i am in china'}
+{'class': 102, 'id': 'Recruiting011', 'is_standard_q': False, 'text': 'where should my friend put my referral code'}
+{'class': 102, 'id': 'Recruiting011', 'is_standard_q': False, 'text': 'can i recommand a friend'}
+{'class': 102, 'id': 'Recruiting011', 'is_standard_q': False, 'text': 'where can i get my referral code'}
+{'class': 103, 'id': 'Recruiting012', 'is_standard_q': False, 'text': 'where can i see my referral bonus'}
+{'class': 103, 'id': 'Recruiting012', 'is_standard_q': False, 'text': 'is there referral bonus if i recommand people'}
+{'class': 103, 'id': 'Recruiting012', 'is_standard_q': False, 'text': 'i did not receive my referral bonus'}
+{'class': 103, 'id': 'Recruiting012', 'is_standard_q': False, 'text': 'referral bouns'}
+{'class': 103, 'id': 'Recruiting012', 'is_standard_q': False, 'text': 'my friend starts teaching already but i have not receive the referral bonus'}
+{'class': 104, 'id': 'Recruiting013', 'is_standard_q': True, 'text': 'my friend forgot to input my referral code while filling the applications can i still get my referral bouns'}
+{'class': 104, 'id': 'Recruiting013', 'is_standard_q': False, 'text': 'can i still get paid if my candidate forget to put my referral code when submit the application form'}
+{'class': 105, 'id': 'Recruiting014', 'is_standard_q': False, 'text': 'what takes so long to verify my friend s applications'}
+{'class': 105, 'id': 'Recruiting014', 'is_standard_q': False, 'text': 'aplicaiton varify took so long'}
+{'class': 105, 'id': 'Recruiting014', 'is_standard_q': False, 'text': 'what happened about the application varify so slow'}
+{'class': 106, 'id': 'Recruiting015', 'is_standard_q': False, 'text': 'can i change my password of the application portal'}
+{'class': 106, 'id': 'Recruiting015', 'is_standard_q': False, 'text': 'it says access incorrect password when i log in my application portal'}
+{'class': 106, 'id': 'Recruiting015', 'is_standard_q': False, 'text': 'i forgot the password of the application portal'}
+{'class': 107, 'id': 'Recruiting016', 'is_standard_q': True, 'text': 'can i do the interview through the phone or pad'}
+{'class': 107, 'id': 'Recruiting016', 'is_standard_q': False, 'text': 'can i do the interview through my ipad'}
+{'class': 107, 'id': 'Recruiting016', 'is_standard_q': False, 'text': 'can i do the interview without a camera'}
+{'class': 108, 'id': 'Recruiting017', 'is_standard_q': False, 'text': 'how long will the interview be'}
+{'class': 108, 'id': 'Recruiting017', 'is_standard_q': False, 'text': 'book interview'}
+{'class': 108, 'id': 'Recruiting017', 'is_standard_q': False, 'text': 'prepare for the interview'}
+{'class': 109, 'id': 'Recruiting018', 'is_standard_q': False, 'text': 'may i know when will schedule the interview for me'}
+{'class': 109, 'id': 'Recruiting018', 'is_standard_q': False, 'text': 'waiting for the interview'}
+{'class': 110, 'id': 'Recruiting019', 'is_standard_q': True, 'text': 'i would like to confirm my interview today with you could you please tell me the interview process'}
+{'class': 110, 'id': 'Recruiting019', 'is_standard_q': False, 'text': 'what should i do if the interviewer no show'}
+{'class': 110, 'id': 'Recruiting019', 'is_standard_q': False, 'text': 'there is mo one in the interview room'}
+{'class': 110, 'id': 'Recruiting019', 'is_standard_q': False, 'text': 'when should i enter the interview room'}
+{'class': 111, 'id': 'Recruiting020', 'is_standard_q': False, 'text': 'i would like to reschedule my interview'}
+{'class': 111, 'id': 'Recruiting020', 'is_standard_q': False, 'text': 'how can i reschedule my interview'}
+{'class': 111, 'id': 'Recruiting020', 'is_standard_q': False, 'text': 'could you please help me to reschedule the interview time because i had some technical difficulties'}
+{'class': 112, 'id': 'Recruiting021', 'is_standard_q': True, 'text': 'can i review the lesson plan and preparation videos before starting the interview'}
+{'class': 112, 'id': 'Recruiting021', 'is_standard_q': False, 'text': 'do you have any tips of interview for me'}
+{'class': 113, 'id': 'Recruiting022', 'is_standard_q': True, 'text': 'what is the mock session during the interview about'}
+{'class': 113, 'id': 'Recruiting022', 'is_standard_q': False, 'text': 'do i need to prepare the mock session material by myself'}
+{'class': 113, 'id': 'Recruiting022', 'is_standard_q': False, 'text': 'mock session'}
+{'class': 113, 'id': 'Recruiting022', 'is_standard_q': False, 'text': 'why do i need to do the mock session during an interview'}
+{'class': 114, 'id': 'Recruiting023', 'is_standard_q': False, 'text': 'interview feedback'}
+{'class': 114, 'id': 'Recruiting023', 'is_standard_q': False, 'text': 'interview result'}
+{'class': 114, 'id': 'Recruiting023', 'is_standard_q': False, 'text': 'do i simply need to wait after the interview'}
+{'class': 115, 'id': 'Recruiting024', 'is_standard_q': True, 'text': 'why my interview result is reject'}
+{'class': 115, 'id': 'Recruiting024', 'is_standard_q': False, 'text': 'i was rejected why'}
+{'class': 115, 'id': 'Recruiting024', 'is_standard_q': False, 'text': 'why you rejected me'}
+{'class': 115, 'id': 'Recruiting024', 'is_standard_q': False, 'text': 'the interview result is unfair why i was rejected'}
+{'class': 116, 'id': 'Recruiting025', 'is_standard_q': False, 'text': 'when the update is finished i should be able to sign it correct'}
+{'class': 116, 'id': 'Recruiting025', 'is_standard_q': False, 'text': 'where do i sign the service agreement i have read it but there is no signing option on it'}
+{'class': 116, 'id': 'Recruiting025', 'is_standard_q': False, 'text': 'sign the service agreement'}
+{'class': 116, 'id': 'Recruiting025', 'is_standard_q': False, 'text': 'please tell me where to find the service agreement'}
+{'class': 117, 'id': 'Recruiting026', 'is_standard_q': False, 'text': 'how to find my signed service agreement'}
+{'class': 117, 'id': 'Recruiting026', 'is_standard_q': False, 'text': 'where to check my service agreement'}
+{'class': 117, 'id': 'Recruiting026', 'is_standard_q': False, 'text': 'i signed the service agreement but i can not find where to check it'}
+{'class': 118, 'id': 'Recruiting027', 'is_standard_q': False, 'text': 'i would like a copy of my agreement'}
+{'class': 118, 'id': 'Recruiting027', 'is_standard_q': False, 'text': 'can you send a copy of service agreement to me'}
+{'class': 119, 'id': 'Recruiting032', 'is_standard_q': False, 'text': 'can i still be able to teach with you'}
+{'class': 119, 'id': 'Recruiting032', 'is_standard_q': False, 'text': 'is it possible to continue the onboarding process after a month'}
+{'class': 120, 'id': 'Recruiting033', 'is_standard_q': False, 'text': 'where can i get the onboarding structure'}
+{'class': 120, 'id': 'Recruiting034', 'is_standard_q': True, 'text': 'i have a problem with updating my profile'}
+{'class': 120, 'id': 'Recruiting034', 'is_standard_q': False, 'text': 'i have an issue with updating my profile'}
+{'class': 120, 'id': 'Recruiting034', 'is_standard_q': False, 'text': 'i can not add two of the same certifications'}
+{'class': 121, 'id': 'Recruiting036', 'is_standard_q': False, 'text': 'what do i do after i get the certificate'}
+{'class': 122, 'id': 'Recruiting037', 'is_standard_q': False, 'text': 'is it a problem that i do not have any esl teaching certifications'}
+{'class': 122, 'id': 'Recruiting037', 'is_standard_q': False, 'text': 'i do nothave any teaching certificates'}
+{'class': 122, 'id': 'Recruiting037', 'is_standard_q': False, 'text': 'where to take the esl certification courses'}
+{'class': 123, 'id': 'Recruiting038', 'is_standard_q': True, 'text': 'i just moved to another country can i get a higher base rate'}
+{'class': 125, 'id': 'Recruiting042', 'is_standard_q': True, 'text': 'how can i attain an esl certification tesol tefl or the equivalent'}
+{'class': 125, 'id': 'Recruiting042', 'is_standard_q': False, 'text': 'where should i apply for the esl certificate'}
+{'class': 126, 'id': 'Recruiting043', 'is_standard_q': True, 'text': 'which esl certifications are accepted'}
+{'class': 126, 'id': 'Recruiting043', 'is_standard_q': False, 'text': 'i would like to know the requirements for an esl certificate'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'what are the peak hours on sundays'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'what are the peak hours on weekdays'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'what are the peak hours during weekdays'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'can you explaine the peak hour policy for me'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'please let me know what the peak hours are'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'could you let me know the peak hours during weekdays'}
+{'class': 130, 'id': 'Schedule001', 'is_standard_q': False, 'text': 'what are the peak hours during weekends'}
+{'class': 131, 'id': 'Schedule002', 'is_standard_q': False, 'text': 'please remove the peak hours for me as i cannot commit them'}
+{'class': 131, 'id': 'Schedule002', 'is_standard_q': False, 'text': 'i am not able to support 5 peak hours what can i do'}
+{'class': 131, 'id': 'Schedule002', 'is_standard_q': False, 'text': 'is it possible for me not to teach peak hours'}
+{'class': 132, 'id': 'Schedule003', 'is_standard_q': True, 'text': 'how can i change to my local time zone'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'can you tell me more about dst'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'when should i turn off my dst setting'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'how can i set up dst on my page'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'do i need to change my schedule once dst updated'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'is dst observing in my area'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'what is the gmt 8'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'when is the dst starting effective'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'when is the dst off'}
+{'class': 133, 'id': 'Schedule004', 'is_standard_q': False, 'text': 'does my area observe dst'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'i need to change my mpt schedule for next month'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'i am no longer available for some of the fixed hours can you help me to adjust it'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'can i make a new application for mpt schedule to start feb 1st'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'my fixed schedule for friday should be 19 30 beijing time it is currently set to 20 30 can this be changed'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'hi collges just wanted to ask how can i change my fixed schedule'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'i am new and i have a question is it possible to change the prime time hours and if yes how'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'any way possible to cancel or block scheduling on the slot 11 30 12 00 utc 0 19 30 20 00 utc 8 on fridays'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'can you help me to change my mpt schdule'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'is it possible for me to withdraw my mpt schedule'}
+{'class': 137, 'id': 'Schedule008', 'is_standard_q': False, 'text': 'hello i would like to change my mandatory weekly hours starting from the 14th of january'}
+{'class': 138, 'id': 'Schedule009', 'is_standard_q': False, 'text': 'can i remove my fixed hours'}
+{'class': 138, 'id': 'Schedule009', 'is_standard_q': False, 'text': 'i cannot commit my mpt schedule the next few months can i cancel them'}
+{'class': 143, 'id': 'Schedule014', 'is_standard_q': False, 'text': 'can i add some extra hours beyond my mpt schedule'}
+{'class': 143, 'id': 'Schedule014', 'is_standard_q': False, 'text': 'can i have some extra hours to teach'}
+{'class': 143, 'id': 'Schedule014', 'is_standard_q': False, 'text': 'can i be added some extra hours to teach'}
+{'class': 143, 'id': 'Schedule014', 'is_standard_q': False, 'text': 'is there any extra class for me today'}
+{'class': 143, 'id': 'Schedule014', 'is_standard_q': False, 'text': 'can i book extra hours beyond my mpt schedule'}
+{'class': 143, 'id': 'Schedule014', 'is_standard_q': False, 'text': 'how to add extra hours to my mpt schedule'}
+{'class': 145, 'id': 'Schedule016', 'is_standard_q': False, 'text': 'please explain the symbols on the my session page'}
+{'class': 146, 'id': 'Schedule017', 'is_standard_q': False, 'text': 'how many session have been scheduled for me'}
+{'class': 146, 'id': 'Schedule017', 'is_standard_q': False, 'text': 'can you tell me do i have sessions today'}
+{'class': 147, 'id': 'Schedule019', 'is_standard_q': True, 'text': 'what is the empty room policy'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': True, 'text': 'can you exclude the student for me'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': False, 'text': 'can you change the client of my session please'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': False, 'text': 'the client is having negative impact on my ratings please remove him for me'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': False, 'text': 'the client does not have good feedback for me please remove him from the list for me'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': False, 'text': 'please exclude the client for me'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': False, 'text': 'i do not want to teach the client anymore'}
+{'class': 148, 'id': 'Schedule020', 'is_standard_q': False, 'text': 'please remove this client from my session'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'i would like to cancel a session'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'i cant theach this lesson give it to other teacher'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'i will not have power for today please find replacements for my sessions'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'hello i need to have some time off from my schedule'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'please can you swith my class'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'cancel my lesson'}
+{'class': 149, 'id': 'Schedule021', 'is_standard_q': False, 'text': 'how can i place a holiday request'}
+{'class': 150, 'id': 'Schedule022', 'is_standard_q': False, 'text': 'hi my internet is down'}
+{'class': 150, 'id': 'Schedule022', 'is_standard_q': False, 'text': 'my computer is broken i cannot teach'}
+{'class': 150, 'id': 'Schedule022', 'is_standard_q': False, 'text': 'i had isused with internet and could not join session on time'}
+{'class': 150, 'id': 'Schedule022', 'is_standard_q': False, 'text': 'i need to go to get a new headset please remove me from the upcoming session'}
+{'class': 150, 'id': 'Schedule022', 'is_standard_q': False, 'text': 'i have to cancel my session because of electricity problem'}
+{'class': 151, 'id': 'Schedule023', 'is_standard_q': True, 'text': 'session cancellation confirm'}
+{'class': 151, 'id': 'Schedule023', 'is_standard_q': False, 'text': 'i have submitted a cancellation for saturday sunday can you please confirm receipt and approval'}
+{'class': 151, 'id': 'Schedule023', 'is_standard_q': False, 'text': 'please could you check my cancelation request'}
+{'class': 151, 'id': 'Schedule023', 'is_standard_q': False, 'text': 'can you please approve my cancellation request'}
+{'class': 151, 'id': 'Schedule023', 'is_standard_q': False, 'text': 'i submitted a few cancellations because i need to go with my husband to the doctor'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': True, 'text': 'i have submit session cancellation but the sessions are not removed'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'please check my cancellation request as i have requested the hours off'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'please check my cancellation request'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'the sessions i requested off are not removed from my schedule yet please check for me'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'the session hours i requested off are not removed yet'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'please double check my request as i have already request the hours off'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'the scheduled sessions are supposed to be removed but they are still there'}
+{'class': 153, 'id': 'Schedule025', 'is_standard_q': False, 'text': 'my session cancellation request has been approved however the sessions are still there'}
+{'class': 154, 'id': 'Schedule026', 'is_standard_q': True, 'text': 'how can i appeal for session absence'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': True, 'text': 'my absence appeal was disapproved'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': False, 'text': 'network was very poor so this caused problems i am not absent'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': False, 'text': 'i am supposed to start teaching a lesson at 19 30 so in about an hour from now i had recieved a comfirmation email of that being my very first lesson however i had recieved an email stating i was absent for a lesson at 13 00 which i never knew i had even had it was not on my scheudle and now they are saying that i had added the class even though i dont even know how to do that yet because i have not even taught my first class'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': False, 'text': 'i want to challenge my absence yesterday'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': False, 'text': 'the absence is wrong can you assist me to remove the absence'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': False, 'text': 'i noticed i have a no show record i never saw this booking in my session page'}
+{'class': 155, 'id': 'Schedule029', 'is_standard_q': False, 'text': 'i received an absence after i entering a class ans it stated emptyroom box can it be removed'}
+{'class': 156, 'id': 'Schedule030', 'is_standard_q': True, 'text': 'when can i use the free pass'}
+{'class': 156, 'id': 'Schedule030', 'is_standard_q': False, 'text': 'where can i use the technical free pass'}
+{'class': 156, 'id': 'Schedule030', 'is_standard_q': False, 'text': 'can newly generated free pass be used for my past absences'}
+{'class': 157, 'id': 'Schedule031', 'is_standard_q': False, 'text': 'how many sj reminders can i be given before being removed from the sj team'}
+{'class': 158, 'id': 'Schedule032', 'is_standard_q': True, 'text': 'i would like to teach oup sessions'}
+{'class': 158, 'id': 'Schedule032', 'is_standard_q': False, 'text': 'i would like to formally sign up to delivery oup sessions'}
+{'class': 158, 'id': 'Schedule032', 'is_standard_q': False, 'text': 'i am ready to do oup teaching'}
+{'class': 159, 'id': 'Schedule033', 'is_standard_q': False, 'text': 'i am a standby consultant do i need to book extra sessions'}
+{'class': 161, 'id': 'Schedule035', 'is_standard_q': False, 'text': 'can i appeal for the absence of tutorming session'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': True, 'text': 'can you schedule more sessions for me'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'urgent schedule for now at 21 00'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'can i please get a class scheduled i am available for class but there is nothing in my schedule'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'may i please be scheduled for 0430 0530 and 0630 please would appreciate it'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'i have three hours free 14 30 15 30 and 16 30 and i would like to have sessions i am available to teach'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'hi looking for sessions at 2030'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'can you schedule 21 00'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'i need a few more sessions scheduled today is supposed to be busy why only two'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'not even 1 session gets scheduled today'}
+{'class': 163, 'id': 'Schedule037', 'is_standard_q': False, 'text': 'please find me a lesson to teach for 21 30 local time'}
+{'class': 164, 'id': 'Schedule038', 'is_standard_q': True, 'text': 'how should i approach teaching more students at the same time'}
+{'class': 165, 'id': 'Schedule039', 'is_standard_q': True, 'text': 'dashboard shows that i passed review but there is nothing happen'}
+{'class': 166, 'id': 'Schedule040', 'is_standard_q': False, 'text': 'where to check my teaching status'}
+{'class': 167, 'id': 'Recruiting028', 'is_standard_q': False, 'text': 'how can i contact with my recruiter'}
+{'class': 167, 'id': 'Recruiting028', 'is_standard_q': False, 'text': 'who is my recruiter'}
+{'class': 168, 'id': 'Recruiting029', 'is_standard_q': True, 'text': 'how many days for me to do the onboarding process'}
+{'class': 168, 'id': 'Recruiting029', 'is_standard_q': False, 'text': 'does my 4 days to complete my onboarding training begin now or once i have logged on and started'}
+{'class': 169, 'id': 'TM003', 'is_standard_q': False, 'text': 'i do not want to 25 minutes session session'}
+{'class': 169, 'id': 'Recruiting030', 'is_standard_q': False, 'text': 'when to finish the onboarding process'}
+{'class': 169, 'id': 'Recruiting030', 'is_standard_q': False, 'text': 'how will the four day deadline work then'}
+{'class': 169, 'id': 'Recruiting030', 'is_standard_q': False, 'text': 'when can i start to do the onboarding process'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'hi can you reset my password i cannot log in'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'access denied when i try to log in my consultant portal'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'i can not log in i need my log in and my password'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'i am still unable to log in to the portal'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'i forget my password'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'i just want to ask if what is the birthday i have put in the system that is not my birthday actually if you could please send me what birthday did i put in the system so that i can log in and start training'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'i can not log in my consultant portal'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'it is saying access denied when i login the consultant page'}
+{'class': 170, 'id': 'TM004', 'is_standard_q': False, 'text': 'i followed the instructions but i could not log in'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'i am having a bit of trouble finishing my profile within the 4 day'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'i am not be able to finish all 4 tasks within four days because of the it test was failed'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'i want to ask for an extension for the onboarding process'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'what should i do if i cannot finish the onboarding process in four days'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'is it okay for me to finish all 4 tasks more than 4 days'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'what will happen if i could not finish onboarding steps on time'}
+{'class': 170, 'id': 'Recruiting031', 'is_standard_q': False, 'text': 'i need more time to finish the onboarding steps'}
+{'class': 171, 'id': 'TM005', 'is_standard_q': False, 'text': 'the quiz keeps telling me that i am getting the answer wrong'}
+{'class': 171, 'id': 'TM005', 'is_standard_q': False, 'text': 'i have finished the quiz but the submit button is stuck can you help me with this'}
+{'class': 171, 'id': 'Recruiting035', 'is_standard_q': False, 'text': 'can i teach without ba degree'}
+{'class': 171, 'id': 'Recruiting035', 'is_standard_q': False, 'text': 'i do not have a ba can i teach'}
+{'class': 173, 'id': 'TM007', 'is_standard_q': True, 'text': 'can i change my location'}
+{'class': 176, 'id': 'TM010', 'is_standard_q': False, 'text': 'can you give me some advices about how to greet an adult student'}
+{'class': 177, 'id': 'TM011', 'is_standard_q': False, 'text': 'how to greeting kids in age 4 to 7'}
+{'class': 177, 'id': 'TM011', 'is_standard_q': False, 'text': 'what kind of greetings should i use when teach level 1'}
+{'class': 178, 'id': 'TM012', 'is_standard_q': False, 'text': 'what kind of greetings should i use when teach level 5'}
+{'class': 178, 'id': 'TM012', 'is_standard_q': False, 'text': 'what kind of greetings should i use when teach level 6'}
+{'class': 179, 'id': 'TM013', 'is_standard_q': False, 'text': 'what kind of greetings should i use when teach level 12'}
+{'class': 179, 'id': 'TM013', 'is_standard_q': False, 'text': 'what kind of greetings should i use when teach level 7'}
+{'class': 180, 'id': 'TM014', 'is_standard_q': False, 'text': 'will it helpful to use tpr with jr students'}
+{'class': 181, 'id': 'TM015', 'is_standard_q': False, 'text': 'why is it important to use props in the classroom'}
+{'class': 181, 'id': 'TM015', 'is_standard_q': False, 'text': 'what is the point to use props in the session'}
+{'class': 182, 'id': 'TM016', 'is_standard_q': False, 'text': 'how do you measure my teaching qualities'}
+{'class': 183, 'id': 'TM017', 'is_standard_q': False, 'text': 'what should i do when clients are speaking chinese in class'}
+{'class': 183, 'id': 'TM017', 'is_standard_q': False, 'text': 'what should i do client is peaking chinese in class'}
+{'class': 183, 'id': 'TM017', 'is_standard_q': False, 'text': 'if the client only speak chinese no english at all what should i do'}
+{'class': 183, 'id': 'TM017', 'is_standard_q': False, 'text': 'my client is speaking chinese i cannot understand'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': True, 'text': 'student is not participating in the lesson'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'the client does not speak at all just type what should i do'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'client is singing a song by himself can you call his parents'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'how to make students pay attention on the class'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'what should i do my client is talking to each other'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'what can you do to get the student to participate'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'the student is crying'}
+{'class': 185, 'id': 'TM020', 'is_standard_q': False, 'text': 'the kid is refuse to talk to me'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'i need help on progress report how do i fill it'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'i do not know how to fill the progress report'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'how to complete the report if client was in session for only 10 minutes'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'should i include negative feedback in client s progress report'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'the client was missed but i cannot mark him absent what should i do'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'how do i fill in the progress report if client did not show up'}
+{'class': 186, 'id': 'TM021', 'is_standard_q': False, 'text': 'what should i fill in if a client is no show from a session'}
+{'class': 187, 'id': 'TM022', 'is_standard_q': False, 'text': 'when should i complete my session report'}
+{'class': 187, 'id': 'TM022', 'is_standard_q': False, 'text': 'do i get paid if i was not able to complete my session report on time'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': True, 'text': 'which kind of feedback report should i fill in'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'half of the class has passed should i continue'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'do i ought to fill the demo report in the event that the client leave class early'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'the client disconnected in the middle of the class which report should i fill'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'we run out of time now what report should i submit'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'i do not have enough time to teach the client should i submit incomplete'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'do i need to fill the demo report if the client leave class early'}
+{'class': 188, 'id': 'TM023', 'is_standard_q': False, 'text': 'there are solely 10 minutes left ought to i fill in incomplete'}
+{'class': 189, 'id': 'TM024', 'is_standard_q': False, 'text': 'is there any way to help me higher my rating'}
+{'class': 189, 'id': 'TM024', 'is_standard_q': False, 'text': 'can i attend some training sessions like how to higher your rating'}
+{'class': 190, 'id': 'TM025', 'is_standard_q': False, 'text': 'please remove me from oup session'}
+{'class': 190, 'id': 'TM025', 'is_standard_q': False, 'text': 'can i not teaching oup sessions i never had training before'}
+{'class': 191, 'id': 'TM026', 'is_standard_q': False, 'text': 'is there any way that i do not need to teach oup 1 on 2 sessions'}
+{'class': 193, 'id': 'TM028', 'is_standard_q': True, 'text': 'what is the qualification for special sessions'}
+{'class': 193, 'id': 'TM028', 'is_standard_q': False, 'text': 'i am writing to you regarding myspecial session qualification'}
+{'class': 194, 'id': 'TM030', 'is_standard_q': True, 'text': 'what is the storytelling presentation'}
+{'class': 194, 'id': 'TM030', 'is_standard_q': False, 'text': 'i would like to apply for storytelling presentation sessions'}
+{'class': 195, 'id': 'TM031', 'is_standard_q': False, 'text': 'what do i do if i get emptyroom session on my schedule'}
+{'class': 195, 'id': 'TM031', 'is_standard_q': False, 'text': 'it is showing emptyroom sesssion on my page can you fix it'}
+{'class': 196, 'id': 'TM032', 'is_standard_q': True, 'text': 'can i be a standby consultant'}
+{'class': 196, 'id': 'TM032', 'is_standard_q': False, 'text': 'hello i am looking for more possibilities in this company can i be qualify for standby sessions'}
+{'class': 198, 'id': 'TM034', 'is_standard_q': False, 'text': 'is it possible for me to apply for tutorming'}
+{'class': 198, 'id': 'TM034', 'is_standard_q': False, 'text': 'am i qualified for tutorming sessions'}
+{'class': 200, 'id': 'TM036', 'is_standard_q': True, 'text': 'what is the policy of tutorming sessions'}
+{'class': 201, 'id': 'TM037', 'is_standard_q': False, 'text': 'can i sell my tutorming account'}
+{'class': 202, 'id': 'TM038', 'is_standard_q': False, 'text': 'how to reactive my account which is suspended due to the performance issue'}
+{'class': 204, 'id': 'TM040', 'is_standard_q': True, 'text': 'when can a teacher be sent to re train'}
+{'class': 205, 'id': 'TM041', 'is_standard_q': False, 'text': 'i completed my training on consultant page can you reactivate my account'}
+{'class': 205, 'id': 'TM041', 'is_standard_q': False, 'text': 'my account was re train due to performance'}
+{'class': 205, 'id': 'TM041', 'is_standard_q': False, 'text': 'i would like to know how to reactivate my account i have finished all training classes'}
+{'class': 206, 'id': 'TM042', 'is_standard_q': False, 'text': 'how to become a senior consultant'}
+{'class': 207, 'id': 'TM043', 'is_standard_q': True, 'text': 'what kind of information is made available via the dashboard'}
+{'class': 207, 'id': 'TM043', 'is_standard_q': False, 'text': 'where can i chack my average ratings of my most recent 200 session hours'}
+{'class': 209, 'id': 'TM045', 'is_standard_q': True, 'text': 'how come my dashboard was reset'}
+{'class': 209, 'id': 'TM045', 'is_standard_q': False, 'text': 'why my session hours on dashboard suddenly reduced a lot'}
+{'class': 210, 'id': 'TM046', 'is_standard_q': False, 'text': 'i taught 10 sessions yesterday but only got 6 session hours why'}
+{'class': 211, 'id': 'TM047', 'is_standard_q': True, 'text': 'what is clt'}
+{'class': 211, 'id': 'TM047', 'is_standard_q': False, 'text': 'what are these weeks upcoming clt'}
+{'class': 212, 'id': 'TM048', 'is_standard_q': False, 'text': 'what is the qualification to be a trainer'}
+{'class': 212, 'id': 'TM048', 'is_standard_q': False, 'text': 'i want to be a trainer'}
+{'class': 213, 'id': 'TM049', 'is_standard_q': False, 'text': 'i want to resign from itg'}
+{'class': 213, 'id': 'TM049', 'is_standard_q': False, 'text': 'unfortunately i need to resign effective immediately please remove me from the schedule'}
+{'class': 214, 'id': 'TS000', 'is_standard_q': False, 'text': 'i do not have a backdrop'}
+{'class': 214, 'id': 'TS000', 'is_standard_q': False, 'text': 'i need the link of backdrop'}
+{'class': 215, 'id': 'TS001', 'is_standard_q': False, 'text': 'i cannot find the start button it is not showing'}
+{'class': 216, 'id': 'TS002', 'is_standard_q': False, 'text': 'i have a question regarding the red polo shirt and backdrop is it absolutely necessary to have it right away even for first few lessons'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'i have a session to start in two min but there is no start session button'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'where can i click the session start button'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'where is the start button for demo session'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'when does the start session button appear'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'will i be switched if the session starts late'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'i can not enter lvp session'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'no start session button'}
+{'class': 217, 'id': 'TS003', 'is_standard_q': False, 'text': 'will i be mark as no show if i start my session late'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'who is the client'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'i can only teach one student'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'there are too many people in the classroom'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'there are so many people talking in the classroom'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'there are not only one student people around here'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'i do not know who should i choose to teach'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'there are two students in my demo class what should i do'}
+{'class': 219, 'id': 'TS008', 'is_standard_q': False, 'text': 'lots of students here i can not continue to teach'}
+{'class': 220, 'id': 'TS009', 'is_standard_q': False, 'text': 'the client is a kid in the adult session can you remove him her from the class i cannot teach like this'}
+{'class': 220, 'id': 'TS009', 'is_standard_q': False, 'text': 'someone else is using the student s account'}
+{'class': 220, 'id': 'TS009', 'is_standard_q': False, 'text': 'i would like to report a client s abnormal behavior during the session'}
+{'class': 221, 'id': 'TS010', 'is_standard_q': False, 'text': 'the client s behavior is very rude'}
+{'class': 221, 'id': 'TS010', 'is_standard_q': False, 'text': 'the kid was impolite in the class'}
+{'class': 224, 'id': 'TS013', 'is_standard_q': False, 'text': 'the student took off her his shirt during the session'}
+{'class': 225, 'id': 'TS014', 'is_standard_q': False, 'text': 'i do not the client take photos of me during the session'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'i need to edit my session report'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'i have put in the wrong content for the report please help me to change it'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'please let me modify my report as there is some mistake in it'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'i made an error on my progress report today can i modify it'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'i need your help to modify my progress report'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'can you help my to revise my progress report'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'i need to edit my progress report'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'please allow me to correct an error on my progress report'}
+{'class': 226, 'id': 'TS015', 'is_standard_q': False, 'text': 'i need to update the content of my progress report'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'unreasonable rating'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'an absent student gave me a 1'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'i got a low rating i want to appeal'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'i receive a low rating from a student but that was for the replaced teacher'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'a client did not attend the session but gave me rating 8'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'a client was having technical issue in the session and the client left a low rating'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'i have a bad rating in a good regular session'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'the class went well but the student gave me 1'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'what can i do with my low ratings'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'remove the bad rating'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'the study level too high why i got low rating'}
+{'class': 228, 'id': 'TS017', 'is_standard_q': False, 'text': 'that low rating should not belong to me'}
+{'class': 229, 'id': 'TS018', 'is_standard_q': False, 'text': 'what is the low rating ratio'}
+{'class': 229, 'id': 'TS018', 'is_standard_q': False, 'text': 'what is the low rating ratio on my dashboard'}
+{'class': 230, 'id': 'TS019', 'is_standard_q': False, 'text': 'how is an average rating of 9 5 or above calculated'}
+{'class': 231, 'id': 'TS020', 'is_standard_q': False, 'text': 'the app shows that i do not have sessions but my session page is showing as scheduled'}
+{'class': 231, 'id': 'TS020', 'is_standard_q': False, 'text': 'the phone app is not functioning properly'}
+{'class': 231, 'id': 'TS020', 'is_standard_q': False, 'text': 'i did not receive notification on my phone that tells me i have a session'}
+{'class': 232, 'id': 'TS021', 'is_standard_q': True, 'text': 'my account was terminated because of 6 no shows'}

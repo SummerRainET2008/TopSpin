@@ -16,8 +16,7 @@ class Param(ParamBase):
     self.vali_file = f"{self.path_feat}/vali.pydict"
     self.test_files = []
 
-    self.pretrained_model = os.path.expanduser(
-        "~/pretrained_models/roberta/roberta.base/", )
+    self.tokenizer_data = "example/nlp/tokenizer_data/roberta"
 
     self.optimizer_name = "Adam"
     self.lr = 5e-4

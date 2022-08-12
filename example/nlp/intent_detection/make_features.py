@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Shuang Zhao
 
-from example.nlp.estimator6.intent_detection import *
-from example.nlp.estimator6.intent_detection.param import Param
+from example.nlp.intent_detection.estimator6 import *
+from example.nlp.intent_detection.estimator6.param import Param
 from palframe.pytorch.pretrained.tokenizer import Tokenizer
 from palframe import nlp
 
@@ -16,7 +16,7 @@ def process(data_files: list, out_file: str, param: Param):
       yield sentence.lower(), int(label)
 
   def data_generator():
-    tokenizer = Tokenizer.get_instance(param.pretrained_model)
+    tokenizer = Tokenizer.get_instance(param.tokenizer_data)
 
     for sentence, label in get_point():
       word_ids = tokenizer.tokenize1(sentence, param.max_seq_len)
@@ -32,12 +32,11 @@ def main():
 
   nlp.mkdir(param.path_feat)
 
-  process([f"qa/intent/data/itg/ver06.train.0.pydict"],
+  process([f"example/nlp/intent_detection/data/ver06.train.0.pydict"],
           os.path.join(param.path_feat, "train.pydict"), param)
 
-  process([f"qa/intent/data/itg/ver06.test.0.pydict"],
-          os.path.join(param.path_feat, "vali.pydict"), param)
-
+  process([f"example/nlp/intent_detection/data/ver06.test.0.pydict"],
+          os.path.join(param.path_feat, "test.pydict"), param)
 
 if __name__ == "__main__":
   main()
