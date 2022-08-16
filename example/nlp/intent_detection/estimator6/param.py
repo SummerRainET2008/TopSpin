@@ -21,8 +21,9 @@ class Param(ParamBase):
     self.optimizer_name = "Adam"
     self.lr = 5e-4
     # self.epoch_num = 50
-    self.batch_size = 3
-    self.batch_size_inference_one_gpu = self.batch_size * 3
+    self.max_train_step = 20
+    self.batch_size_one_gpu = 3
+    self.batch_size_inference_one_gpu = self.batch_size_one_gpu * 3
     self.iter_num_update_optimizer = 1
     self.max_seq_len = 128
 

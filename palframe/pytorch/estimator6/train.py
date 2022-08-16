@@ -123,7 +123,15 @@ class TrainerBase:
 
     self._vali_error_history = []
 
-    self._target_seen_sample_num = param.epoch_num * param.train_sample_num
+    if param.epoch_num is not None:
+      self._target_seen_sample_num = param.epoch_num * param.train_sample_num
+    else:
+      assert param.batch_size_one_gpu is not None, \
+        "User has to set 'batch_size_one_gpu' in one minibatch."
+
+      self._target_seen_sample_num = param.max_train_step * self._world_size * param.batch_size_one_gpu * param.iter_num_update_optimizer
+      param.epoch_num = math.ceil(self._target_seen_sample_num /
+                                  param.train_sample_num)
 
     if param.restore_from_last_train:
       Logger.info(f"{self._get_worker_info()} "
@@ -174,8 +182,12 @@ class TrainerBase:
       files = parse_feat_folder(param.test_files)
       assert len(files) > 0, "Wrong param.test_files"
 
+    if int(param.epoch_num is None) + int(param.max_train_step is None) != 1:
+      assert False, \
+        "param.epoch_num and param.max_train_step can not be None or not None "\
+        "AT THE SAME TIME"
+
     assert param.train_sample_num is not None
-    assert param.epoch_num is not None
     assert param.eval_gap_sample_num is not None, \
       "You can set as 'self.train_sample_num"
     if param.use_gpu:

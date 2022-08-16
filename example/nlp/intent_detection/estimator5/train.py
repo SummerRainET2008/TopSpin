@@ -13,8 +13,8 @@ class Trainer(TrainerBase):
 
     super(Trainer, self).__init__(
         model_wrapper,
-        get_batch_data(param.train_files, param.epoch_num,
-                       param.batch_size, 4, True,
+        get_batch_data(param.train_files, 1024,
+                       param.batch_size_one_gpu, 4, True,
                        dist.get_rank(), dist.get_world_size(),
                        _pad_batch_data), None)
 

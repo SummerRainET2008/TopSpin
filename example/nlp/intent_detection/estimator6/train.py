@@ -30,8 +30,8 @@ class Trainer(TrainerBase):
   def get_training_data(self, rank: int, world_size: int):
     param = self._param
     yield from get_batch_data(feat_path=param.train_files,
-                              epoch_num=param.epoch_num,
-                              batch_size=param.batch_size,
+                              epoch_num=1024,
+                              batch_size=param.batch_size_one_gpu,
                               worker_num=4,
                               shuffle=True,
                               rank=rank,
