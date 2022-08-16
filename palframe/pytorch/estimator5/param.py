@@ -100,7 +100,6 @@ class ParamBase(abc.ABC):
 
     # example on one gpu
     self.variable_batch_size = {"<=30": 100, "<=128": 30}
-    self.batch_size = 10
 
     self.iter_num_update_optimizer = 1
 
@@ -110,7 +109,6 @@ class ParamBase(abc.ABC):
 
     self.train_sample_num = None
     self.epoch_num = None  # can be float.
-    self.max_train_step = None  #
 
     # Evaluation would be conducted every eval_gap_sample_num samples.
     self.eval_gap_sample_num = None
