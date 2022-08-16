@@ -69,7 +69,10 @@ class TrainerBase:
     if param.epoch_num is not None:
       self._target_seen_sample_num = param.epoch_num * param.train_sample_num
     else:
-      self._target_seen_sample_num = param.max_train_step * self._world_size * param.batch_size * param.iter_num_update_optimizer
+      assert param.batch_size_one_gpu is not None, \
+        "User has to set 'batch_size_one_gpu' in one minibatch."
+
+      self._target_seen_sample_num = param.max_train_step * self._world_size * param.batch_size_one_gpu * param.iter_num_update_optimizer
       param.epoch_num = math.ceil(self._target_seen_sample_num /
                                   param.train_sample_num)
 

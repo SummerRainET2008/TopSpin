@@ -100,7 +100,7 @@ class ParamBase(abc.ABC):
 
     # example on one gpu
     self.variable_batch_size = {"<=30": 100, "<=128": 30}
-    self.batch_size = 10
+    self.batch_size_one_gpu = None
 
     self.iter_num_update_optimizer = 1
 
