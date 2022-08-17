@@ -60,6 +60,7 @@ def parse_feat_folder(feat_path: typing.Union[list, str, None],
 
 def get_batch_data_helper(dataset, epoch_num, batch_size, worker_num,
                           shuffle: bool, pad_batch_data_func):
+  epoch_num = 1024 if epoch_num is None else epoch_num
   for epoch_id in range(epoch_num):
     data_iter = torch.utils.data.DataLoader(
         dataset,

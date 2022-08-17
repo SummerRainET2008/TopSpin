@@ -71,6 +71,7 @@ def get_batch_data(feat_path,
                    variable_batch_size: list = None,
                    length_key_func=None):
   dataset = Dataset(feat_path, world_size, rank, shuffle, sample_filter_func)
+  epoch_num = 1024 if epoch_num is None else epoch_num
   for epoch_id in range(epoch_num):
     my_bacth_sampler = MyBatchSampler(dataset, variable_batch_size,
                                       length_key_func, shuffle)
