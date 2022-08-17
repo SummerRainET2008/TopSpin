@@ -1,7 +1,8 @@
 from example.nlp.intent_detection.estimator5 import *
 from example.nlp.intent_detection.estimator5.param import Param
 from example.nlp.intent_detection.estimator5.model import Model
-from example.nlp.intent_detection.estimator5.dataset import get_batch_data
+from example.nlp.intent_detection.estimator5.dataset import get_batch_data, \
+  _pad_batch_data
 from palframe.measure import Measure
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 
@@ -19,10 +20,14 @@ class ModelWrapper(ModelWrapperBase):
     start_time = time.time()
     all_true_labels = []
     all_pred_labels = []
-    for _, batch in get_batch_data(self._param, [data_file], 1, 0, 1, False):
-      batch = [e.to(self._device) for e in batch]
+    for _, batch in get_batch_data(data_file, epoch_num=1, batch_size=10,
+                                   worker_num=4, shuffle=False, rank=0,
+                                   world_size=1,
+                                   pad_batch_data_func=_pad_batch_data):
+      batch = nlp_torch.to_device(batch, self._device)
+      # batch = [e.to(self._device) for e in batch]
 
-      b_word_ids, b_labels = batch
+      b_word_ids, b_labels = batch[0], batch[1]
       logits, pred_labels = self.predict(b_word_ids)
 
       all_true_labels.extend(b_labels.tolist())

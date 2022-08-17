@@ -20,7 +20,7 @@ class Param(ParamBase):
     ################ model related settings ################
     self.path_feat = "feat/textcnn"
     self.train_files = [f"{self.path_feat}/train.pydict"]
-    self.vali_file = f"{self.path_feat}/vali.pydict"
+    self.vali_file = f"{self.path_feat}/test.pydict"
     self.test_files = []
 
     self.max_seq_len = 128
@@ -28,6 +28,7 @@ class Param(ParamBase):
     self.train_sample_num = 3200
     self.class_number = 234
     self.eval_gap_sample_num = self.train_sample_num
+    # self.eval_gap_sample_num = 10
     self.epoch_num = 5
     # self.max_train_step = 20
 
