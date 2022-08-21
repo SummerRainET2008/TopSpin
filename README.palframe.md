@@ -532,12 +532,12 @@ In the PAT-BERT project, one pretrained model would be tested in 10 downstream
 #### 2. Distributed training
 #### 3. Automaic GPUs and servers allocation for task parallelization
 #### 4. AutoML
-#### 5. Three running modes without a code change
+#### 5. Three running modes 
 
 No any change for your codes.
-1. Debug mode, for quck running of a single GPU task or for debugging. 
-2. Auto mode, supporting automatic GPUs and servers allocation.
-3. Distributed mode, supporting quite large model training.
+1. `Debug mode`, for debugging only, which uses single GPU (or CPU).
+2. `Auto mode`, your common choice, which supports automatic GPUs and servers allocation.
+3. `Distributed mode`, for quite complex tasks that need more than one server.
 
 #### 6. Learning rate warmup and decay
 
