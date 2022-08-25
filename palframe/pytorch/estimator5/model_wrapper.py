@@ -46,7 +46,8 @@ class ModelWrapperBase:
     nlp.timeout(self._init_distributed_training, [param], 30)
 
     if not self._quickrun_mode:
-      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}")
+      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
+                             append=param.restore_from_last_train)
     if dist.get_rank() == 0:
       Logger.set_level(param.debug_level)
     else:
