@@ -40,6 +40,7 @@ class TrainerBase:
 
       param.gpu_num = 1
       param.gpus = param.gpus[:1]
+      param.servers_file = None
 
       param.create_workspace()
 

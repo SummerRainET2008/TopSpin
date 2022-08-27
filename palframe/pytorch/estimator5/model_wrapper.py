@@ -31,6 +31,7 @@ class ModelWrapperBase:
         param_instance = next(param.generate_all_variants())
         param.__dict__.update(param_instance.__dict__)
       param.gpu_num = 1
+      param.servers_file = None
 
       param.create_workspace()
 
