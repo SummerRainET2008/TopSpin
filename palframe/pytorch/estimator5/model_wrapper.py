@@ -31,6 +31,7 @@ class ModelWrapperBase:
         param_instance = next(param.generate_all_variants())
         param.__dict__.update(param_instance.__dict__)
       param.gpu_num = 1
+      param.servers_file = None
 
       param.create_workspace()
 
@@ -46,7 +47,8 @@ class ModelWrapperBase:
     nlp.timeout(self._init_distributed_training, [param], 30)
 
     if not self._quickrun_mode:
-      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}")
+      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
+                             append=param.restore_from_last_train)
     if dist.get_rank() == 0:
       Logger.set_level(param.debug_level)
     else:

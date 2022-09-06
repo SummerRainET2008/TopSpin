@@ -20,7 +20,6 @@ class TrainerBase:
                optimizer: typing.Union[Optimizer, None] = None):
     param = model_wrapper._param
     self._param = param
-    self._check_param_validity()
 
     nlp.set_random_seeds(param.seed)
     torch.backends.cudnn.deterministic = param.cudnn_deterministic
@@ -111,31 +110,6 @@ class TrainerBase:
     if self._use_amp:
       self._grad_scaler = amp.GradScaler()
 
-  def _check_param_validity(self):
-    param = self._param
-
-    assert not nlp.is_none_or_empty(param.train_files)
-    files = parse_feat_folder(param.train_files)
-    assert len(files) > 0, "Empty train_files"
-
-    if not nlp.is_none_or_empty(param.vali_file):
-      files = parse_feat_folder(param.vali_file)
-      assert len(files) <= 1, "Expecting: #validation files <= 1"
-
-    if not nlp.is_none_or_empty(param.test_files):
-      files = parse_feat_folder(param.test_files)
-      assert len(files) > 0, "Wrong param.test_files"
-
-    if int(param.epoch_num is None) + int(param.max_train_step is None) != 1:
-      assert False, \
-        "param.epoch_num and param.max_train_step can not be None or not None "\
-        "AT THE SAME TIME"
-
-    assert param.train_sample_num is not None
-    assert param.eval_gap_sample_num is not None, \
-      "You can set as 'self.train_sample_num"
-    if param.use_gpu:
-      assert param.gpu_num > 0
 
   def _get_worker_info(self):
     return f"rank[{self._rank}/{self._world_size}]"

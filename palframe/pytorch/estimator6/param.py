@@ -206,6 +206,7 @@ class ParamBase(abc.ABC):
       if nlp.is_none_or_empty(file_name):
         ParamBase.cls_locks[cls_str] = True
         param = cls()
+        param.check_param_validity()
       else:
         Logger.info(f"loading param from '{file_name}'")
         param = pickle.load(open(file_name, "rb"))
@@ -307,3 +308,31 @@ class ParamBase(abc.ABC):
     except:
       pass
     Logger.info("-" * 64, "\n")
+
+
+  def check_param_validity(self):
+    files = parse_feat_folder(self.train_files)
+    if len(files) == 0:
+      Logger.warn(f"Empty {self.train_files}")
+
+    if not nlp.is_none_or_empty(self.vali_file):
+      files = parse_feat_folder(self.vali_file)
+      if len(files) == 0:
+        Logger.warn(f"Empty {self.vali_file}")
+
+    if not nlp.is_none_or_empty(self.test_files):
+      files = parse_feat_folder(self.test_files)
+      if len(files) == 0:
+        Logger.warn(f"Empty {self.test_files}")
+
+    if int(self.epoch_num is None) + int(self.max_train_step is None) != 1:
+      assert False, \
+        "param.epoch_num and param.max_train_step can not be None or not None " \
+        "AT THE SAME TIME"
+
+    assert self.train_sample_num is not None
+    assert self.eval_gap_sample_num is not None, \
+      "You can set as 'self.train_sample_num"
+
+    if self.use_gpu:
+      assert self.gpu_num > 0

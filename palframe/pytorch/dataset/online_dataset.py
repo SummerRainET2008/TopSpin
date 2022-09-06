@@ -66,6 +66,7 @@ def get_batch_data(feat_path,
                    world_size,
                    pad_batch_data_func,
                    sample_filter_func=None):
+  epoch_num = 1024 if epoch_num is None else epoch_num
   for epoch_id in range(epoch_num):
     dataset = Dataset(feat_path, world_size, rank, shuffle, sample_filter_func)
     yield from get_batch_data_helper(
