@@ -67,7 +67,8 @@ class ModelWrapperBase:
           find_unused_parameters=param.find_unused_parameters,
       )
     else:
-      gpu_id = param.gpus[self._local_rank]
+      os.environ["CUDA_VISIBLE_DEVICES"] = f"{self._local_rank}"
+      gpu_id = 0
       self._device = torch.device(f"cuda:{gpu_id}")
       torch.cuda.set_device(self._device)
       user_model = user_model.to(self._device)
