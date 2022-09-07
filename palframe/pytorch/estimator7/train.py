@@ -137,9 +137,8 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     self._figure_data["loss"] = self._loss_history
 
     self._vali_error_history = []
-
-
-    self._model_size = nlp_torch.display_model_parameters(self.model)
+    
+    self._model_size = None
 
     # if param.epoch_num is not None:
     #   self._target_seen_sample_num = param.epoch_num * param.train_sample_num
@@ -358,7 +357,8 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     if self.is_master_rank():
       Logger.info(f"create training work_path")
       # create the work space
-      param.create_workspace()
+      if self.quickrun_mode:
+        param.create_workspace()
       # create the monitor thread 
 
       nlp.command(f"touch {param.run_lock_file}")
@@ -376,6 +376,7 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     # redirect Logger output 
     if not self.quickrun_mode:
       Logger.reset_outstream(f"{param.path_log}/log.rank_{self._rank}")
+      Logger.info(f"rank: {self._rank} start to trainning")
     if self.should_print_log():
       Logger.set_level(param.debug_level)
     else:
@@ -385,6 +386,7 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     param.worker_IP = os.getenv("worker_IP")
     if self.should_print_log():
       param.display()
+      self._model_size = nlp_torch.display_model_parameters(self.model)
 
   def _run_minibatch(self,batch):
     if self._use_amp:
@@ -692,7 +694,6 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
       # evaluate the model
       with Timer("evaluate"):
         torch.cuda.empty_cache()
-        self.evaluator.model = self.model
         metric_res = self.evaluator.eval(
           dev_data =self.dev_data,
           test_data = self.test_data
@@ -708,7 +709,7 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
       # add metric res to dataloader
       self.eval_data_recorder.add_acc(metric_res)
       best_res = self.eval_data_recorder.get_k_best_eval_res(1)[0]
-      Logger.info(f"current best result:"
+      Logger.info(f"current best evaluate result:"
                   f"\n{json.dumps(best_res,indent=2,ensure_ascii=False)}")
     
     # delete model

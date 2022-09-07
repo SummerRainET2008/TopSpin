@@ -4,7 +4,9 @@
 palframe command tools, including start_dist_train ...
 """
 
+import importlib
 import sys, os
+from unittest.mock import NonCallableMagicMock
 from palframe import nlp
 from palframe.nlp import Logger
 from palframe.nlp import load_module_from_full_path
@@ -22,7 +24,7 @@ def list_parse(list_str):
 START_DIST_TRAIN_PARAMS = [
     ('servers_file', str, 'servers file,e.g. ip1,ip2,ip3'),
     ('train_files', str, 'train files location'),
-    ('vali_files', str, 'validation files location'),
+    ('dev_files', str, 'validation files location'),
     ('test_files', str, 'test files location'),
     ('path_initial_model', str, 'inital checkpoint'),
     ('gpus', list_parse, 'gpus, such as `[0,1,2]`'),
@@ -30,7 +32,8 @@ START_DIST_TRAIN_PARAMS = [
     ('max_train_step', int, 'train stop condition:: max train step'),
     ('model_saved_num', int, 'max checkpoint num to save'),
     ('iter_num_update_optimizer', int, 'gradient accumulation num'),
-    ('batch_size', int, 'batch size')
+    ('train_batch_size', int, 'train_batch size'),
+    ('eval_batch_size', int, 'eval batch size'),
 ]
 
 
@@ -64,7 +67,7 @@ def parser_args():
                                        help='class name of param')
   start_dist_train_parser.add_argument('--project_dir',
                                        required=True,
-                                       help='location of project path')
+                                       help='location of project path, default is same as train_script_name')
   start_dist_train_parser.add_argument('--extra_run_tag',
                                        default=None,
                                        help='extra run tag')
@@ -125,7 +128,7 @@ def start_dist_train(args):
   assert os.path.exists(param_script_path), param_script_path
 
   # get param cls
-  param_module = load_module_from_full_path(param_script_path)
+  param_module = importlib.import_module(param_script_path.replace(".py","").replace('/','.'))
   Param_cls = getattr(param_module, param_cls_name)
 
   # modify run_tag in param class's __init__ signature
@@ -145,11 +148,7 @@ def start_dist_train(args):
     value = getattr(args, name)
     if value is not None:
       setattr(param_obj, name, value)
-  # print(param_obj)
-  # print(train_script_path)
-  # print(fg)
-  # launch train
-  from palframe.pytorch.estimator6 import starter
+  from palframe.pytorch.estimator7 import starter
   starter.start_distributed_train(param_obj, train_script_path)
 
 

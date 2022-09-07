@@ -63,7 +63,7 @@ class ParamBase(abc.ABC):
     # self.param_norm = 1
     # Do not use it, as it will be allocated automatically,
     # except for debug mode.
-    self.gpus = [0]  # all vaisible gpus 
+    self.gpus = None  # all vaisible gpus 
     self.batch_dim = 0
   
     
@@ -172,6 +172,7 @@ class ParamBase(abc.ABC):
     self.cudnn_deterministic = True
     self.cudnn_benchmark = False
 
+
   def _check_instance_validity(self):
     cls_str = str(type(self))
     assert cls_str is not ParamBase
@@ -238,6 +239,7 @@ class ParamBase(abc.ABC):
       else:
         Logger.info(f"loading param from '{file_name}'")
         param = pickle.load(open(file_name, "rb"))
+
       ParamBase.instances[cls_str] = param
 
     return ParamBase.instances[cls_str]
@@ -417,6 +419,8 @@ def distributed_init(param:ParamBase):
   import torch.distributed as dist
   dist.init_process_group(backend=param.backhand)
   HAS_RUN_DISTRIBUTED_INIT = True
+  if not quickrun_mode:
+      Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}")
   
 def get_rank():
   import torch.distributed as dist

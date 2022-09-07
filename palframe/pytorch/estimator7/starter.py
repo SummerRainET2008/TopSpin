@@ -3,6 +3,7 @@
 
 #todo: check all ERR, WARN infor
 
+from distutils.log import error
 from palframe.pytorch.estimator5.param import ParamBase
 from palframe.pytorch import *
 import threading
@@ -387,14 +388,20 @@ def stop_train(run_id):
 
 
 def start_distributed_train(param: ParamBase, source_script_and_params):
-  def start(param_file, server_ips):
-    master_node_ip = server_ips[-1]
+  def start(server_infos):
+    master_node_ip = server_infos[-1][0]
     port = _get_netport()
     pythonpath = ":".join(sys.path)
 
-    for server_id, server_IP in enumerate(server_ips):
+    for server_id, (server_IP,gpu_num,gpus) in enumerate(server_infos):
       Logger.info(f"starting {server_IP} ...")
-      node_rank = (server_id + 1) % len(server_ips)
+      node_rank = (server_id + 1) % len(server_infos)
+      # save param_file
+      param.gpus = gpus
+      param.gpu_num = gpu_num
+      param_file = f"{param.path_meta}/param.{server_IP}.pkl"
+      with open(param_file, "wb") as f:
+        pickle.dump(param, f)
       cmd_base = f"cd {os.getcwd()}; " \
                  f"DIST_RUN=1 " \
                  f"PYTHONPATH=./:{pythonpath} " \
@@ -402,7 +409,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
                  f"worker_IP={server_IP} " \
                  f"<mask1> {sys.executable} -m torch.distributed.launch " \
                  f"--nproc_per_node={param.gpu_num} " \
-                 f"--nnodes={len(server_ips)} " \
+                 f"--nnodes={len(server_infos)} " \
                  f"--node_rank={node_rank} " \
                  f"--master_addr={master_node_ip} " \
                  f"--master_port={port} " \
@@ -415,7 +422,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
         cmd = cmd.replace("<mask1>", f" nohup ").replace("<mask3>", f"&")
       else:
         cmd = cmd.replace("<mask1>", "").replace("<mask3>", f"")
-
+      
       code = nlp.command(cmd, server=server_IP)[0]
       if code != 0:
         Logger.info(f"starting {server_IP} failed")
@@ -425,22 +432,55 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
 
     return True
 
-  def check_servers(server_ips):
+  def check_servers(server_infos):
     if param.use_gpu:
-      server_gpu_info = [[ip, list(range(param.gpu_num))] for ip in server_ips]
+      server_gpu_info = [[server_info[0], server_info[2]] for server_info in server_infos]
       assert _check_server_gpus(server_gpu_info)
 
-    assert _check_server_disk_path(server_ips, os.getcwd())
+    assert _check_server_disk_path(
+      [server_info[0] for server_info in server_infos], os.getcwd()
+      )
 
-  def get_server_ips():
+  def _get_server_ips():
     servers_files = param.servers_file
     if nlp.is_none_or_empty(servers_files):
-      yield nlp.get_server_ip()
+      # local run
+      yield (nlp.get_server_ip(),param.gpu_num,param.gpus)
 
     else:
+      # for multiple servers
       for sf in servers_files.split(","):
         content = open(os.path.expanduser(sf)).read()
-        yield from re.sub(r"(:\d+)", " ", content).replace(",", " ").split()
+        server_infos = content.split('\n')
+        for server_info in server_infos:
+          server_info_list = server_info.split(' ')
+          server_ip = server_info_list[0].strip()
+          # get gpu_num, if have 
+          if len(server_info_list)>=2:
+            gpu_num = int(server_info[1].replace('slots=',"").strip())
+          else:
+            gpu_num = param.gpu_num  
+
+          # get gpus if have  
+          if len(server_info_list) >=3:
+            gpus = eval(f'[{server_info_list[2]}]')
+          else:
+            gpus = param.gpus 
+          yield (server_ip,gpu_num,gpus) 
+
+  def get_server_ips():
+    server_ips = []
+    for server_ip,gpu_num,gpus in _get_server_ips():
+      error_info = f"plaease check setting: "\
+                   f"server_ip: {server_ip}, gpu_num: {gpu_num}, gpus: {gpus}"
+      assert gpu_num >=1, error_info
+      if gpus is None:
+        gpus = list(range(gpu_num))
+      assert len(gpus) == gpu_num, error_info
+      assert server_ip not in server_ips, f"duplicate ip: {server_ip}"
+      server_ips.append(server_ip)
+      yield server_ip,gpu_num,gpus
+        
 
   whole_run_starting_time = time.time()
   nlp.set_random_seeds(0)
@@ -448,16 +488,16 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     "Distributed training model permits only one param variant, or You can" \
     "use starter.start_train(...)"
 
-  server_ips = list(get_server_ips())
-  check_servers(server_ips)
-
+  server_infos = list(get_server_ips())
+  check_servers(server_infos)
   param.create_workspace()
-  param.gpus = list(range(param.gpu_num))
-  param.worker_IPs = ",".join(server_ips)
+  #param.gpus = list(range(param.gpu_num))
+  param.worker_IPs = ",".join([server_info[0] for server_info in server_infos])
+  # common param
   param_file = f"{param.path_meta}/param.pkl"
   pickle.dump(param, open(param_file, "wb"))
 
-  if not start(param_file, server_ips):
+  if not start(server_infos):
     Logger.error(f"Distributed running '{param.path_work}' fails.")
     stop_distributed_train(param.path_work)
 
@@ -495,5 +535,4 @@ def exception_stop(class_func):
       #traceback.print_exc()
       stop_distributed_train(args[0]._param.path_work)
       raise
-
   return f

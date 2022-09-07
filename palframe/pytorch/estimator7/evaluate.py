@@ -5,7 +5,7 @@
 import torch
 from typing import Iterator, List, Dict
 from palframe.pytorch import nlp_torch
-from palframe import nlp 
+from palframe.nlp import Logger
 from tqdm import tqdm
 from palframe.pytorch.estimator7._train_eval_base import TrainEvalBase
 
@@ -56,7 +56,7 @@ class EvaluatorBase(TrainEvalBase):
       data_len = None  
     
     data_iter = tqdm(data_iter,total=data_len)
-    for batch_data in data_iter:
+    for i,batch_data in enumerate(data_iter):
       batch_eval_res = self.evaluate_one_batch(
         *batch_data[0]['args'],
         **batch_data[0]['kwargs']
