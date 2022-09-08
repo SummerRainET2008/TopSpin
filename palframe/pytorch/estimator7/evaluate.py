@@ -9,7 +9,24 @@ from palframe.nlp import Logger
 from tqdm import tqdm
 from palframe.pytorch.estimator7._train_eval_base import TrainEvalBase
 
-class EvaluatorBase(TrainEvalBase):
+
+class EvaluatorBaseMeta(type):
+    """
+    控制实例化过程
+    """
+    def __call__(cls,param,model,**kwargs):
+      self = cls.__new__(cls,param,model,**kwargs)
+      assert not isinstance(model,torch.nn.parallel.DistributedDataParallel),\
+        'model in evlautor should not '\
+        'the subclass of torch.nn.parallel.DistributedDataParallel'
+      self._has_call_base_init = False
+      cls.__init__(self,param,model,**kwargs)
+      assert self._has_call_base_init,\
+       f"you should use super().__init__(*args,**kwargs) in your own __init__ "
+      return self
+
+
+class EvaluatorBase(TrainEvalBase,metaclass=EvaluatorBaseMeta):
 
   def __init__(self, param, model):
     """
@@ -21,7 +38,7 @@ class EvaluatorBase(TrainEvalBase):
     """
     self.param = param
     self.model = model
-
+    self._has_call_base_init = True 
 
   def _try_to_get_device_from_model(self):
     return next(self.model.parameters()).device

@@ -24,7 +24,7 @@ class ParameterRange:
     self.grouped_attribute = grouped_attribute
 
 
-class ParamBase(abc.ABC):
+class ParamBase:
   instances = {}
   cls_locks = {}
 
@@ -71,7 +71,7 @@ class ParamBase(abc.ABC):
     # Train params      #
     #####################
     self.train_files = None 
-    self.train_batch_size = None
+    self.train_batch_size = 32
     self.train_sample_num = None
     self.iter_num_update_optimizer = 1
     self.epoch_num = None  # can be float.
@@ -111,6 +111,7 @@ class ParamBase(abc.ABC):
     self.weight_decay = 0.01
     self.lr_scheduler_type = 'linear' # "linear", default no lr schedule
     self.num_warmup_steps = None
+    self.num_warmup_ratio = None 
     self.param_clip_norm = 1
     # Mixed-precision optimization
     self.use_amp = True
@@ -140,7 +141,7 @@ class ParamBase(abc.ABC):
     # batch size during eval stage
     self.vali_file = None
     self.test_files = None 
-    self.eval_batch_size = None 
+    self.eval_batch_size = 32
     self.eval_num_workers_loading_data = 2
     self.eval_process_example_num_worker = 1
     # main field in evaluation stage
@@ -153,7 +154,7 @@ class ParamBase(abc.ABC):
     # Pred params       #
     #####################
     # pred batch size
-    self.pred_batch_size = None
+    self.pred_batch_size = 32
 
     # Sets the number of threads used for intraop parallelism on CPU.
     self.num_threads_cpu = 4
@@ -171,6 +172,8 @@ class ParamBase(abc.ABC):
 
     self.cudnn_deterministic = True
     self.cudnn_benchmark = False
+    # deal with paramrange
+    self._instance_cache = None
 
 
   def _check_instance_validity(self):
@@ -182,19 +185,19 @@ class ParamBase(abc.ABC):
     if not ParamBase.cls_locks.get(cls_str, False):
       assert False, "Use Param.get_instance(cls), rather than Param()"
 
-  @property
-  def lr_decay_strategy(self):
-    return self.__lr_decay_strategy, self.__lr_decay_strategy_id
+  # @property
+  # def lr_decay_strategy(self):
+  #   return self.__lr_decay_strategy, self.__lr_decay_strategy_id
 
-  @lr_decay_strategy.setter
-  def lr_decay_strategy(self, name: str):
-    name = name.lower()
-    cand_names = ["linear", "stepwise_sgd"]
-    try:
-      self.__lr_decay_strategy = name
-      self.__lr_decay_strategy_id = cand_names.index(name)
-    except ValueError:
-      assert False, f"param.lr_decay_strategy should be {cand_names}"
+  # @lr_decay_strategy.setter
+  # def lr_decay_strategy(self, name: str):
+  #   name = name.lower()
+  #   cand_names = ["linear", "stepwise_sgd"]
+  #   try:
+  #     self.__lr_decay_strategy = name
+  #     self.__lr_decay_strategy_id = cand_names.index(name)
+  #   except ValueError:
+  #     assert False, f"param.lr_decay_strategy should be {cand_names}"
 
   @property
   def true_gradient(self):
@@ -236,6 +239,8 @@ class ParamBase(abc.ABC):
       if nlp.is_none_or_empty(file_name):
         ParamBase.cls_locks[cls_str] = True
         param = cls()
+        param = next(param.generate_all_variants())
+        param._instance_cache = param
       else:
         Logger.info(f"loading param from '{file_name}'")
         param = pickle.load(open(file_name, "rb"))
@@ -258,6 +263,8 @@ class ParamBase(abc.ABC):
   is_instance = has_param_range  
 
   def generate_all_variants(self):
+    if self._instance_cache is not None:
+      self = self._instance_cache
     cand_key_values = []
     cand_key_values_grouped = []
     for key, value in self.__dict__.items():

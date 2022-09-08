@@ -28,7 +28,7 @@ class TrainerBaseMeta(type):
     控制实例化过程
     """
     def __call__(cls,param,model,**kwargs):
-      self = object.__new__(cls)
+      self = cls.__new__(cls,param,model,**kwargs)
       self.quickrun_mode = os.getenv("DIST_RUN") is None
       self.param = param
       self._local_rank = self.parse_local_rank()
@@ -52,8 +52,10 @@ class TrainerBaseMeta(type):
       self._dist_model = self.wrap_model_with_ddp(model)
       self._user_model = model
       self.model = self._dist_model
+      self._has_call_base_init = False
       cls.__init__(self,param,self.model,**kwargs)
-    
+      assert self._has_call_base_init,\
+       f"you must use super().__init__(*args,**kwargs) in your own __init__ "
       return self
 
 class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
@@ -105,10 +107,14 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
           )
 
     # get lr_schedule
+    num_warmup_steps = self.param.num_warmup_steps
+    if num_warmup_steps is None and self.param.num_warmup_ratio is not None:
+        num_warmup_steps = int(self.param.num_warmup_ratio*self.max_train_step)
+  
     self.lr_scheduler = self.create_scheduler(
       self.param.lr_scheduler_type,
       self.max_train_step,
-      self.param.num_warmup_steps,
+      num_warmup_steps,
       self._optimizer
     )
     
@@ -196,6 +202,8 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
 
     self.eval_data_recorder = None
     self.current_epoch = None
+
+    self._has_call_base_init = True  
    
 
   def create_scheduler(
@@ -327,12 +335,17 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
                   "wb"))
 
         Logger.info("Saving debugging model")
+      
         info = {
-            "model_seen_sample_num": self._model_seen_sample_num,
-            "opt_evaluate_error": self._opt_evaluate_error,
-            "last_evaluate_point": self._last_evaluate_point,
-        }
-        self._user_model.save_model(info, f"rank_{self._rank}")
+        "batch_id": self._batch_id,
+        "model_seen_sample_num": self._model_seen_sample_num,
+        "opt_evaluate_error": self._opt_evaluate_error,
+        "last_evaluate_point": self._last_evaluate_point,
+        "figure_data": self._figure_data,
+        "optimizer_state": self._optimizer.state_dict(),
+        "lr_scheduler_state": self.lr_scheduler.state_dict()
+    }
+        self._user_model.save_model(info, self.param.path_model,tag='bug')
 
         for name, var in self.model.named_parameters():
           if nlp_torch.isabnormal(var):
@@ -465,6 +478,11 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
         is_larger_better=self.param.eval_value_is_large_better
       )
 
+    self.train_sample_num = param.train_sample_num
+    if self.train_sample_num is None:
+      if hasattr(train_data,'__len__'):
+        self.train_sample_num  = len(train_data)
+
     while True:
       batch_start_time = time.time()
       self.model.train()
@@ -555,7 +573,10 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
 
       batch_duration = time.time() - batch_start_time
       train_duration = time.time() - train_start_time
-      epoch_id = self.current_epoch # self._model_seen_sample_num / param.train_sample_num
+      if self.train_sample_num is not None:
+        epoch_id = self._model_seen_sample_num / param.train_sample_num
+      else:
+        epoch_id = self.current_epoch
       a = train_duration / (self._batch_id + 1)
       b = self.max_train_step - self._batch_id
       remaining_time = a * b
@@ -706,11 +727,15 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
         'epoch':self.current_epoch,
         'model_save_path':model_save_path
       })
+      Logger.info(f"current evaluate result:"
+                  f"\n{json.dumps(metric_res,indent=2,ensure_ascii=False)}")
       # add metric res to dataloader
       self.eval_data_recorder.add_acc(metric_res)
       best_res = self.eval_data_recorder.get_k_best_eval_res(1)[0]
       Logger.info(f"current best evaluate result:"
                   f"\n{json.dumps(best_res,indent=2,ensure_ascii=False)}")
+
+      
     
     # delete model
     self.delete_model(self.param.model_saved_num)
@@ -720,6 +745,8 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     """
     checkpoint_file_path = os.path.join(self.param.path_model,"checkpoint")
     checkpoint_paths = self.parse_checkpoint_file(checkpoint_file_path)
+    need_save_paths = []
+    
     if self.eval_data_recorder is not None:
       optimal_records = self.eval_data_recorder.get_k_best_eval_res(model_saved_num)
       optimal_records.sort(key=lambda x:x['step'])
@@ -727,6 +754,7 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     else:
       # save last k model
       need_save_paths = checkpoint_paths[-model_saved_num:]
+    
     need_delete_paths = list(set(checkpoint_paths).difference(need_save_paths))
     # delete model 
     for path in need_delete_paths:

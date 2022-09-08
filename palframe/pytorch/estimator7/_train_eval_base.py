@@ -122,11 +122,11 @@ class TrainEvalBase:
       assert eval_gap_sample_num > global_batch_size,\
          f"eval_gap_sample_num num should be " \
         f"large than global batch size: {global_batch_size}"
-      return math.cile(eval_gap_sample_num/global_batch_size)
+      return math.ceil(eval_gap_sample_num/global_batch_size)
 
     if eval_gap_epoch_num is not None:
       assert eval_gap_epoch_num > 0
-      return math.cile(train_sample_num*eval_gap_epoch_num/global_batch_size)
+      return math.ceil(train_sample_num*eval_gap_epoch_num/global_batch_size)
 
 
   def _all_none_except_one_check(self,*args):
@@ -187,7 +187,7 @@ class TrainEvalBase:
       return max_train_step
     train_sample_num = self.param.train_sample_num
     total_sample_num = train_sample_num * epoch_num 
-    return math.cile(total_sample_num/global_batch_size)
+    return math.ceil(total_sample_num/global_batch_size)
 
   
   def parse_checkpoint_file(self,checkpoint_file_path):
