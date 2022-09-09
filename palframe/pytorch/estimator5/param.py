@@ -287,7 +287,7 @@ class ParamBase(abc.ABC):
     nlp.mkdir("work")
     nlp.mkdir(self.path_work)
     nlp.mkdir(self.path_model)
-    nlp.mkdir(self.path_log, True)
+    nlp.mkdir(self.path_log)
     nlp.mkdir(self.path_meta, True)
     nlp.mkdir(self.path_bug)
 
