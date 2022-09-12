@@ -202,7 +202,6 @@ class ParamBase(abc.ABC):
       if nlp.is_none_or_empty(file_name):
         ParamBase.cls_locks[cls_str] = True
         param = cls()
-        param.check_param_validity()
       else:
         Logger.info(f"loading param from '{file_name}'")
         param = pickle.load(open(file_name, "rb"))
@@ -283,11 +282,12 @@ class ParamBase(abc.ABC):
   def create_workspace(self):
     Logger.info(f"ParamBase.create_workspace: {self.path_work}")
 
+    self.check_param_validity()
     self.__workspace_created = True
     nlp.mkdir("work")
     nlp.mkdir(self.path_work)
     nlp.mkdir(self.path_model)
-    nlp.mkdir(self.path_log, True)
+    nlp.mkdir(self.path_log)
     nlp.mkdir(self.path_meta, True)
     nlp.mkdir(self.path_bug)
 
