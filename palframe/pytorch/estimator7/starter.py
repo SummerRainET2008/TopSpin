@@ -1,12 +1,15 @@
 #coding: utf8
-#author: Tian Xia
+#author: Xuan Zhou
 
 #todo: check all ERR, WARN infor
 
-from distutils.log import error
 from palframe.pytorch.estimator5.param import ParamBase
-from palframe.pytorch import *
-import threading
+# from palframe.pytorch import *
+from palframe import nlp  
+from palframe.nlp import Logger
+from palframe.pytorch.estimator7.utils import parse_server_infos
+import threading,os,traceback,time,pickle,sys,re  
+import typing,random
 
 
 def _check_server_disk_path(server_ips, current_path):
@@ -369,9 +372,7 @@ class RunManager:
       thread.join()
 
     nlp.execute_cmd(f"rm {self._run_lock_file}")
-
     Logger.info(f"RunManager.run() is done")
-
 
 def start_train(param: ParamBase, source_script_and_params: str,
                 servers: typing.List[Server], **kwargs):
@@ -383,6 +384,7 @@ def start_train(param: ParamBase, source_script_and_params: str,
   run_manager.run()
 
 
+
 def stop_train(run_id):
   nlp.execute_cmd(f"rm work/batch_task.run_id_{run_id}/.run.lock")
 
@@ -392,7 +394,6 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     master_node_ip = server_infos[-1][0]
     port = _get_netport()
     pythonpath = ":".join(sys.path)
-
     for server_id, (server_IP,gpu_num,gpus) in enumerate(server_infos):
       Logger.info(f"starting {server_IP} ...")
       node_rank = (server_id + 1) % len(server_infos)
@@ -441,54 +442,13 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
       [server_info[0] for server_info in server_infos], os.getcwd()
       )
 
-  def _get_server_ips():
-    servers_files = param.servers_file
-    if nlp.is_none_or_empty(servers_files):
-      # local run
-      yield (nlp.get_server_ip(),param.gpu_num,param.gpus)
-
-    else:
-      # for multiple servers
-      for sf in servers_files.split(","):
-        content = open(os.path.expanduser(sf)).read()
-        server_infos = content.split('\n')
-        for server_info in server_infos:
-          server_info_list = server_info.split(' ')
-          server_ip = server_info_list[0].strip()
-          # get gpu_num, if have 
-          if len(server_info_list)>=2:
-            gpu_num = int(server_info[1].replace('slots=',"").strip())
-          else:
-            gpu_num = param.gpu_num  
-
-          # get gpus if have  
-          if len(server_info_list) >=3:
-            gpus = eval(f'[{server_info_list[2]}]')
-          else:
-            gpus = param.gpus 
-          yield (server_ip,gpu_num,gpus) 
-
-  def get_server_ips():
-    server_ips = []
-    for server_ip,gpu_num,gpus in _get_server_ips():
-      error_info = f"plaease check setting: "\
-                   f"server_ip: {server_ip}, gpu_num: {gpu_num}, gpus: {gpus}"
-      assert gpu_num >=1, error_info
-      if gpus is None:
-        gpus = list(range(gpu_num))
-      assert len(gpus) == gpu_num, error_info
-      assert server_ip not in server_ips, f"duplicate ip: {server_ip}"
-      server_ips.append(server_ip)
-      yield server_ip,gpu_num,gpus
-        
-
   whole_run_starting_time = time.time()
   nlp.set_random_seeds(0)
   assert param.is_instance(), \
     "Distributed training model permits only one param variant, or You can" \
     "use starter.start_train(...)"
 
-  server_infos = list(get_server_ips())
+  server_infos = list(parse_server_infos(param))
   check_servers(server_infos)
   param.create_workspace()
   #param.gpus = list(range(param.gpu_num))

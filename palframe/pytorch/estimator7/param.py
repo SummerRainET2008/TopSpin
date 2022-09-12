@@ -33,8 +33,9 @@ class ParamBase:
                path_work_restored_training=None,
                experiment_folder="work"):
     self._check_instance_validity()
-
+  
     self.seed = 0  # 0 means random.
+    self.__workspace_created = False
 
     if not nlp.is_none_or_empty(path_work_restored_training):
       self.path_work = path_work_restored_training
@@ -56,6 +57,7 @@ class ParamBase:
     
     # Initialization model.
     self.path_initial_model = None
+    self.path_initial_model_load_optimizer = False
     # For deployment.
     self.path_inference_model = None
     
@@ -71,6 +73,7 @@ class ParamBase:
     # Train params      #
     #####################
     self.train_files = None 
+    self.train_valid_file_extention = ["pkl", "pydict"]
     self.train_batch_size = 32
     self.train_sample_num = None
     self.iter_num_update_optimizer = 1
@@ -141,12 +144,14 @@ class ParamBase:
     # batch size during eval stage
     self.vali_file = None
     self.test_files = None 
+    self.eval_valid_file_extention = ["pkl", "pydict"]
     self.eval_batch_size = 32
     self.eval_num_workers_loading_data = 2
     self.eval_process_example_num_worker = 1
     # main field in evaluation stage
     # this field must in return of evaluate.metric() 
-    self.metric_primary_field = None  
+    self.metric_primary_field = None 
+    self.metric_fields = [] 
     # like F1 is large better, ppl is small better
     self.eval_value_is_large_better = None 
 
@@ -164,8 +169,6 @@ class ParamBase:
     # set a value.
     self.automl_max_model_size = None
 
-    
-
     self.debug_level = 1  # debug=0, info=1, warning=2, error=3
 
     self.detect_anomaly = False  # only for debugging.
@@ -174,6 +177,7 @@ class ParamBase:
     self.cudnn_benchmark = False
     # deal with paramrange
     self._instance_cache = None
+    
 
 
   def _check_instance_validity(self):
@@ -217,7 +221,7 @@ class ParamBase:
 
   @path_work.setter
   def path_work(self, value):
-    if self.__dict__.get("__workspace_created", False):
+    if self.__workspace_created:
       assert False, "You can NOT set param.path_work after " \
                     "calling param.create_workspace()"
 
@@ -228,7 +232,6 @@ class ParamBase:
     self.path_bug = f"{value}/bug"
     self.run_lock_file = f"{self.path_meta}/run.lock"
     self.bug_lock_file = f"{self.path_meta}/bug.lock"
-
     self.__path_work = value
 
   @classmethod
@@ -335,6 +338,8 @@ class ParamBase:
                          .replace("[utc]", "utc")
     return date_str
   def create_workspace(self):
+    if self.__workspace_created:
+      return 
     Logger.info(f"ParamBase.create_workspace: {self.path_work}")
     self.__workspace_created = True
     nlp.mkdir("work")

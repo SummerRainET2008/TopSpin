@@ -6,7 +6,7 @@ import os,time
 from signal import SIGTERM
 import threading 
 from concurrent.futures import ProcessPoolExecutor as _ProcessPoolExecutor
-
+from palframe import nlp
 
 def start_thread_to_terminate_when_parent_process_dies(ppid):
   """
@@ -48,3 +48,56 @@ class ProcessPoolExecutor(_ProcessPoolExecutor):
       initializer = start_thread_to_terminate_when_parent_process_dies,
       initargs=(os.getpid(),)
       )
+
+
+def _monitor_file_exist_helper(file_path):
+  while True:
+    if os.path.exists(file_path):
+      return 
+    time.sleep(0.1)
+
+def monitor_file_exist(file_path,max_time_seconds):
+  nlp.timeout(_monitor_file_exist_helper, [file_path], max_time_seconds)
+  return True
+
+
+
+def _parse_server_infos(param):
+    servers_files = param.servers_file
+    if nlp.is_none_or_empty(servers_files):
+      # local run
+      yield (nlp.get_server_ip(),param.gpu_num,param.gpus)
+
+    else:
+      # for multiple servers
+      for sf in servers_files.split(","):
+        content = open(os.path.expanduser(sf)).read()
+        server_infos = content.split('\n')
+        for server_info in server_infos:
+          server_info_list = server_info.split(' ')
+          server_ip = server_info_list[0].strip()
+          # get gpu_num, if have 
+          if len(server_info_list)>=2:
+            gpu_num = int(server_info[1].replace('slots=',"").strip())
+          else:
+            gpu_num = param.gpu_num  
+
+          # get gpus if have  
+          if len(server_info_list) >=3:
+            gpus = eval(f'[{server_info_list[2]}]')
+          else:
+            gpus = param.gpus 
+          yield (server_ip,gpu_num,gpus) 
+
+def parse_server_infos(param):
+  server_ips = []
+  for server_ip,gpu_num,gpus in _parse_server_infos(param):
+    error_info = f"plaease check setting: "\
+                  f"server_ip: {server_ip}, gpu_num: {gpu_num}, gpus: {gpus}"
+    assert gpu_num >=1, error_info
+    if gpus is None:
+      gpus = list(range(gpu_num))
+    assert len(gpus) == gpu_num, error_info
+    assert server_ip not in server_ips, f"duplicate ip: {server_ip}"
+    server_ips.append(server_ip)
+    yield server_ip,gpu_num,gpus

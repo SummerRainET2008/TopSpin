@@ -38,7 +38,13 @@ class EvaluatorBase(TrainEvalBase,metaclass=EvaluatorBaseMeta):
     """
     self.param = param
     self.model = model
+    assert param.metric_fields, f"please set param.metric_fields"
+    assert param.metric_primary_field in param.metric_fields,\
+      f"param.metric_primary_field: {param.metric_primary_field}, " \
+      f"not in param.metric_fields: {param.metric_fields}"
+  
     self._has_call_base_init = True 
+    
 
   def _try_to_get_device_from_model(self):
     return next(self.model.parameters()).device
@@ -67,10 +73,10 @@ class EvaluatorBase(TrainEvalBase,metaclass=EvaluatorBaseMeta):
     data_iter = self._get_batches_data(
       dataloader,device,iter_num_update_optimizer=1)
     
-    if getattr(dataloader,'__len__'):
+    try:
       data_len = len(dataloader)
-    else:
-      data_len = None  
+    except:
+      data_len = None 
     
     data_iter = tqdm(data_iter,total=data_len)
     for i,batch_data in enumerate(data_iter):
@@ -108,6 +114,15 @@ class EvaluatorBase(TrainEvalBase,metaclass=EvaluatorBaseMeta):
         ret[f"{data_type}_res"] = eval_res
 
     metric_res = self.metric(**ret)
+
+    assert isinstance(metric_res,dict), \
+      f"dict is expected, not {type(metric_res)}"
+
+    keys = list(metric_res.keys())
+    assert set(keys).issubset(set(self.param.metric_fields)), \
+      f"keys: {keys} of metric function return must in param.metric_fields: "\
+      f"{self.param.metric_fields}"
+
     return metric_res
 
 
