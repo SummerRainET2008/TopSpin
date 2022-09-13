@@ -42,9 +42,16 @@ estimator7 is based on estimator5. Here, we give a brief introduction about `NEW
 ## Attentions
   - Seting either `epoch_num` or  `max_train_step` can give a train stop condition.
   - You should set one of in parameters `eval_gap_step_num`, `eval_gap_sample_num`, `eval_gap_epoch_num` to `save` model, and set  bool parameter `eval_during_trainning` to do evaluation.
+
+  - Currently, `param.py`,  `train.py` are necessary files for a palframe project, and should be in the same level of the directory. `model.py`,`evaluator.py`,`make_feature.py` are  recommended to use.
   
 
 ## Examples
   Coming soon...
+
+
+## TODO
+   - Create project templates.
+   - Give a feature builder base class.
     
 
