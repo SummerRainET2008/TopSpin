@@ -3,11 +3,11 @@
 # base class used in both  train/eval/pred stages 
 
 
-import os,math
-import random
+import typing,pickle,os,math
 from functools import lru_cache
 from palframe.pytorch.estimator7.param import ParamBase
 from palframe.pytorch.estimator7.model import ModelBase
+from palframe.pytorch.estimator7.utils import monitor_file_exist
 from palframe.nlp import Logger
 from palframe.pytorch import nlp_torch
 from palframe.pytorch.dataset.offline_bigdataset import parse_feat_folder
@@ -31,15 +31,15 @@ class TrainEvalBase:
     param = self._param
 
     assert not nlp.is_none_or_empty(param.train_files)
-    files = parse_feat_folder(param.train_files)
+    files = self.parse_data_folder(param.train_files,self.param.train_valid_file_extention)
     assert len(files) > 0, "Empty train_files"
      
     if not nlp.is_none_or_empty(param.vali_file):
-      files = parse_feat_folder(param.vali_file)
+      files = self.parse_data_folder(param.vali_file,self.param.eval_valid_file_extention)
       assert len(files) <= 1, "Expecting: #validation files <= 1"
 
     if not nlp.is_none_or_empty(param.test_files):
-      files = parse_feat_folder(param.test_files)
+      files = self.parse_data_folder(param.test_files,self.param.eval_valid_file_extention)
       assert len(files) > 0, "Wrong param.test_files"
 
     if not self._all_none_except_one_check(param.epoch_num,param.max_train_step):
@@ -72,6 +72,106 @@ class TrainEvalBase:
       assert self.param.eval_value_is_large_better is not None and \
         isinstance(self.param.eval_value_is_large_better,bool),\
           "please set param.eval_value_is_large_better that is type of bool"
+  
+  def parse_data_folder(
+    self,
+    feat_path: typing.Union[list, str, None],
+    valid_file_extention: typing.List = ["pkl", "pydict"]
+    ):
+    if nlp.is_none_or_empty(feat_path):
+      return []
+    elif isinstance(feat_path, str):
+      assert isinstance(valid_file_extention, (list, set))
+      assert len(valid_file_extention) > 0
+      valid_file_extention = set(valid_file_extention)
+
+      if os.path.isdir(feat_path):
+        feat_path = os.path.realpath(feat_path)
+        meta_file = os.path.join(feat_path, f".meta.palframe.pkl")
+
+        if os.path.exists(meta_file):
+          Logger.info(f"read cached meta file '{meta_file}'")
+          meta = pickle.load(open(meta_file, "rb"))
+
+          if not isinstance(meta, dict) or \
+            len(valid_file_extention - meta["valid_file_extention"]) > 0:
+            nlp.command(f"rm {meta_file}")
+            return self.parse_data_folder(feat_path, valid_file_extention)
+
+          rel_files = meta["files"]
+          full_files = [os.path.join(feat_path, f) for f in rel_files]
+          return full_files
+
+        else:
+          full_files = self.create_meta_file(
+            feat_path,
+            valid_file_extention,
+            meta_file,
+            is_master_rank=True if self._rank==0 else False, 
+          )
+          return full_files
+          # full_files = list(
+          #     nlp.get_files_in_folder(feat_path, valid_file_extention, True))
+          # rel_files = [f[len(feat_path) + 1:] for f in full_files]
+          # meta = {
+          #     "valid_file_extention": valid_file_extention,
+          #     "files": rel_files
+          # }
+          # pickle.dump(meta, open(meta_file, "wb"))
+          # return full_files
+
+      elif os.path.isfile(feat_path):
+        assert nlp.get_file_extension(feat_path) in valid_file_extention
+        return [feat_path]
+
+      else:
+        Logger.error(f"'{feat_path}' does NOT exisit.")
+        return []
+
+    elif isinstance(feat_path, list):
+      ret = []
+      for f in feat_path:
+        ret.extend(self.parse_data_folder(f, valid_file_extention))
+      return ret
+
+
+  @staticmethod
+  def create_meta_file(
+    feat_path,valid_file_extention,
+    meta_file,
+    is_master_rank=True,max_time_seconds=60*10
+    ):
+    """create mata file for load data files efficiently,
+    Args:
+        feat_path (_type_): _description_
+        valid_file_extention (_type_): _description_
+        is_master_rank
+        timeout: 
+    Returns:
+        _type_: _description_
+
+    Yields:
+        _type_: _description_
+    """
+    if is_master_rank:
+      Logger.info(f"create meta file '{meta_file}'")
+      full_files = list(
+              nlp.get_files_in_folder(feat_path, valid_file_extention, True))
+      rel_files = [f[len(feat_path) + 1:] for f in full_files]
+      meta = {
+          "valid_file_extention": valid_file_extention,
+          "files": rel_files
+      }
+      pickle.dump(meta, open(meta_file, "wb"))
+      return full_files
+    else:
+      Logger.info(f"waiting meta file '{meta_file}'")
+      # wait master rank to complete data
+      if monitor_file_exist(meta_file,max_time_seconds):
+        meta = pickle.load(open(meta_file, "rb"))
+        rel_files = meta["files"]
+        full_files = [os.path.join(feat_path, f) for f in rel_files]
+        return full_files
 
   @lru_cache()
   def should_print_log(self):

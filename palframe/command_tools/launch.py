@@ -28,6 +28,7 @@ START_DIST_TRAIN_PARAMS = [
     ('test_files', str, 'test files location'),
     ('path_initial_model', str, 'inital checkpoint'),
     ('gpus', list_parse, 'gpus, such as `[0,1,2]`'),
+    ('gpu_num', int, 'gpu num'),
     ('epoch_num', int, 'train stop condition: total epoch'),
     ('max_train_step', int, 'train stop condition:: max train step'),
     ('model_saved_num', int, 'max checkpoint num to save'),

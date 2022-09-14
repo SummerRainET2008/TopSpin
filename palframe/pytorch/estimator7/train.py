@@ -89,12 +89,7 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
 
     self._check_param_validity()
     
-  
-    nlp.set_random_seeds(param.seed)
-    torch.backends.cudnn.deterministic = param.cudnn_deterministic
-    torch.backends.cudnn.benchmark = param.cudnn_benchmark
-    torch.set_num_threads(param.num_threads_cpu)
-
+    self.set_random_seeds()
 
     # optimizer initialize 
     if optimizer is not None:
@@ -107,16 +102,13 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
           )
 
     # get lr_schedule
-    num_warmup_steps = self.param.num_warmup_steps
-    if num_warmup_steps is None and self.param.num_warmup_ratio is not None:
-        num_warmup_steps = int(self.param.num_warmup_ratio*self.max_train_step)
-  
     self.lr_scheduler = self.create_scheduler(
       self.param.lr_scheduler_type,
       self.max_train_step,
-      num_warmup_steps,
       self._optimizer
     )
+
+    # load init model
     
     if not nlp.is_none_or_empty(param.path_initial_model):
       '''
@@ -126,7 +118,10 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
       '''
       Logger.info(f"Loading initial model '{param.path_initial_model}'")
       info = self.model.load_model_from_file(param.path_initial_model,self.device)
-      if info is not None and "optimizer_state" in info:
+      # aviod to load optimizer param from pretrain model
+      
+      if self.param.path_initial_model_load_optimizer and \
+        info is not None and "optimizer_state" in info:
         try:
           self._optimizer.load_state_dict(info["optimizer_state"])
         except:
@@ -157,31 +152,9 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
       # param.epoch_num = math.ceil(self._target_seen_sample_num /
       #                             param.train_sample_num)
 
-    if param.restore_from_last_train:
-      Logger.info(f"{self._get_worker_info()} "
-                  f"Restoring from last training...")
-      info = self.load_model_from_folder()
-      if info is not None:
-        self._model_seen_sample_num = info["model_seen_sample_num"]
-        self._batch_id = info['batch_id']
-        self._opt_evaluate_error = info["opt_evaluate_error"]
-        self._last_evaluate_point = info["last_evaluate_point"]
-
-        if "figure_data" in info:
-          self._figure_data = info["figure_data"]
-          self._loss_history = self._figure_data["loss"]
-
-        if "batch_id" in info:
-          self._batch_id = info["batch_id"]
-
-        if "optimizer_state" in info:
-          self._optimizer.load_state_dict(info["optimizer_state"])
-        # add lr_scheduler state reload
-        if "lr_scheduler_state" in info:
-          self.lr_scheduler.load_state_dict(info['lr_scheduler_state'])
-    else:
-      if self.should_print_log():
-        nlp.execute_cmd(f"echo > {param.path_model}/checkpoint")
+    
+    # restore from last
+    self.restore_trainer()
 
     # self._train_data_iter = train_data_iter
     # self._model_wrapper = model_wrapper
@@ -195,22 +168,57 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
     if self._use_amp:
       self._grad_scaler = amp.GradScaler()
 
-
     self.train_data = None  
     self.dev_data = None  
     self.test_data = None  
 
     self.eval_data_recorder = None
     self.current_epoch = None
-
     self._has_call_base_init = True  
    
+  def restore_trainer(self):
+    param = self.param  
+    if not param.restore_from_last_train:
+      if self.should_print_log():
+        nlp.execute_cmd(f"echo > {param.path_model}/checkpoint")
+      return 
 
+    Logger.info(f"{self._get_worker_info()} "
+                f"Restoring from last training...")
+    info = self.load_model_from_folder()
+    if info is not None:
+      self._model_seen_sample_num = info["model_seen_sample_num"]
+      self._batch_id = info['batch_id']
+      self._opt_evaluate_error = info["opt_evaluate_error"]
+      self._last_evaluate_point = info["last_evaluate_point"]
+
+      if "figure_data" in info:
+        self._figure_data = info["figure_data"]
+        self._loss_history = self._figure_data["loss"]
+
+      if "batch_id" in info:
+        self._batch_id = info["batch_id"]
+
+      if "optimizer_state" in info:
+        self._optimizer.load_state_dict(info["optimizer_state"])
+      # add lr_scheduler state reload
+      if "lr_scheduler_state" in info:
+        self.lr_scheduler.load_state_dict(info['lr_scheduler_state'])
+  
+  
+  def set_random_seeds(self):
+    """set kinds of random seeds
+    """
+    param = self.param
+    nlp.set_random_seeds(param.seed)
+    torch.backends.cudnn.deterministic = param.cudnn_deterministic
+    torch.backends.cudnn.benchmark = param.cudnn_benchmark
+    torch.set_num_threads(param.num_threads_cpu)
+  
   def create_scheduler(
     self, 
     lr_scheduler_type,
     num_training_steps: int, 
-    num_warmup_steps:int,
     optimizer: torch.optim.Optimizer = None
     ):
 
@@ -224,6 +232,9 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
         num_training_steps (int): The number of training steps to do.
         num_warmup_steps (int): The number of warmup step 
     """
+    num_warmup_steps = self.param.num_warmup_steps
+    if num_warmup_steps is None and self.param.num_warmup_ratio is not None:
+        num_warmup_steps = int(self.param.num_warmup_ratio*num_training_steps)
     if self.lr_scheduler is None:
         self.lr_scheduler = get_scheduler(
             lr_scheduler_type,
@@ -480,8 +491,10 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
 
     self.train_sample_num = param.train_sample_num
     if self.train_sample_num is None:
-      if hasattr(train_data,'__len__'):
+      try:
         self.train_sample_num  = len(train_data)
+      except:
+        Logger.warn(f"can not get train sample num")
 
     while True:
       batch_start_time = time.time()
@@ -734,7 +747,12 @@ class TrainerBase(TrainEvalBase,metaclass=TrainerBaseMeta):
       best_res = self.eval_data_recorder.get_k_best_eval_res(1)[0]
       Logger.info(f"current best evaluate result:"
                   f"\n{json.dumps(best_res,indent=2,ensure_ascii=False)}")
-
+      
+      best_score = best_res[self.param.metric_primary_field]
+      Logger.info(f"so far the best vali error: {best_score}")
+      # save best to local file 
+      pickle.dump(best_score,
+                  file=open(f"{self.param.path_meta}/dev.eval.pkl", "wb"))
       
     
     # delete model
