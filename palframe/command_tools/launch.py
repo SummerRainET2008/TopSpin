@@ -5,13 +5,20 @@ palframe command tools, including start_dist_train ...
 """
 
 import importlib
-import sys, os
-from unittest.mock import NonCallableMagicMock
+import sys, os,time,traceback
 from palframe import nlp
 from palframe.nlp import Logger
 from palframe.nlp import load_module_from_full_path
 from functools import partial
 from argparse import ArgumentParser
+
+abs_path_dir = os.path.dirname(__file__)
+template_dir = os.path.join(
+  os.path.dirname(abs_path_dir),
+  'pytorch',
+  'estimator7',
+  'templates'
+)
 
 
 def list_parse(list_str):
@@ -53,6 +60,15 @@ def parser_args():
 
   subparser.add_parser = partial(subparser.add_parser, parents=[global_parser])
 
+  
+  # start new project
+  create_project_parser = subparser.add_parser(
+    'init', help='init a new project'
+  )
+  create_project_parser.set_defaults(func=create_new_project)
+
+  
+  
   # start distributed train
   start_dist_train_parser = subparser.add_parser(
       'start_dist_train', help='start a dsitributed trainning')
@@ -180,6 +196,73 @@ def stop_dist_train(args):
   elif not nlp.is_none_or_empty(args.servers_file):
     for ip in open(args.servers_file).read().replace(",", " ").split():
       starter.clear_server(ip)
+
+
+def create_new_project(args):
+    """
+    create new project 
+    :param args:
+    :return:
+    """
+    args = vars(args)
+    # mutual cmd
+    while True:
+        project_name = input('project name: ')
+        if project_name:
+            args['project_name'] = project_name
+            break
+        else:
+            print('Project name cannot be empty, please re-enter ')
+    author_name = input('author name: ')
+    args['author'] = author_name
+
+    author_email = input('author email: ')
+    args['email'] = author_email
+
+    args['time'] = time.strftime("%Y/%m/%d %H:%M", time.localtime())
+
+    distribute_from_templates(args)
+
+def distribute_from_templates(args):
+    """
+    :param args: 
+    :return:
+    """
+    def _render_one_file(path_sorce, path_target, args):
+        try:
+            with open(path_sorce, 'r', encoding='utf-8') as f:
+                r = f.read()
+            r_render = r.replace(r'{{time}}',args['time']).\
+                replace(r'{{author}}',args['author']).\
+                replace(r'{{email}}',args['email']).\
+                replace(r'{{project}}', args['project_name'])
+            with open(path_target, 'w', encoding='utf-8') as f:
+                f.write(r_render)
+        except:
+            print(traceback.print_exc())
+            print('当前渲染出错的路径', path_sorce, path_target)
+
+   
+    path_project = os.path.join(os.getcwd(), args['project_name'])
+    if os.path.exists(path_project):
+        raise ValueError('the project path  already exists')
+    os.mkdir(path_project)
+  
+    
+    paths_total = [
+      os.path.join(template_dir,'param.py'),
+      os.path.join(template_dir,'model.py'),
+      os.path.join(template_dir,'train.py'),
+      os.path.join(template_dir,'evaluate.py'),
+      os.path.join(template_dir,'make_feature.py'),
+    ]
+
+    for path in paths_total:
+        _render_one_file(
+            path,
+            os.path.join(path_project, os.path.basename(path)),
+            args
+        )
 
 
 def main():

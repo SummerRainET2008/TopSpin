@@ -1,7 +1,7 @@
 
 # PAL Frame Commands
 
-We support some commands to launch training , stop training ...
+We support some commands to create new project, launch training , stop training ...
 
 ```
 usage: palframe [-h] {start_dist_train,stop_dist_train} ...
@@ -11,12 +11,21 @@ palframe command tools
 positional arguments:
   {start_dist_train,stop_dist_train}
                         sub-command
+    init                init a new project
     start_dist_train    start a dsitributed trainning
     stop_dist_train     stop a dsitributed trainning
 
 optional arguments:
   -h, --help            show this help message and exit
 ```
+- create new project 
+
+  Execute following command:
+
+  ```palframe init``` 
+  
+  then give some answer to palframe , such as name,email and so on.
+
 - Start distributed trainning
 ```shell
   usage: palframe start_dist_train [-h] [--debug_level DEBUG_LEVEL]
