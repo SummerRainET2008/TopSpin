@@ -1,6 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
+from multiprocessing.context import assert_spawning
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 from palframe.pytorch import *
 from torch.optim import Optimizer
@@ -20,7 +21,7 @@ def draw_figure(figure_data, out_file):
       if values == []:
         continue
 
-      if "vali_file" in key or "test_file" in key:
+      if "dev_file" in key or "test_file" in key:
         xs = [_[0] for _ in values]
         ys = [_[1] for _ in values]
       else:
@@ -37,6 +38,73 @@ def draw_figure(figure_data, out_file):
 
       plt.plot(xs, ys, label=key)
 
+      plt.grid(linestyle='--', linewidth=0.5)
+      plt.legend()
+      plt.tight_layout(rect=[0, 0, 0.75, 1])
+
+    plt.savefig(out_file, bbox_inches="tight")
+    plt.close()
+
+  except Exception as error:
+    Logger.warn(error)
+    traceback.print_exc()
+
+
+def _parse_combines(y_labels,combines=None):
+  """
+
+  Args:
+      y_labels (_type_): _description_
+      combines (_type_, optional): _description_. Defaults to None.
+
+  Returns:
+      _type_: _description_
+      return single and combines y_labels
+  """
+  assert isinstance(y_labels,list),y_labels
+  assert len(set(y_labels)) == len(y_labels),y_labels
+  single_labels = y_labels[:]
+  combines_labels = []
+  if combines is None:
+    return single_labels,combines_labels
+  
+
+  assert isinstance(combines,list),combines
+  for combine in combines:
+    assert isinstance(combine,list),combine
+    for y_label in combine:
+      assert y_label in y_labels, f"{y_label}/{y_labels}"
+      if y_label in single_labels:
+        single_labels.remove(y_label)
+    combines_labels.append(combine)
+  return single_labels,combines_labels
+
+
+def draw_eval_figure(
+  figure_data, out_file,y_labels:list, x_label='step',
+  combines=None
+  ):
+  """
+
+  Args:
+      figure_data (_type_): dict[list]
+      out_file (_type_): _description_
+      y_labels: list, to plot y labels
+      x_labels: 
+      combines: list[list]
+  """
+  single_labels,combines_labels = _parse_combines(y_labels,combines)
+  from itertools import chain
+  all_y_labels = list(chain(single_labels,combines_labels))
+  try:
+    import matplotlib.pyplot as plt
+    plt.figure()
+    for i,cur_y_labels in enumerate(all_y_labels):
+      ax = plt.subplot(len(all_y_labels),1,i+1)
+
+      xs = figure_data[x_label]
+      for y_label in cur_y_labels:
+        plt.plot(xs,figure_data[y_label],label=y_label)
       plt.grid(linestyle='--', linewidth=0.5)
       plt.legend()
       plt.tight_layout(rect=[0, 0, 0.75, 1])

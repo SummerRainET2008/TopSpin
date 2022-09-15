@@ -2,8 +2,11 @@
 #author: zhou xuan
 # implement some common class
 
-import os,time 
+import os,time,json
 from signal import SIGTERM
+from datetime import datetime
+import numpy as np
+from datetime import date
 import threading 
 from concurrent.futures import ProcessPoolExecutor as _ProcessPoolExecutor
 from palframe import nlp
@@ -92,7 +95,7 @@ def _parse_server_infos(param):
 def parse_server_infos(param):
   server_ips = []
   for server_ip,gpu_num,gpus in _parse_server_infos(param):
-    error_info = f"plaease check setting: "\
+    error_info = f"please check setting: "\
                   f"server_ip: {server_ip}, gpu_num: {gpu_num}, gpus: {gpus}"
     assert gpu_num >=1, error_info
     if gpus is None:
@@ -101,3 +104,37 @@ def parse_server_infos(param):
     assert server_ip not in server_ips, f"duplicate ip: {server_ip}"
     server_ips.append(server_ip)
     yield server_ip,gpu_num,gpus
+
+
+
+class JsonComplexEncoder(json.JSONEncoder):
+    """
+    json序列化辅助类
+    """
+    def default(self, obj):
+        if isinstance(obj, datetime):
+          return obj.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(obj, date):
+          return obj.strftime('%Y-%m-%d')
+        elif isinstance(obj,np.integer):
+          return int(obj)
+        elif isinstance(obj,np.floating):
+          return float(obj)
+        elif isinstance(obj,np.ndarray):
+          return obj.tolist()
+        else:
+            try:
+                return obj.__dict__
+            except:
+                return str(obj)
+
+
+def json_dumps(obj, indent=2, ensure_ascii=False):
+    """
+    定制化json_dumps
+    :param obj:
+    :param indent:
+    :param ensure_ascii:
+    :return:
+    """
+    return json.dumps(obj,indent=indent,ensure_ascii=ensure_ascii,cls=JsonComplexEncoder)

@@ -1,15 +1,19 @@
 #coding: utf8
 #author: zhouxuan553
 
-import os,pickle,copy,itertools,math,psutil,random
-import abc
+from functools import partial
+import os, pickle, copy, itertools, math, psutil, random
+import threading
+import copy
 from palframe import nlp
 from palframe.nlp import Logger
+from ._DEFAULT_PARAMS import DEFAULT_PARAMS
 
-# from palframe.pytorch.dataset.helper import parse_feat_folder
+instance_local = threading.local()
 
 
 class ParameterRange:
+
   def __init__(self, values, grouped_attribute=False):
     '''
       for example:
@@ -24,170 +28,211 @@ class ParameterRange:
     self.grouped_attribute = grouped_attribute
 
 
-class ParamBase:
-  instances = {}
-  cls_locks = {}
+class ParamBaseMeta(type):
 
-  def __init__(self,
-               run_tag: str,
-               path_work_restored_training=None,
-               experiment_folder="work"):
-    self._check_instance_validity()
-  
-    self.seed = 0  # 0 means random.
-    self.__workspace_created = False
-
-    if not nlp.is_none_or_empty(path_work_restored_training):
-      self.path_work = path_work_restored_training
-      assert os.path.isdir(self.path_work), self.path_work
+  def __call__(cls):
+    cls_str = str(cls)
+    cache_key = f'{cls_str}_param_instance'
+    # single instance, that is thread safe
+    if hasattr(instance_local, cache_key):
+      return getattr(instance_local, cache_key)
+    file_name = os.getenv("param_file")
+    if nlp.is_none_or_empty(file_name):
+      # normal create
+      param = cls.__new__(cls)
+      param.__init__()
+      # after init
+      if not nlp.is_none_or_empty(param.path_work_restored_training):
+        param.path_work = param.path_work_restored_training
+        assert os.path.isdir(param.path_work), param.path_work
+      else:
+        assert not nlp.is_none_or_empty(param.run_tag)
+        param.parse_path_work_name()
+      
+      param._instance_cache = None  
+      # deal with multi value
+      param = next(param.generate_all_variants())
+      # for other case to call generate_all_variants
+      param._instance_cache = param
     else:
-      assert not nlp.is_none_or_empty(run_tag)
+      # dist run, using cache from env
+      Logger.info(f"loading param from '{file_name}'")
+      param = pickle.load(open(file_name, "rb"))
+    setattr(instance_local, cache_key, param)
+    modify_time_display(param)
+    return param
 
-      date_str = nlp.get_log_time(True)
-      date_str = date_str.replace(" ", "_").replace(":", "-")\
-                         .replace("[utc]", "utc")
-      self.run_tag = f"{run_tag}.{date_str}"
-      self.path_work = f"{experiment_folder}/run.{self.run_tag}"
+class ParamBase(metaclass=ParamBaseMeta):
 
+  def __new__(cls):
+    self = super().__new__(cls)
+    self._workspace_created = False
+    self._true_gradient = False
+    self.__dict__.update(**copy.deepcopy(DEFAULT_PARAMS))
+    return self
+
+
+  def parse_path_work_name(self):
+    date_str = nlp.get_log_time(self.use_utc_time)
+    date_str = date_str.replace(" ", "_").replace(":", "-")\
+                         .replace("[utc]", "utc").replace("[local]","local")
+    
+    self._ori_run_tag = self.run_tag
+    self.run_tag = f"{self._ori_run_tag}.{date_str}"
+    self.path_work = f"{self.experiment_folder}/run.{self.run_tag}"
+
+  # def __init__(self):
+  #   # self._check_instance_validity()
+
+  #   # self.seed = 0  # 0 means random.
+  #   self._workspace_created = False
+
+  #   if not nlp.is_none_or_empty(path_work_restored_training):
+  #     self.path_work = path_work_restored_training
+  #     asf"{experiment_folder}/run.{self.run_tag}"sert os.path.isdir(self.path_work), self.path_work
+  #   else:
+  #     assert not nlp.is_none_or_empty(run_tag)
+
+  #     date_str = nlp.get_log_time(True)
+  #     date_str = date_str.replace(" ", "_").replace(":", "-")\
+  #                        .replace("[utc]", "utc")
+  #     self.run_tag = f"{run_tag}.{date_str}"
+  #     self.path_work = 
     # self.path_model, self.path_log, self.path_meta, are set automatically
     # by path_work.
-    
-    self.gpu_num = 1
-    self.use_gpu = True
-    
+
+    # self.gpu_num = 1
+    # self.use_gpu = True
+
     # Initialization model.
-    self.path_initial_model = None
-    self.path_initial_model_load_optimizer = False
+    # self.path_initial_model = None
+    # self.path_initial_model_load_optimizer = False
     # For deployment.
-    self.path_inference_model = None
-    
-    # Default settings that work fine.
-    # self.param_norm = 1
-    # Do not use it, as it will be allocated automatically,
-    # except for debug mode.
-    self.gpus = None  # all vaisible gpus 
-    self.batch_dim = 0
-  
-    
+    # self.path_inference_model = None
+
+    # # Default settings that work fine.
+    # # self.param_norm = 1
+    # # Do not use it, as it will be allocated automatically,
+    # # except for debug mode.
+    # self.gpus = None  # all vaisible gpus
+    # self.batch_dim = 0
+
     #####################
     # Train params      #
     #####################
-    self.train_files = None 
-    self.train_valid_file_extention = ["pkl", "pydict"]
-    self.train_batch_size = 32
-    self.train_sample_num = None
-    self.iter_num_update_optimizer = 1
-    self.epoch_num = None  # can be float.
-    self.max_train_step = None  #
-    # continue train
-    self.restore_from_last_train = \
-      not nlp.is_none_or_empty(path_work_restored_training)
-    self.find_unused_parameters = True
-    self.model_saved_num = 3 # model save param
-    # worker num in dataloader
-    self.train_num_workers_loading_data = 2
-    # worker num in processing exmaple, i.e. create feat stage
-    self.train_process_example_num_worker = 1 
-    # eval druing train
-    # whether eval during training
-    # if this flag is true, then evaluator should be given as argument to trainer
-    self.eval_during_trainning = False  
-    self.eval_gap_step_num = None 
-    self.eval_gap_sample_num = None
-    self.eval_gap_epoch_num = None  
-    # whether save first step
-    self.is_save_model_at_first_step = False
-    # For the case that each GPU worker consumes different batch size.
-    self.true_gradient = False
-    # ranks to print log, default is [0] 
-    self.log_print_ranks = [0] 
-     
+    # self.train_files = None
+    # self.train_valid_file_extention = ["pkl", "pydict"]
+    # self.train_batch_size = 32
+    # self.train_sample_num = None
+    # self.iter_num_update_optimizer = 1
+    # self.epoch_num = None  # can be float.
+    # self.max_train_step = None  #
+    # # continue train
+    # self.restore_from_last_train = \
+    #   not nlp.is_none_or_empty(path_work_restored_training)
+    # self.find_unused_parameters = True
+    # self.model_saved_num = 3 # model save param
+    # # worker num in dataloader
+    # self.train_num_workers_loading_data = 2
+    # # worker num in processing exmaple, i.e. create feat stage
+    # self.train_process_example_num_worker = 1
+    # # eval druing train
+    # # whether eval during training
+    # # if this flag is true, then evaluator should be given as argument to trainer
+    # self.eval_during_training = False
+    # self.eval_gap_step_num = None
+    # self.eval_gap_sample_num = None
+    # self.eval_gap_epoch_num = None
+    # # whether save first step
+    # self.is_save_model_at_first_step = False
+    # # For the case that each GPU worker consumes different batch size.
+    # self.true_gradient = False
+    # # ranks to print log, default is [0]
+    # self.log_print_ranks = [0]
 
     #####################
     # Optimal params    #
     #####################
-    # If optimizer is set as SGD, then lr decay is forced to the classic
-    # step-wise decay, and warmup_ratio, ending_lr_ratio becomes void.
-    self.optimizer_name = "AdamW"
-    self.lr = 0.001
-    #  Such in RoBERTa, l2 weight decay is 0.01
-    self.weight_decay = 0.01
-    self.lr_scheduler_type = 'linear' # "linear", default no lr schedule
-    self.num_warmup_steps = None
-    self.num_warmup_ratio = None 
-    self.param_clip_norm = 1
-    # Mixed-precision optimization
-    self.use_amp = True
+    # # If optimizer is set as SGD, then lr decay is forced to the classic
+    # # step-wise decay, and warmup_ratio, ending_lr_ratio becomes void.
+    # self.optimizer_name = "AdamW"
+    # self.lr = 0.001
+    # #  Such in RoBERTa, l2 weight decay is 0.01
+    # self.weight_decay = 0.01
+    # self.lr_scheduler_type = 'linear' # "linear", default no lr schedule
+    # self.num_warmup_steps = None
+    # self.num_warmup_ratio = None
+    # self.param_clip_norm = 1
+    # # Mixed-precision optimization
+    # self.use_amp = True
 
     ######################
     # Draw Figure params #
     ######################
     # draw the loss figure
-    self.train_draw_figure_gap_step_num = 100
+    # self.train_draw_figure_gap_step_num = 100
 
     #######################
     # distribution params #
     #######################
-    self.servers_file = None
-    # Default value 25Mb works fine.
-    self.bucket_cap_mb = 25
-    # "nccl" for GPU; "gloo" for GPU and CPU.
-    self.backhand = "gloo"
-    # Usually you do NOT need to set it, as PAL Frame Would set for you in
-    # the background.
-    self.net_name = None
+    # self.servers_file = None
+    # # Default value 25Mb works fine.
+    # self.bucket_cap_mb = 25
+    # # "nccl" for GPU; "gloo" for GPU and CPU.
+    # self.backhand = "gloo"
+    # # Usually you do NOT need to set it, as PAL Frame Would set for you in
+    # # the background.
+    # self.net_name = None
 
     #####################
     # Eval params       #
     #####################
     # Evaluation would be conducted every eval_gap_sample_num samples.
     # batch size during eval stage
-    self.vali_file = None
-    self.test_files = None 
-    self.eval_valid_file_extention = ["pkl", "pydict"]
-    self.eval_batch_size = 32
-    self.eval_num_workers_loading_data = 2
-    self.eval_process_example_num_worker = 1
-    # main field in evaluation stage
-    # this field must in return of evaluate.metric() 
-    self.metric_primary_field = None 
-    self.metric_fields = [] 
-    # like F1 is large better, ppl is small better
-    self.eval_value_is_large_better = None 
+    # self.vali_file = None
+    # self.test_files = None
+    # self.eval_valid_file_extention = ["pkl", "pydict"]
+    # self.eval_batch_size = 32
+    # self.eval_num_workers_loading_data = 2
+    # self.eval_process_example_num_worker = 1
+    # # main field in evaluation stage
+    # # this field must in return of evaluate.metric()
+    # self.metric_primary_field = None
+    # self.metric_fields = []
+    # # like F1 is large better, ppl is small better
+    # self.eval_value_is_large_better = None
 
     #####################
     # Pred params       #
     #####################
     # pred batch size
-    self.pred_batch_size = 32
+    # self.pred_batch_size = 32
 
-    # Sets the number of threads used for intraop parallelism on CPU.
-    self.num_threads_cpu = 4
-    self.num_workers_loading_data = 2
+    # # Sets the number of threads used for intraop parallelism on CPU.
+    # self.num_threads_cpu = 4
+    # self.num_workers_loading_data = 2
 
-    # None value denotes no limits on the maximum model size, or you should
-    # set a value.
-    self.automl_max_model_size = None
+    # # None value denotes no limits on the maximum model size, or you should
+    # # set a value.
+    # self.automl_max_model_size = None
 
-    self.debug_level = 1  # debug=0, info=1, warning=2, error=3
+    # self.debug_level = 1  # debug=0, info=1, warning=2, error=3
 
-    self.detect_anomaly = False  # only for debugging.
+    # self.detect_anomaly = False  # only for debugging.
 
-    self.cudnn_deterministic = True
-    self.cudnn_benchmark = False
-    # deal with paramrange
-    self._instance_cache = None
-    
+    # self.cudnn_deterministic = True
+    # self.cudnn_benchmark = False
+    # # deal with paramrange
+    # self._instance_cache = None
 
+  # def _check_instance_validity(self):
+  #   cls_str = str(type(self))
+  #   assert cls_str is not ParamBase
+  #   if cls_str in ParamBase.instances:
+  #     assert False, f"{type(self)} can not be instantiated for more than one."
 
-  def _check_instance_validity(self):
-    cls_str = str(type(self))
-    assert cls_str is not ParamBase
-    if cls_str in ParamBase.instances:
-      assert False, f"{type(self)} can not be instantiated for more than one."
-
-    if not ParamBase.cls_locks.get(cls_str, False):
-      assert False, "Use Param.get_instance(cls), rather than Param()"
+  #   if not ParamBase.cls_locks.get(cls_str, False):
+  #     assert False, "Use Param.get_instance(cls), rather than Param()"
 
   # @property
   # def lr_decay_strategy(self):
@@ -205,7 +250,7 @@ class ParamBase:
 
   @property
   def true_gradient(self):
-    return self.__true_gradient
+    return self._true_gradient
 
   @true_gradient.setter
   def true_gradient(self, value):
@@ -213,7 +258,7 @@ class ParamBase:
       self.use_amp = False
       Logger.info(
           f"Automatically set use_amp=False, when true gradient is used.")
-    self.__true_gradient = value
+    self._true_gradient = value
 
   @property
   def path_work(self):
@@ -221,7 +266,7 @@ class ParamBase:
 
   @path_work.setter
   def path_work(self, value):
-    if self.__workspace_created:
+    if self._workspace_created:
       assert False, "You can NOT set param.path_work after " \
                     "calling param.create_workspace()"
 
@@ -236,21 +281,22 @@ class ParamBase:
 
   @classmethod
   def get_instance(cls):
-    cls_str = str(cls)
-    if cls_str not in ParamBase.instances:
-      file_name = os.getenv("param_file")
-      if nlp.is_none_or_empty(file_name):
-        ParamBase.cls_locks[cls_str] = True
-        param = cls()
-        param = next(param.generate_all_variants())
-        param._instance_cache = param
-      else:
-        Logger.info(f"loading param from '{file_name}'")
-        param = pickle.load(open(file_name, "rb"))
+    return cls()
+    # cls_str = str(cls)
+    # if cls_str not in ParamBase.instances:
+    #   file_name = os.getenv("param_file")
+    #   if nlp.is_none_or_empty(file_name):
+    #     ParamBase.cls_locks[cls_str] = True
+    #     param = cls()
+    #     param = next(param.generate_all_variants())
+    #     param._instance_cache = param
+    #   else:
+    #     Logger.info(f"loading param from '{file_name}'")
+    #     param = pickle.load(open(file_name, "rb"))
 
-      ParamBase.instances[cls_str] = param
+    #   ParamBase.instances[cls_str] = param
 
-    return ParamBase.instances[cls_str]
+    # return ParamBase.instances[cls_str]
 
   def has_param_range(self):
     """check whether containt ParamRange param
@@ -263,7 +309,7 @@ class ParamBase:
         return False
     return True
 
-  is_instance = has_param_range  
+  is_instance = has_param_range
 
   def generate_all_variants(self):
     if self._instance_cache is not None:
@@ -330,18 +376,13 @@ class ParamBase:
     param.path_work = f"{param.path_work}.clone_{clone_id}"
 
     return param
-  
 
-  def get_date_str(self):
-    date_str = nlp.get_log_time(True)
-    date_str = date_str.replace(" ", "_").replace(":", "-")\
-                         .replace("[utc]", "utc")
-    return date_str
+
   def create_workspace(self):
-    if self.__workspace_created:
-      return 
+    if self._workspace_created:
+      return
     Logger.info(f"ParamBase.create_workspace: {self.path_work}")
-    self.__workspace_created = True
+    self._workspace_created = True
     nlp.mkdir("work")
     nlp.mkdir(self.path_work)
     nlp.mkdir(self.path_model)
@@ -364,7 +405,6 @@ class ParamBase:
       pass
     Logger.info("-" * 64, "\n")
 
-
   def _try_get_net_name(self, param):
     if not nlp.is_none_or_empty(param.net_name):
       return param.net_name
@@ -384,7 +424,6 @@ class ParamBase:
       Logger.error("Cannot find a suitable net_name, please set manually.")
       assert False
 
-
   def reduce_param_range(self):
     """using the first group param by default
 
@@ -393,23 +432,22 @@ class ParamBase:
     """
     if not self.has_param_range():
       if self.restore_from_last_train:
-        Logger.error(
-            f"Restore_from_last_train does not support ParamerRange")
+        Logger.error(f"Restore_from_last_train does not support ParamerRange")
         assert False
 
       param_instance = next(self.generate_all_variants())
       self.__dict__.update(param_instance.__dict__)
-  
 
 
 # register distributed trainning to palfram.distributed_init()
 
 HAS_RUN_DISTRIBUTED_INIT = False
 
-def distributed_init(param:ParamBase):
+
+def distributed_init(param: ParamBase):
   global HAS_RUN_DISTRIBUTED_INIT
   if HAS_RUN_DISTRIBUTED_INIT:
-    return 
+    return
   quickrun_mode = os.getenv("DIST_RUN") is None
   if quickrun_mode:
     # using python train.py to train
@@ -432,18 +470,28 @@ def distributed_init(param:ParamBase):
   dist.init_process_group(backend=param.backhand)
   HAS_RUN_DISTRIBUTED_INIT = True
   if not quickrun_mode:
-      Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}")
-  
+    Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}")
+
+
+def modify_time_display(param):
+  # modify timezone
+  from palframe import nlp  
+  nlp.get_log_time = partial(nlp.get_log_time,param.use_utc_time)
+
+
 def get_rank():
   import torch.distributed as dist
   return dist.get_rank()
+
 
 def get_world_size():
   import torch.distributed as dist
   return dist.get_world_size()
 
+
 # bind mehtod to palframe
-import palframe  
+import palframe
+
 palframe.distributed_init = distributed_init
-palframe.get_rank = get_rank  
+palframe.get_rank = get_rank
 palframe.get_world_size = get_world_size

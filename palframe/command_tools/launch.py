@@ -22,11 +22,13 @@ def list_parse(list_str):
 
 # command params for starting distributed train
 START_DIST_TRAIN_PARAMS = [
+    ('run_tag', str, 'work_path_name'),
+    ('path_work_restored_training',str,'path_work of restored training'),
     ('servers_file', str, 'servers file,e.g. ip1,ip2,ip3'),
     ('train_files', str, 'train files location'),
     ('dev_files', str, 'validation files location'),
     ('test_files', str, 'test files location'),
-    ('path_initial_model', str, 'inital checkpoint'),
+    ('train_path_initial_model', str, 'train initial checkpoint'),
     ('gpus', list_parse, 'gpus, such as `[0,1,2]`'),
     ('gpu_num', int, 'gpu num'),
     ('epoch_num', int, 'train stop condition: total epoch'),
@@ -117,14 +119,18 @@ def start_dist_train(args):
   train_script_name = args.train_script_name
   param_script_name = args.param_script_name
   # trainer_cls_name = args.trainer_cls_name
-  extra_run_tag = args.extra_run_tag
+  # extra_run_tag = args.extra_run_tag
   param_cls_name = args.param_cls_name
 
   project_dir = args.project_dir
+  
 
-  train_script_path = os.path.join(project_dir, train_script_name)
-  param_script_path = os.path.join(project_dir, param_script_name)
-
+  train_script_path = os.path.relpath(
+    os.path.join(project_dir, train_script_name)
+  )
+  param_script_path = os.path.relpath(
+    os.path.join(project_dir, param_script_name)
+  )
   assert os.path.exists(train_script_path), train_script_path
   assert os.path.exists(param_script_path), param_script_path
 
@@ -134,12 +140,12 @@ def start_dist_train(args):
 
   # modify run_tag in param class's __init__ signature
   # by using a decorator
-  import inspect
-  sig = inspect.signature(Param_cls.__init__)
-  run_tag = sig.parameters['run_tag'].default
-  if extra_run_tag is not None:
-    run_tag = run_tag + '.' + extra_run_tag
-  Param_cls.__init__ = param_init_fn_decorator(run_tag)(Param_cls.__init__)
+  # import inspect
+  # sig = inspect.signature(Param_cls.__init__)
+  # run_tag = sig.parameters['run_tag'].default
+  # if extra_run_tag is not None:
+    # run_tag = run_tag + '.' + extra_run_tag
+  # Param_cls.__init__ = param_init_fn_decorator(run_tag)(Param_cls.__init__)
 
   # get param object and modify some param from command
   param_obj = Param_cls.get_instance()
