@@ -47,11 +47,10 @@ estimator7 is based on estimator5. Here, we give a brief introduction about `NEW
   
 
 ## Examples
-  Coming soon...
+  See `examples/regression/boston_predict`.
 
 
 ## TODO
-   - Create project templates.
    - Give a feature builder base class.
    - command for param search 
     
