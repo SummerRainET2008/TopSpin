@@ -6,7 +6,19 @@ import torch
 from functools import lru_cache
 import itertools
 import os
+from palframe.pytorch.estimator7.utils import FolderMetaCache 
+from palframe.pytorch.dataset.online_dataset import Dataset as _OnlineDataset
+from palframe.pytorch.dataset.offline_smalldataset import Dataset as _OfflineDataset
 
+
+class OnlineDataset(_OnlineDataset):
+  def get_all_feat_files(self, feat_path):
+    print('dataset feat_path',feat_path)
+    return sorted(FolderMetaCache.load_folder_files(feat_path))
+
+class OfflineDataset(_OfflineDataset):
+  def get_all_feat_files(self, feat_path):
+    return sorted(FolderMetaCache.load_folder_files(feat_path))
 
 
 class Dataset(torch.utils.data.IterableDataset):
@@ -53,10 +65,6 @@ class Dataset(torch.utils.data.IterableDataset):
       worker_id = worker_info.id
       files = self._feat_files[worker_id::num_workers]
       yield from self._gen_from_files(files)
-
-
-
-
 
 
 class FileDatasetBase(torch.utils.data.IterableDataset):
@@ -131,7 +139,6 @@ class FileDatasetBase(torch.utils.data.IterableDataset):
           yield from self.parse_lines(file)
 
   def __iter__(self):
-    if self.is_first_epoch
     examples_iter = self._create_examples(self.data_files)
     # devide from rank 
     examples_iter = itertools.islice(examples_iter,self.rank,None,self.world_size)

@@ -5,7 +5,7 @@
 DEFAULT_PARAMS = dict( 
     #### Train params  ####
     train_files = None,
-    train_valid_file_extension = ["pkl", "pydict"],
+    train_valid_file_extension = ["pkl", "pydict","json"],
     train_batch_size = 32,
     train_sample_num = None,
     iter_num_update_optimizer = 1,
@@ -69,7 +69,7 @@ DEFAULT_PARAMS = dict(
     # batch size during eval stage
     dev_file = None,
     test_files = None,
-    eval_valid_file_extension = ["pkl", "pydict"],
+    eval_valid_file_extension = ["pkl", "pydict","json"],
     eval_batch_size= 32,
     eval_num_workers_loading_data = 2,
     eval_process_example_num_worker = 1,
@@ -105,5 +105,6 @@ DEFAULT_PARAMS = dict(
     cudnn_benchmark = False,
     experiment_folder="work",
     run_tag=None,
-    use_utc_time=True
+    use_utc_time=True,
+    folder_cache_meta_name=".meta.palframe.pkl"
     )

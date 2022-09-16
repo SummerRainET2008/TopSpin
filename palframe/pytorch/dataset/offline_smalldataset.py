@@ -19,7 +19,7 @@ class Dataset(_DataSet):
       all_data.extend(pickle.load(open(f, "rb")))
     if sample_filter_func is not None:
       all_data = [e for e in all_data if sample_filter_func(e)]
-
+      
     Logger.info(f"real whole dataset: {len(all_data):_}.")
     return all_data[rank::world_size]
 

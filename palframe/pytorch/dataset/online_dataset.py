@@ -21,7 +21,7 @@ class Dataset(torch.utils.data.IterableDataset):
                rank: int = 0,
                shuffle: bool = True,
                sample_filter_func=None):
-    all_feat_files = sorted(parse_feat_folder(feat_path))
+    all_feat_files = self.get_all_feat_files(feat_path)
     assert world_size <= len(all_feat_files)
     self._feat_files = all_feat_files[rank::world_size]
     if shuffle:
@@ -29,6 +29,10 @@ class Dataset(torch.utils.data.IterableDataset):
 
     self._shuffle = shuffle
     self._sample_filter_func = sample_filter_func
+
+
+  def get_all_feat_files(self,feat_path):
+    return sorted(parse_feat_folder(feat_path))
 
   def _gen_from_files(self, files: list):
     for fname in files:

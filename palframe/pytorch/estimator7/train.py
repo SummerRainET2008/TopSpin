@@ -771,7 +771,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     )
 
     # draw eval figure
-    self._draw_eval_figure(eval_ret_fields)
+    with nlp.Timer("Draw evaluation metric"):
+      self._draw_eval_figure(eval_ret_fields)
     
     metric_res.update({
         'model_save_path': model_save_path
@@ -880,7 +881,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     out_file = os.path.join(
           self.param.path_work,
           os.path.split(self.param.path_work)[1] + ".eval.metric.png")
-
+    Logger.info(f"save eval image to: {out_file}")
     draw_eval_figure(
       eval_figure_data,
       out_file,draw_y_labels,

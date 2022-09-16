@@ -2,7 +2,7 @@
 #author: zhou xuan
 # implement some common class
 
-import os,time,json
+import os,time,json,pickle
 from signal import SIGTERM
 from datetime import datetime
 import numpy as np
@@ -10,6 +10,7 @@ from datetime import date
 import threading 
 from concurrent.futures import ProcessPoolExecutor as _ProcessPoolExecutor
 from palframe import nlp
+from palframe.nlp import Logger
 
 def start_thread_to_terminate_when_parent_process_dies(ppid):
   """
@@ -138,3 +139,129 @@ def json_dumps(obj, indent=2, ensure_ascii=False):
     :return:
     """
     return json.dumps(obj,indent=indent,ensure_ascii=ensure_ascii,cls=JsonComplexEncoder)
+
+
+class FolderMetaCache:
+  """
+  cache folder files for faster file read
+
+  Returns:
+      _type_: _description_
+  """
+  
+  meta_file_name = ".meta.palframe.pkl"
+  valid_file_extension = ["pkl", "pydict","json"]
+
+
+  @staticmethod 
+  def create_meta_file(
+    feat_path,valid_file_extension=valid_file_extension,meta_file_name=meta_file_name):
+      """create meta file for load data files efficiently,
+      Args:
+          feat_path (_type_): _description_
+          valid_file_extension (_type_): _description_
+          is_master_rank
+          timeout: 
+      Returns:
+          _type_: _description_
+
+      Yields:
+          _type_: _description_
+      """
+      if isinstance(feat_path,list):
+        for f in feat_path:
+          FolderMetaCache.create_meta_file(
+            f,valid_file_extension,meta_file_name
+          )
+        return 
+      assert isinstance(feat_path,str) and os.path.exists(feat_path), \
+        feat_path
+      assert os.path.isdir(feat_path), feat_path
+      meta_file_path = os.path.join(feat_path,meta_file_name)
+      Logger.info(f"create meta file {meta_file_path} ...")
+      full_files = list(
+          nlp.get_files_in_folder(feat_path, valid_file_extension, True))
+      rel_files = [os.path.basename(f) for f in full_files]
+      meta = {
+        "valid_file_extension": valid_file_extension,
+         "files": rel_files
+         }
+      pickle.dump(meta, open(meta_file_path, "wb"))
+      Logger.info(f"meta file {meta_file_path} completed, total file num: {len(full_files)}")
+      
+  @staticmethod
+  def create_meta_command_info(
+    feat_path,
+    valid_file_extension=valid_file_extension,
+    meta_file_name = meta_file_name
+    ):
+    cmd = f"please use command:\n "\
+          f"palframe create_folder_meta {feat_path} "\
+          f"--valid_file_extension='{str(list(valid_file_extension))}' "\
+          f"--meta_file_name='{meta_file_name}' \n" \
+          "to create folder meta file for faster files loading"
+    return cmd  
+
+  @staticmethod
+  def load_folder_files(
+    feat_path,
+    valid_file_extension=valid_file_extension,
+    meta_file_name=meta_file_name,
+    ):
+    """load folder files from 
+
+    Args:
+        feat_path (_type_): _description_
+        valid_file_extension (_type_): _description_
+        meta_file_name (_type_, optional): _description_. Defaults to meta_file_name.
+    """
+
+    assert isinstance(valid_file_extension, (list, set)), valid_file_extension
+    assert len(valid_file_extension) > 0
+    valid_file_extension = list(valid_file_extension)
+
+    if nlp.is_none_or_empty(feat_path):
+      return []
+
+    if isinstance(feat_path,list):
+      ret = []
+      for f in feat_path:
+        ret.extend(FolderMetaCache.load_folder_files(
+          f,valid_file_extension,meta_file_name)
+        )
+      return ret 
+
+    if not os.path.isdir(feat_path):
+      assert os.path.exists(feat_path),feat_path
+      return [feat_path]
+
+    meta_file_path = os.path.join(feat_path,meta_file_name)
+    Logger.info(f"read cached meta file '{meta_file_path}'")
+
+    create_meta_info = FolderMetaCache.create_meta_command_info(
+      feat_path,
+      valid_file_extension,
+      meta_file_name
+    )
+   
+    assert os.path.exists(meta_file_path),\
+      f"meta file: {meta_file_path} is not exist.\n" + create_meta_info
+
+    meta = pickle.load(open(meta_file_path, "rb"))
+    meta_valid_file_extension = meta.get('valid_file_extention',None) or\
+      meta['valid_file_extension']
+    if not isinstance(meta, dict) or \
+      len(set(valid_file_extension) - set(meta_valid_file_extension)) > 0:
+      raise RuntimeError("meta file format is not valid. " + create_meta_info)
+
+    rel_files = meta["files"]
+    full_files = [os.path.join(feat_path, f) for f in rel_files]
+    print('full+files',full_files)
+    return full_files
+
+
+
+
+
+
+      

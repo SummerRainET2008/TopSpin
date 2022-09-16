@@ -71,7 +71,6 @@ class ParamBase(metaclass=ParamBaseMeta):
     self.__dict__.update(**copy.deepcopy(DEFAULT_PARAMS))
     return self
 
-
   def parse_path_work_name(self):
     date_str = nlp.get_log_time(self.use_utc_time)
     date_str = date_str.replace(" ", "_").replace(":", "-")\
@@ -81,172 +80,57 @@ class ParamBase(metaclass=ParamBaseMeta):
     self.run_tag = f"{self._ori_run_tag}.{date_str}"
     self.path_work = f"{self.experiment_folder}/run.{self.run_tag}"
 
-  # def __init__(self):
-  #   # self._check_instance_validity()
+  
+  def _check_folder_meta(self,auto_create=False):
+    """check train,dev, test folder 
+    Returns:
+        _type_: _description_
 
-  #   # self.seed = 0  # 0 means random.
-  #   self._workspace_created = False
-
-  #   if not nlp.is_none_or_empty(path_work_restored_training):
-  #     self.path_work = path_work_restored_training
-  #     asf"{experiment_folder}/run.{self.run_tag}"sert os.path.isdir(self.path_work), self.path_work
-  #   else:
-  #     assert not nlp.is_none_or_empty(run_tag)
-
-  #     date_str = nlp.get_log_time(True)
-  #     date_str = date_str.replace(" ", "_").replace(":", "-")\
-  #                        .replace("[utc]", "utc")
-  #     self.run_tag = f"{run_tag}.{date_str}"
-  #     self.path_work = 
-    # self.path_model, self.path_log, self.path_meta, are set automatically
-    # by path_work.
-
-    # self.gpu_num = 1
-    # self.use_gpu = True
-
-    # Initialization model.
-    # self.path_initial_model = None
-    # self.path_initial_model_load_optimizer = False
-    # For deployment.
-    # self.path_inference_model = None
-
-    # # Default settings that work fine.
-    # # self.param_norm = 1
-    # # Do not use it, as it will be allocated automatically,
-    # # except for debug mode.
-    # self.gpus = None  # all vaisible gpus
-    # self.batch_dim = 0
-
-    #####################
-    # Train params      #
-    #####################
-    # self.train_files = None
-    # self.train_valid_file_extention = ["pkl", "pydict"]
-    # self.train_batch_size = 32
-    # self.train_sample_num = None
-    # self.iter_num_update_optimizer = 1
-    # self.epoch_num = None  # can be float.
-    # self.max_train_step = None  #
-    # # continue train
-    # self.restore_from_last_train = \
-    #   not nlp.is_none_or_empty(path_work_restored_training)
-    # self.find_unused_parameters = True
-    # self.model_saved_num = 3 # model save param
-    # # worker num in dataloader
-    # self.train_num_workers_loading_data = 2
-    # # worker num in processing exmaple, i.e. create feat stage
-    # self.train_process_example_num_worker = 1
-    # # eval druing train
-    # # whether eval during training
-    # # if this flag is true, then evaluator should be given as argument to trainer
-    # self.eval_during_training = False
-    # self.eval_gap_step_num = None
-    # self.eval_gap_sample_num = None
-    # self.eval_gap_epoch_num = None
-    # # whether save first step
-    # self.is_save_model_at_first_step = False
-    # # For the case that each GPU worker consumes different batch size.
-    # self.true_gradient = False
-    # # ranks to print log, default is [0]
-    # self.log_print_ranks = [0]
-
-    #####################
-    # Optimal params    #
-    #####################
-    # # If optimizer is set as SGD, then lr decay is forced to the classic
-    # # step-wise decay, and warmup_ratio, ending_lr_ratio becomes void.
-    # self.optimizer_name = "AdamW"
-    # self.lr = 0.001
-    # #  Such in RoBERTa, l2 weight decay is 0.01
-    # self.weight_decay = 0.01
-    # self.lr_scheduler_type = 'linear' # "linear", default no lr schedule
-    # self.num_warmup_steps = None
-    # self.num_warmup_ratio = None
-    # self.param_clip_norm = 1
-    # # Mixed-precision optimization
-    # self.use_amp = True
-
-    ######################
-    # Draw Figure params #
-    ######################
-    # draw the loss figure
-    # self.train_draw_figure_gap_step_num = 100
-
-    #######################
-    # distribution params #
-    #######################
-    # self.servers_file = None
-    # # Default value 25Mb works fine.
-    # self.bucket_cap_mb = 25
-    # # "nccl" for GPU; "gloo" for GPU and CPU.
-    # self.backhand = "gloo"
-    # # Usually you do NOT need to set it, as PAL Frame Would set for you in
-    # # the background.
-    # self.net_name = None
-
-    #####################
-    # Eval params       #
-    #####################
-    # Evaluation would be conducted every eval_gap_sample_num samples.
-    # batch size during eval stage
-    # self.vali_file = None
-    # self.test_files = None
-    # self.eval_valid_file_extention = ["pkl", "pydict"]
-    # self.eval_batch_size = 32
-    # self.eval_num_workers_loading_data = 2
-    # self.eval_process_example_num_worker = 1
-    # # main field in evaluation stage
-    # # this field must in return of evaluate.metric()
-    # self.metric_primary_field = None
-    # self.metric_fields = []
-    # # like F1 is large better, ppl is small better
-    # self.eval_value_is_large_better = None
-
-    #####################
-    # Pred params       #
-    #####################
-    # pred batch size
-    # self.pred_batch_size = 32
-
-    # # Sets the number of threads used for intraop parallelism on CPU.
-    # self.num_threads_cpu = 4
-    # self.num_workers_loading_data = 2
-
-    # # None value denotes no limits on the maximum model size, or you should
-    # # set a value.
-    # self.automl_max_model_size = None
-
-    # self.debug_level = 1  # debug=0, info=1, warning=2, error=3
-
-    # self.detect_anomaly = False  # only for debugging.
-
-    # self.cudnn_deterministic = True
-    # self.cudnn_benchmark = False
-    # # deal with paramrange
-    # self._instance_cache = None
-
-  # def _check_instance_validity(self):
-  #   cls_str = str(type(self))
-  #   assert cls_str is not ParamBase
-  #   if cls_str in ParamBase.instances:
-  #     assert False, f"{type(self)} can not be instantiated for more than one."
-
-  #   if not ParamBase.cls_locks.get(cls_str, False):
-  #     assert False, "Use Param.get_instance(cls), rather than Param()"
-
-  # @property
-  # def lr_decay_strategy(self):
-  #   return self.__lr_decay_strategy, self.__lr_decay_strategy_id
-
-  # @lr_decay_strategy.setter
-  # def lr_decay_strategy(self, name: str):
-  #   name = name.lower()
-  #   cand_names = ["linear", "stepwise_sgd"]
-  #   try:
-  #     self.__lr_decay_strategy = name
-  #     self.__lr_decay_strategy_id = cand_names.index(name)
-  #   except ValueError:
-  #     assert False, f"param.lr_decay_strategy should be {cand_names}"
+    Yields:
+        _type_: _description_
+    """
+    # check train folder
+    meta_file_name = self.folder_cache_meta_name
+    def __check_folder_meta(feat_path,valid_file_extension):
+      if nlp.is_none_or_empty(feat_path):
+        return 
+      if isinstance(feat_path,list):
+        for f in feat_path:
+          __check_folder_meta(f)
+        return 
+      if os.path.isdir(feat_path):
+        if not os.path.exists(os.path.join(feat_path,meta_file_name)):
+          from palframe.pytorch.estimator7.utils import FolderMetaCache
+          error_info = FolderMetaCache.create_meta_command_info(
+            feat_path,
+            valid_file_extension,
+            meta_file_name
+          )
+          if auto_create:
+            # auto create meta, this is process unsafe
+            FolderMetaCache.create_meta_file(
+              feat_path,
+              valid_file_extension,
+              meta_file_name
+            )
+          else:
+            raise RuntimeError(error_info)
+    
+    # check train
+    __check_folder_meta(
+      self.train_files,
+      self.train_valid_file_extension,
+    )
+    # check dev
+    __check_folder_meta(
+      self.dev_files,
+      self.eval_valid_file_extension
+    )
+    # check test
+    __check_folder_meta(
+      self.test_files,
+      self.eval_valid_file_extension,
+    )
 
   @property
   def true_gradient(self):
@@ -471,7 +355,9 @@ def distributed_init(param: ParamBase):
   HAS_RUN_DISTRIBUTED_INIT = True
   if not quickrun_mode:
     Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}")
-
+  
+  if quickrun_mode:
+    param._check_folder_meta(auto_create=True)
 
 def modify_time_display(param):
   # modify timezone

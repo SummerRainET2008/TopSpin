@@ -23,7 +23,7 @@ class Dataset(torch.utils.data.Dataset):
     '''
       keep the sample when sample_filter_func(sample) == True.
     '''
-    all_feat_files = sorted(parse_feat_folder(feat_path))
+    all_feat_files = self.get_all_feat_files(feat_path)
     with nlp.Timer(f"Loading {feat_path}"):
       self._data = self._load_data(all_feat_files, world_size, rank,
                                    sample_filter_func)
@@ -40,8 +40,11 @@ class Dataset(torch.utils.data.Dataset):
       data.extend(pickle.load(open(f, "rb")))
     if sample_filter_func is not None:
       data = [e for e in data if sample_filter_func(e)]
-
     return data
+
+  
+  def get_all_feat_files(self,feat_path):
+    return sorted(parse_feat_folder(feat_path))
 
   def __len__(self):
     return len(self._data)

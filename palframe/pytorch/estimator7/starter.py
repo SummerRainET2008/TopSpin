@@ -3,7 +3,7 @@
 
 #todo: check all ERR, WARN infor
 
-from palframe.pytorch.estimator5.param import ParamBase
+from palframe.pytorch.estimator7.param import ParamBase
 # from palframe.pytorch import *
 from palframe import nlp  
 from palframe.nlp import Logger
@@ -378,11 +378,12 @@ def start_train(param: ParamBase, source_script_and_params: str,
                 servers: typing.List[Server], **kwargs):
   tasks = []
   for param_var in param.generate_all_variants():
+    # check folder meta before train
+    param_var._check_folder_meta(auto_create=True)
     tasks.append(Task(param_var, source_script_and_params))
 
   run_manager = RunManager(tasks, servers, **kwargs)
   run_manager.run()
-
 
 
 def stop_train(run_id):
@@ -394,6 +395,8 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     master_node_ip = server_infos[-1][0]
     port = _get_netport()
     pythonpath = ":".join(sys.path)
+    # check folder meta before train
+    param._check_folder_meta(auto_create=True)
     for server_id, (server_IP,gpu_num,gpus) in enumerate(server_infos):
       Logger.info(f"starting {server_IP} ...")
       node_rank = (server_id + 1) % len(server_infos)

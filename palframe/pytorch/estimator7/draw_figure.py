@@ -93,6 +93,9 @@ def draw_eval_figure(
       x_labels: 
       combines: list[list]
   """
+
+  if isinstance(y_labels,str):
+    y_labels = [y_labels]
   single_labels,combines_labels = _parse_combines(y_labels,combines)
   from itertools import chain
   all_y_labels = list(chain(single_labels,combines_labels))
@@ -103,6 +106,8 @@ def draw_eval_figure(
       ax = plt.subplot(len(all_y_labels),1,i+1)
 
       xs = figure_data[x_label]
+      if isinstance(cur_y_labels,str):
+        cur_y_labels = [cur_y_labels]
       for y_label in cur_y_labels:
         plt.plot(xs,figure_data[y_label],label=y_label)
       plt.grid(linestyle='--', linewidth=0.5)
@@ -117,50 +122,50 @@ def draw_eval_figure(
     traceback.print_exc()
 
 
-def main():
-  parser = optparse.OptionParser(usage="cmd [optons] ..]")
-  # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
-  parser.add_option("--show", action="store_true", default=False)
-  parser.add_option("--path_work", default=None)
-  parser.add_option("--x_from", type=int, default=0)
-  parser.add_option("--x_to", type=int, default=sys.maxsize)
-  parser.add_option("--line_IDs", default="")
-  parser.add_option("--out_file", default="")
-  (options, args) = parser.parse_args()
+# def main():
+#   parser = optparse.OptionParser(usage="cmd [optons] ..]")
+#   # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
+#   parser.add_option("--show", action="store_true", default=False)
+#   parser.add_option("--path_work", default=None)
+#   parser.add_option("--x_from", type=int, default=0)
+#   parser.add_option("--x_to", type=int, default=sys.maxsize)
+#   parser.add_option("--line_IDs", default="")
+#   parser.add_option("--out_file", default="")
+#   (options, args) = parser.parse_args()
 
-  figure_data_file = os.path.join(options.path_work, "meta/figure.data")
-  figure_data = pickle.load(open(figure_data_file, "rb"))
-  line_names = sorted(figure_data.keys())
-  for line_idx, line_name in enumerate(line_names):
-    print(f"{line_idx:<5}: {line_name}")
-  print(f"x.range: [0, {len(figure_data['loss'])}]")
-  print()
+#   figure_data_file = os.path.join(options.path_work, "meta/figure.data")
+#   figure_data = pickle.load(open(figure_data_file, "rb"))
+#   line_names = sorted(figure_data.keys())
+#   for line_idx, line_name in enumerate(line_names):
+#     print(f"{line_idx:<5}: {line_name}")
+#   print(f"x.range: [0, {len(figure_data['loss'])}]")
+#   print()
 
-  if options.show:
-    return
+#   if options.show:
+#     return
 
-  assert not nlp.is_none_or_empty(options.out_file)
+#   assert not nlp.is_none_or_empty(options.out_file)
 
-  if options.line_IDs != "":
-    user_line_IDs = set([int(e) for e in options.line_IDs.split(",")])
-  else:
-    user_line_IDs = set(range(len(line_names)))
+#   if options.line_IDs != "":
+#     user_line_IDs = set([int(e) for e in options.line_IDs.split(",")])
+#   else:
+#     user_line_IDs = set(range(len(line_names)))
 
-  cut_figure_data = {}
-  for line_id, key in enumerate(line_names):
-    if line_id not in user_line_IDs:
-      continue
+#   cut_figure_data = {}
+#   for line_id, key in enumerate(line_names):
+#     if line_id not in user_line_IDs:
+#       continue
 
-    if "vali_file" in key or "test_file" in key:
-      values = [(x - options.x_from, y) for x, y in figure_data[key]
-                if options.x_from <= x <= options.x_to]
-    else:
-      values = figure_data[key][options.x_from:options.x_to]
+#     if "vali_file" in key or "test_file" in key:
+#       values = [(x - options.x_from, y) for x, y in figure_data[key]
+#                 if options.x_from <= x <= options.x_to]
+#     else:
+#       values = figure_data[key][options.x_from:options.x_to]
 
-    cut_figure_data[f"{line_id}.{key}"] = values
+#     cut_figure_data[f"{line_id}.{key}"] = values
 
-  draw_figure(cut_figure_data, options.out_file)
+#   draw_figure(cut_figure_data, options.out_file)
 
 
-if __name__ == "__main__":
-  main()
+# if __name__ == "__main__":
+#   main()

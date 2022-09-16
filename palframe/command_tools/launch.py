@@ -4,6 +4,7 @@
 palframe command tools, including start_dist_train ...
 """
 
+from curses import meta
 import importlib
 import sys, os,time,traceback
 from palframe import nlp
@@ -111,7 +112,39 @@ def parser_args():
 
   stop_dist_train_parser.set_defaults(func=stop_dist_train)
 
+
+  # create folder meta
+  create_folder_meta_parser = subparser.add_parser(
+      'create_folder_meta', help='create folder meta')
+  
+  create_folder_meta_parser.add_argument(
+    'feat_path', help='folder path'
+    )
+  create_folder_meta_parser.add_argument(
+    '--valid_file_extension',
+    default=["pkl", "pydict",'json'],
+    type=list_parse,
+    help='valid file extensions'
+    )
+  create_folder_meta_parser.add_argument(
+    '--meta_file_name',
+    default=".meta.palframe.pkl",
+    help='meta file name'
+    )
+  
+  create_folder_meta_parser.set_defaults(func=create_folder_meta)
+   
+
   return parser.parse_args()
+
+
+
+def create_folder_meta(args):
+  feat_path = args.feat_path
+  valid_file_extension = args.valid_file_extension 
+  meta_file_name = args.meta_file_name  
+  from palframe.pytorch.estimator7.utils import FolderMetaCache
+  FolderMetaCache.create_meta_file(feat_path,valid_file_extension,meta_file_name)
 
 
 def param_init_fn_decorator(run_tag):
