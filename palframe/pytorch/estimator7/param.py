@@ -72,6 +72,7 @@ class ParamBase(metaclass=ParamBaseMeta):
     return self
 
   def parse_path_work_name(self):
+    
     date_str = nlp.get_log_time(self.use_utc_time)
     date_str = date_str.replace(" ", "_").replace(":", "-")\
                          .replace("[utc]", "utc").replace("[local]","local")
@@ -96,7 +97,7 @@ class ParamBase(metaclass=ParamBaseMeta):
         return 
       if isinstance(feat_path,list):
         for f in feat_path:
-          __check_folder_meta(f)
+          __check_folder_meta(f,valid_file_extension)
         return 
       if os.path.isdir(feat_path):
         if not os.path.exists(os.path.join(feat_path,meta_file_name)):
@@ -359,10 +360,14 @@ def distributed_init(param: ParamBase):
   if quickrun_mode:
     param._check_folder_meta(auto_create=True)
 
+from palframe.nlp import get_log_time as _get_log_time
+def get_log_time(utc_time: bool = False):
+  return _get_log_time(utc_time)
+
 def modify_time_display(param):
   # modify timezone
   from palframe import nlp  
-  nlp.get_log_time = partial(nlp.get_log_time,param.use_utc_time)
+  nlp.get_log_time = get_log_time
 
 
 def get_rank():

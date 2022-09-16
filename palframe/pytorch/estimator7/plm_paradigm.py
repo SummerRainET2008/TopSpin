@@ -80,7 +80,7 @@ class DownStreamParamBase(ParamBase):
     if not nlp.is_none_or_empty(file_name) or (
         pretrained_model_version is None and pretrained_path_work is None):
 
-      obj = object.__new__(cls)
+      obj = super().__new__(cls)
       return obj
 
     # 读取版本中的模型类
@@ -100,7 +100,7 @@ class DownStreamParamBase(ParamBase):
     pretrained_param = _PreTrainParam.get_instance()
     downstream_param = _DownStreamParam.get_instance()
 
-    obj = object.__new__(cls)
+    obj = super().__new__(cls)
     # 更新预训练参数
     obj.__dict__.update(pretrained_param.__dict__)
     obj.__dict__.update(downstream_param.__dict__)
@@ -108,9 +108,9 @@ class DownStreamParamBase(ParamBase):
     obj.pretrained_path_work = pretrained_path_work
     # obj._pretrained_param = pretrained_param
     # obj._downstream_param = downstream_param
-    self.process_example_worker_num = psutil.cpu_count()
-    self.process_example_batch_size = 100
-    self._stage_name = DOWNSTREAM_STAGE_NAME
+    obj.process_example_worker_num = psutil.cpu_count()
+    obj.process_example_batch_size = 100
+    obj._stage_name = DOWNSTREAM_STAGE_NAME
     return obj
     
 
