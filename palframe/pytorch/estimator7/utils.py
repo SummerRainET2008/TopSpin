@@ -152,7 +152,7 @@ class FolderMetaCache:
   """
   
   meta_file_name = ".meta.palframe.pkl"
-  valid_file_extension = ["pkl", "pydict","json"]
+  valid_file_extension = ["pkl", "pydict"]
 
 
   @staticmethod 
