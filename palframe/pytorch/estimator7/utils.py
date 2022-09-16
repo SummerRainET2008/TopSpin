@@ -256,7 +256,6 @@ class FolderMetaCache:
 
     rel_files = meta["files"]
     full_files = [os.path.join(feat_path, f) for f in rel_files]
-    print('full+files',full_files)
     return full_files
 
 
