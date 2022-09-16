@@ -398,18 +398,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         3. copy param.py/model.py/train.py
     """
     param = self.param
+    # create the monitor thread
+    nlp.command(f"touch {param.run_lock_file}")
+    starter._MonitorStopThread(param.run_lock_file).start()
     # only do at master rank ,default is rank 0
     if self.is_master_rank():
       Logger.info(f"create training work_path")
       # create the work space
       if self.quickrun_mode:
         param.create_workspace()
-      # create the monitor thread
-
-      nlp.command(f"touch {param.run_lock_file}")
-
-      starter._MonitorStopThread(param.run_lock_file).start()
-
       param_file = inspect.getfile(param.__class__)
       model_file = inspect.getfile(self._user_model.__class__)
       trainer_file = inspect.getfile(self.__class__)

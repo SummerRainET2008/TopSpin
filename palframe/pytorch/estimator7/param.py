@@ -60,6 +60,7 @@ class ParamBaseMeta(type):
       param = pickle.load(open(file_name, "rb"))
     setattr(instance_local, cache_key, param)
     modify_time_display(param)
+    Logger.set_level(param.debug_level)
     return param
 
 class ParamBase(metaclass=ParamBaseMeta):

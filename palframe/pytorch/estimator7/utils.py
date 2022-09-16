@@ -78,6 +78,8 @@ def _parse_server_infos(param):
         content = open(os.path.expanduser(sf)).read()
         server_infos = content.split('\n')
         for server_info in server_infos:
+          if not server_info:
+            continue
           server_info_list = server_info.split(' ')
           server_ip = server_info_list[0].strip()
           # get gpu_num, if have 

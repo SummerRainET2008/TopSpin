@@ -452,6 +452,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     "use starter.start_train(...)"
 
   server_infos = list(parse_server_infos(param))
+  Logger.info(f"server_infos:\n{'\n'.join(server_infos)}")
   check_servers(server_infos)
   param.create_workspace()
   #param.gpus = list(range(param.gpu_num))
