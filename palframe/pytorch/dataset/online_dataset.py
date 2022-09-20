@@ -33,6 +33,7 @@ class Dataset(torch.utils.data.IterableDataset):
 
   def get_all_feat_files(self,feat_path):
     return sorted(parse_feat_folder(feat_path))
+    
 
   def _gen_from_files(self, files: list):
     for fname in files:

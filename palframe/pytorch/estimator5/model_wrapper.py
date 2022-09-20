@@ -93,7 +93,6 @@ class ModelWrapperBase:
     else:
       assert False, f"wrong backhand: {param.backhand}"
     os.environ[socket_ifname] = self._try_get_net_name(param)
-
     dist.init_process_group(backend=param.backhand)
 
   def _try_get_net_name(self, param):

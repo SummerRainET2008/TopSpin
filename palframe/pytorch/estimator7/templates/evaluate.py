@@ -48,6 +48,8 @@ def main():
   
   param = Param()
   model = Model(param)
+  # load model weights
+  model.load_model_from_file(param.eval_path_initial_model)
   evaluator = Evaluator(param,model)
   # next to define you dataset, and use function evaluator.eval to evaluate
   # dev_dataset = Dataset(param.dev_files,1,0,shuffle=False)

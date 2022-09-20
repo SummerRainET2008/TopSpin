@@ -398,9 +398,6 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         3. copy param.py/model.py/train.py
     """
     param = self.param
-    # create the monitor thread
-    nlp.command(f"touch {param.run_lock_file}")
-    starter._MonitorStopThread(param.run_lock_file).start()
     # only do at master rank ,default is rank 0
     if self.is_master_rank():
       Logger.info(f"create training work_path")
@@ -414,7 +411,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       nlp.command(f"cp {param_file} {param.path_work}")
       nlp.command(f"cp {model_file} {param.path_work}")
       nlp.command(f"cp {trainer_file} {param.path_work}")
-
+    
+    # create the monitor thread
+    nlp.command(f"touch {param.run_lock_file}")
+    starter._MonitorStopThread(param.run_lock_file).start()
     # redirect Logger output
     if not self.quickrun_mode:
       Logger.reset_outstream(f"{param.path_log}/log.rank_{self._rank}")
@@ -633,9 +633,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
       )
       # loss moving average, for accurate estimate current loss
+      moving_losses = self._loss_history[-self.train_loss_moving_average_step:]
       self.current_moving_avg_loss = sum(
-        self._loss_history[-self.train_loss_moving_average_step:]
-        )/self.train_loss_moving_average_step
+         moving_losses
+        )/len(moving_losses)
       Logger.info(f"{self._get_worker_info()}: "
                   f"*Epoch: {epoch_id:.2f}, "
                   f"batch_id: {self._batch_id:_}/{self.max_train_step}, "
