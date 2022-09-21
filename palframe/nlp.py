@@ -82,22 +82,24 @@ def is_os_linux():
   return "linux" in sys.platform
 
 
-def histogram_ascii(points) -> None:
+def histogram_ascii(points, out_file=sys.stdout) -> None:
   counted = Counter(points)
   sumv = sum(counted.values())
-  max_ratio = max([v / sumv for v in counted.values()])
+  max_ratio = max([v / sumv for v in counted.values()] + [0])
   accum_sum = 0
-  print()
-  print(f"{'INDEX':>7} {'VALUE':>10} {'PERCENT':>7} {'ACCUM':>7} {'FREQ'}")
+  print(file=out_file)
+  print(f"{'INDEX':>7} {'VALUE':>10} {'PERCENT':>7} {'ACCUM':>7} {'FREQ'}",
+        file=out_file)
 
   for index, [k, v] in enumerate(sorted(counted.items())):
     ratio = v / sumv
     accum_sum += v
     bar_len = math.ceil(ratio / max_ratio * 120)
-    print(f"{index:7d} {k:>10} {ratio * 100:>7.2f} "
-          f" {100 * accum_sum / sumv:>7.2f}  {'+' * bar_len} {counted[k]}")
+    print(f"{index:7d} {k:>10} {ratio * 100:>7.2f}% "
+          f" {100 * accum_sum / sumv:>7.2f}%  {'+' * bar_len} {counted[k]}",
+          file=out_file)
 
-  print()
+  print(file=out_file)
 
 
 def set_random_seeds(seed=0):
