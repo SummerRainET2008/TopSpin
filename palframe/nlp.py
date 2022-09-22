@@ -88,15 +88,19 @@ def histogram_ascii(points, out_file=sys.stdout) -> None:
   max_ratio = max([v / sumv for v in counted.values()] + [0])
   accum_sum = 0
   print(file=out_file)
-  print(f"{'INDEX':>7} {'VALUE':>10} {'PERCENT':>7} {'ACCUM':>7} {'FREQ'}",
+  print(f"{'INDEX':>7} {'VALUE':>10} {'PERCENT':>7} {'ACCUM':>7}  {'FREQ'}",
         file=out_file)
 
   for index, [k, v] in enumerate(sorted(counted.items())):
     ratio = v / sumv
+    tag = "*" if eq(max_ratio, ratio) else ""
     accum_sum += v
     bar_len = math.ceil(ratio / max_ratio * 120)
-    print(f"{index:7d} {k:>10} {ratio * 100:>7.2f}% "
-          f" {100 * accum_sum / sumv:>7.2f}%  {'+' * bar_len} {counted[k]}",
+    key = f"{tag}{k}"
+    percent1 = f"{ratio * 100:>5.2f}%"
+    percent2 = f"{100 * accum_sum / sumv:>5.2f}%"
+    print(f"{index:7d} {key:>10} {percent1:>7} {percent2:>7}  "
+          f"{'+' * bar_len} {counted[k]}",
           file=out_file)
 
   print(file=out_file)
