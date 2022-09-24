@@ -11,6 +11,16 @@ from filelock import FileLock
 
 
 def draw_figure(figure_data, out_file):
+  def shorten_label_name(name, max_prefix_len=12, max_len=30):
+    if len(name) <= max_len:
+      return name
+
+    prefix = name[: max_prefix_len]
+    suffix = name[-(max_len - max_prefix_len):]
+    new_name = prefix + "..." + suffix
+
+    return new_name
+
   try:
     import matplotlib.pyplot as plt
 
@@ -34,7 +44,7 @@ def draw_figure(figure_data, out_file):
       else:
         plt.subplot(3, 1, 3)
 
-      plt.plot(xs, ys, label=key)
+      plt.plot(xs, ys, label=shorten_label_name(key))
 
       plt.grid(linestyle='--', linewidth=0.5)
       plt.legend()
