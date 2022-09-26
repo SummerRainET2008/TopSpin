@@ -99,9 +99,10 @@ def histogram_ascii(points, out_file=sys.stdout) -> None:
     key = f"{tag}{k}"
     percent1 = f"{ratio * 100:>5.2f}%"
     percent2 = f"{100 * accum_sum / sumv:>5.2f}%"
-    print(f"{index:7d} {key:>10} {percent1:>7} {percent2:>7}  "
-          f"{'+' * bar_len} {counted[k]}",
-          file=out_file)
+    print(
+        f"{index:7d} {key:>10} {percent1:>7} {percent2:>7}  "
+        f"{'+' * bar_len} {counted[k]}",
+        file=out_file)
 
   print(file=out_file)
 

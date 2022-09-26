@@ -42,8 +42,7 @@ class Dataset(torch.utils.data.Dataset):
       data = [e for e in data if sample_filter_func(e)]
     return data
 
-  
-  def get_all_feat_files(self,feat_path):
+  def get_all_feat_files(self, feat_path):
     return sorted(parse_feat_folder(feat_path))
 
   def __len__(self):

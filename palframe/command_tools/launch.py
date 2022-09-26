@@ -6,7 +6,7 @@ palframe command tools, including start_dist_train ...
 
 from curses import meta
 import importlib
-import sys, os,time,traceback
+import sys, os, time, traceback
 from palframe import nlp
 from palframe.nlp import Logger
 from palframe.nlp import load_module_from_full_path
@@ -14,12 +14,8 @@ from functools import partial
 from argparse import ArgumentParser
 
 abs_path_dir = os.path.dirname(__file__)
-template_dir = os.path.join(
-  os.path.dirname(abs_path_dir),
-  'pytorch',
-  'estimator7',
-  'templates'
-)
+template_dir = os.path.join(os.path.dirname(abs_path_dir), 'pytorch',
+                            'estimator7', 'templates')
 
 
 def list_parse(list_str):
@@ -31,7 +27,7 @@ def list_parse(list_str):
 # command params for starting distributed train
 START_DIST_TRAIN_PARAMS = [
     ('run_tag', str, 'work_path_name'),
-    ('path_work_restored_training',str,'path_work of restored training'),
+    ('path_work_restored_training', str, 'path_work of restored training'),
     ('servers_file', str, 'servers file,e.g. ip1,ip2,ip3'),
     ('train_files', str, 'train files location'),
     ('dev_files', str, 'validation files location'),
@@ -61,15 +57,11 @@ def parser_args():
 
   subparser.add_parser = partial(subparser.add_parser, parents=[global_parser])
 
-  
   # start new project
-  create_project_parser = subparser.add_parser(
-    'init', help='init a new project'
-  )
+  create_project_parser = subparser.add_parser('init',
+                                               help='init a new project')
   create_project_parser.set_defaults(func=create_new_project)
 
-  
-  
   # start distributed train
   start_dist_train_parser = subparser.add_parser(
       'start_dist_train', help='start a dsitributed trainning')
@@ -85,9 +77,10 @@ def parser_args():
   start_dist_train_parser.add_argument('--param_cls_name',
                                        default='Param',
                                        help='class name of param')
-  start_dist_train_parser.add_argument('--project_dir',
-                                       required=True,
-                                       help='location of project path, default is same as train_script_name')
+  start_dist_train_parser.add_argument(
+      '--project_dir',
+      required=True,
+      help='location of project path, default is same as train_script_name')
   start_dist_train_parser.add_argument('--extra_run_tag',
                                        default=None,
                                        help='extra run tag')
@@ -112,39 +105,31 @@ def parser_args():
 
   stop_dist_train_parser.set_defaults(func=stop_dist_train)
 
-
   # create folder meta
-  create_folder_meta_parser = subparser.add_parser(
-      'create_folder_meta', help='create folder meta')
-  
-  create_folder_meta_parser.add_argument(
-    'feat_path', help='folder path'
-    )
-  create_folder_meta_parser.add_argument(
-    '--valid_file_extension',
-    default=["pkl", "pydict",'json'],
-    type=list_parse,
-    help='valid file extensions'
-    )
-  create_folder_meta_parser.add_argument(
-    '--meta_file_name',
-    default=".meta.palframe.pkl",
-    help='meta file name'
-    )
-  
+  create_folder_meta_parser = subparser.add_parser('create_folder_meta',
+                                                   help='create folder meta')
+
+  create_folder_meta_parser.add_argument('feat_path', help='folder path')
+  create_folder_meta_parser.add_argument('--valid_file_extension',
+                                         default=["pkl", "pydict", 'json'],
+                                         type=list_parse,
+                                         help='valid file extensions')
+  create_folder_meta_parser.add_argument('--meta_file_name',
+                                         default=".meta.palframe.pkl",
+                                         help='meta file name')
+
   create_folder_meta_parser.set_defaults(func=create_folder_meta)
-   
 
   return parser.parse_args()
 
 
-
 def create_folder_meta(args):
   feat_path = args.feat_path
-  valid_file_extension = args.valid_file_extension 
-  meta_file_name = args.meta_file_name  
+  valid_file_extension = args.valid_file_extension
+  meta_file_name = args.meta_file_name
   from palframe.pytorch.estimator7.utils import FolderMetaCache
-  FolderMetaCache.create_meta_file(feat_path,valid_file_extension,meta_file_name)
+  FolderMetaCache.create_meta_file(feat_path, valid_file_extension,
+                                   meta_file_name)
 
 
 def param_init_fn_decorator(run_tag):
@@ -172,19 +157,17 @@ def start_dist_train(args):
   param_cls_name = args.param_cls_name
 
   project_dir = args.project_dir
-  
 
   train_script_path = os.path.relpath(
-    os.path.join(project_dir, train_script_name)
-  )
+      os.path.join(project_dir, train_script_name))
   param_script_path = os.path.relpath(
-    os.path.join(project_dir, param_script_name)
-  )
+      os.path.join(project_dir, param_script_name))
   assert os.path.exists(train_script_path), train_script_path
   assert os.path.exists(param_script_path), param_script_path
 
   # get param cls
-  param_module = importlib.import_module(param_script_path.replace(".py","").replace('/','.'))
+  param_module = importlib.import_module(
+      param_script_path.replace(".py", "").replace('/', '.'))
   Param_cls = getattr(param_module, param_cls_name)
 
   # modify run_tag in param class's __init__ signature
@@ -193,7 +176,7 @@ def start_dist_train(args):
   # sig = inspect.signature(Param_cls.__init__)
   # run_tag = sig.parameters['run_tag'].default
   # if extra_run_tag is not None:
-    # run_tag = run_tag + '.' + extra_run_tag
+  # run_tag = run_tag + '.' + extra_run_tag
   # Param_cls.__init__ = param_init_fn_decorator(run_tag)(Param_cls.__init__)
 
   # get param object and modify some param from command
@@ -232,70 +215,66 @@ def stop_dist_train(args):
 
 
 def create_new_project(args):
-    """
+  """
     create new project 
     :param args:
     :return:
     """
-    args = vars(args)
-    # mutual cmd
-    while True:
-        project_name = input('project name: ')
-        if project_name:
-            args['project_name'] = project_name
-            break
-        else:
-            print('Project name cannot be empty, please re-enter ')
-    author_name = input('author name: ')
-    args['author'] = author_name
+  args = vars(args)
+  # mutual cmd
+  while True:
+    project_name = input('project name: ')
+    if project_name:
+      args['project_name'] = project_name
+      break
+    else:
+      print('Project name cannot be empty, please re-enter ')
+  author_name = input('author name: ')
+  args['author'] = author_name
 
-    author_email = input('author email: ')
-    args['email'] = author_email
+  author_email = input('author email: ')
+  args['email'] = author_email
 
-    args['time'] = time.strftime("%Y/%m/%d %H:%M", time.localtime())
+  args['time'] = time.strftime("%Y/%m/%d %H:%M", time.localtime())
 
-    distribute_from_templates(args)
+  distribute_from_templates(args)
+
 
 def distribute_from_templates(args):
-    """
+  """
     :param args: 
     :return:
     """
-    def _render_one_file(path_sorce, path_target, args):
-        try:
-            with open(path_sorce, 'r', encoding='utf-8') as f:
-                r = f.read()
-            r_render = r.replace(r'{{time}}',args['time']).\
-                replace(r'{{author}}',args['author']).\
-                replace(r'{{email}}',args['email']).\
-                replace(r'{{project}}', args['project_name'])
-            with open(path_target, 'w', encoding='utf-8') as f:
-                f.write(r_render)
-        except:
-            print(traceback.print_exc())
-            print('当前渲染出错的路径', path_sorce, path_target)
+  def _render_one_file(path_sorce, path_target, args):
+    try:
+      with open(path_sorce, 'r', encoding='utf-8') as f:
+        r = f.read()
+      r_render = r.replace(r'{{time}}',args['time']).\
+          replace(r'{{author}}',args['author']).\
+          replace(r'{{email}}',args['email']).\
+          replace(r'{{project}}', args['project_name'])
+      with open(path_target, 'w', encoding='utf-8') as f:
+        f.write(r_render)
+    except:
+      print(traceback.print_exc())
+      print('当前渲染出错的路径', path_sorce, path_target)
 
-   
-    path_project = os.path.join(os.getcwd(), args['project_name'])
-    if os.path.exists(path_project):
-        raise ValueError('the project path  already exists')
-    os.mkdir(path_project)
-  
-    
-    paths_total = [
-      os.path.join(template_dir,'param.py'),
-      os.path.join(template_dir,'model.py'),
-      os.path.join(template_dir,'train.py'),
-      os.path.join(template_dir,'evaluate.py'),
-      os.path.join(template_dir,'make_feature.py'),
-    ]
+  path_project = os.path.join(os.getcwd(), args['project_name'])
+  if os.path.exists(path_project):
+    raise ValueError('the project path  already exists')
+  os.mkdir(path_project)
 
-    for path in paths_total:
-        _render_one_file(
-            path,
-            os.path.join(path_project, os.path.basename(path)),
-            args
-        )
+  paths_total = [
+      os.path.join(template_dir, 'param.py'),
+      os.path.join(template_dir, 'model.py'),
+      os.path.join(template_dir, 'train.py'),
+      os.path.join(template_dir, 'evaluate.py'),
+      os.path.join(template_dir, 'make_feature.py'),
+  ]
+
+  for path in paths_total:
+    _render_one_file(path, os.path.join(path_project, os.path.basename(path)),
+                     args)
 
 
 def main():

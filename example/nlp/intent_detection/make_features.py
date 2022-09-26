@@ -38,5 +38,6 @@ def main():
   process([f"example/nlp/intent_detection/data/ver06.test.0.pydict"],
           os.path.join(param.path_feat, "test.pydict"), param)
 
+
 if __name__ == "__main__":
   main()

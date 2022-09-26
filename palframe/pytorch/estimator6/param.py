@@ -116,7 +116,7 @@ class ParamBase(abc.ABC):
 
     self.train_sample_num = None
     self.epoch_num = None  # can be float.
-    self.max_train_step = None 
+    self.max_train_step = None
 
     # Evaluation would be conducted every eval_gap_sample_num samples.
     self.eval_gap_sample_num = None
@@ -308,7 +308,6 @@ class ParamBase(abc.ABC):
     except:
       pass
     Logger.info("-" * 64, "\n")
-
 
   def check_param_validity(self):
     files = parse_feat_folder(self.train_files)

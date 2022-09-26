@@ -5,11 +5,11 @@
 
 from palframe.pytorch.estimator7.param import ParamBase
 # from palframe.pytorch import *
-from palframe import nlp  
+from palframe import nlp
 from palframe.nlp import Logger
 from palframe.pytorch.estimator7.utils import parse_server_infos
-import threading,os,traceback,time,pickle,sys,re  
-import typing,random
+import threading, os, traceback, time, pickle, sys, re
+import typing, random
 
 
 def _check_server_disk_path(server_ips, current_path):
@@ -374,6 +374,7 @@ class RunManager:
     nlp.execute_cmd(f"rm {self._run_lock_file}")
     Logger.info(f"RunManager.run() is done")
 
+
 def start_train(param: ParamBase, source_script_and_params: str,
                 servers: typing.List[Server], **kwargs):
   tasks = []
@@ -397,7 +398,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     pythonpath = ":".join(sys.path)
     # check folder meta before train
     param._check_folder_meta(auto_create=True)
-    for server_id, (server_IP,gpu_num,gpus) in enumerate(server_infos):
+    for server_id, (server_IP, gpu_num, gpus) in enumerate(server_infos):
       Logger.info(f"starting {server_IP} ...")
       node_rank = (server_id + 1) % len(server_infos)
       # save param_file
@@ -426,7 +427,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
         cmd = cmd.replace("<mask1>", f" nohup ").replace("<mask3>", f"&")
       else:
         cmd = cmd.replace("<mask1>", "").replace("<mask3>", f"")
-      
+
       code = nlp.command(cmd, server=server_IP)[0]
       if code != 0:
         Logger.info(f"starting {server_IP} failed")
@@ -438,12 +439,12 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
 
   def check_servers(server_infos):
     if param.use_gpu:
-      server_gpu_info = [[server_info[0], server_info[2]] for server_info in server_infos]
+      server_gpu_info = [[server_info[0], server_info[2]]
+                         for server_info in server_infos]
       assert _check_server_gpus(server_gpu_info)
 
     assert _check_server_disk_path(
-      [server_info[0] for server_info in server_infos], os.getcwd()
-      )
+        [server_info[0] for server_info in server_infos], os.getcwd())
 
   whole_run_starting_time = time.time()
   nlp.set_random_seeds(0)
@@ -499,4 +500,5 @@ def exception_stop(class_func):
       #traceback.print_exc()
       stop_distributed_train(args[0]._param.path_work)
       raise
+
   return f

@@ -13,7 +13,7 @@ class Param(ParamBase):
     self.use_amp = False  # mixed precision based training
     self.optimizer_name = "Adam"
     self.lr = 5e-4
-    self.batch_size_one_gpu = 3 # for one GPU. If you have 2 GPUs, then actual batch
+    self.batch_size_one_gpu = 3  # for one GPU. If you have 2 GPUs, then actual batch
     # size would be 16x2=32.
     self.iter_num_update_optimizer = 1  #
 

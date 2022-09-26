@@ -30,10 +30,8 @@ class Dataset(torch.utils.data.IterableDataset):
     self._shuffle = shuffle
     self._sample_filter_func = sample_filter_func
 
-
-  def get_all_feat_files(self,feat_path):
+  def get_all_feat_files(self, feat_path):
     return sorted(parse_feat_folder(feat_path))
-    
 
   def _gen_from_files(self, files: list):
     for fname in files:

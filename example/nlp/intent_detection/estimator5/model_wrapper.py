@@ -20,8 +20,12 @@ class ModelWrapper(ModelWrapperBase):
     start_time = time.time()
     all_true_labels = []
     all_pred_labels = []
-    for _, batch in get_batch_data(data_file, epoch_num=1, batch_size=10,
-                                   worker_num=4, shuffle=False, rank=0,
+    for _, batch in get_batch_data(data_file,
+                                   epoch_num=1,
+                                   batch_size=10,
+                                   worker_num=4,
+                                   shuffle=False,
+                                   rank=0,
                                    world_size=1,
                                    pad_batch_data_func=_pad_batch_data):
       batch = nlp_torch.to_device(batch, self._device)

@@ -177,7 +177,8 @@ def label_smoothing_loss(logits,
 
   return loss
 
-def topK_mask_logits(logits, topk: int=-1, acum_prob_limit: float=-1):
+
+def topK_mask_logits(logits, topk: int = -1, acum_prob_limit: float = -1):
   c_num = logits.size(-1)
   dim = len(logits.shape)
   if 0 < topk < c_num:
@@ -196,6 +197,7 @@ def topK_mask_logits(logits, topk: int=-1, acum_prob_limit: float=-1):
 
   else:
     return logits
+
 
 def to_device(v, device):
   '''

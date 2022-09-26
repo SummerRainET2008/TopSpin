@@ -13,4 +13,6 @@ def _pad_batch_data(batch):
   word_ids = torch.LongTensor(word_ids)
   labels = torch.LongTensor(labels)
 
-  return word_ids, labels, {"readme": "this function can return any value type."}
+  return word_ids, labels, {
+      "readme": "this function can return any value type."
+  }

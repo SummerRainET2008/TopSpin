@@ -110,7 +110,6 @@ class TrainerBase:
     if self._use_amp:
       self._grad_scaler = amp.GradScaler()
 
-
   def _get_worker_info(self):
     return f"rank[{self._rank}/{self._world_size}]"
 
@@ -267,15 +266,9 @@ class TrainerBase:
         batch = batch if isinstance(batch, (list, tuple)) else [batch]
         batch = nlp_torch.to_device(batch, self._model_wrapper._device)
         if not isinstance(batch[-1], dict):
-          yield {
-            "args": batch,
-            "kwargs": {}
-          }
+          yield {"args": batch, "kwargs": {}}
         else:
-          yield {
-            "args": batch[: -1],
-            "kwargs": batch[-1]
-          }
+          yield {"args": batch[:-1], "kwargs": batch[-1]}
 
     yield from nlp.next_batch(get_one_batch(),
                               self._param.iter_num_update_optimizer)

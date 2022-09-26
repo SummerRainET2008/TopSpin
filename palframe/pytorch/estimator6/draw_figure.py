@@ -15,7 +15,7 @@ def draw_figure(figure_data, out_file):
     if len(name) <= max_len:
       return name
 
-    prefix = name[: max_prefix_len]
+    prefix = name[:max_prefix_len]
     suffix = name[-(max_len - max_prefix_len):]
     new_name = prefix + "..." + suffix
 
