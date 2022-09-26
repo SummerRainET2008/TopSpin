@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- 
 # @Time : {{time}}
 # @Author : by {{author}}
 # @Email : {{email}}
@@ -16,7 +16,7 @@ class Dataset(torch.utils.data.Dataset):
   pass
 
 
-def collate_fn(examples: list):
+def collate_fn(examples:list):
   """
 
   Args:
@@ -27,3 +27,8 @@ def collate_fn(examples: list):
   """
   # here to implement collate_fn
   raise NotImplementedError
+  
+
+
+
+

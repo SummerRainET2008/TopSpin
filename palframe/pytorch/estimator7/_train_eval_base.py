@@ -20,6 +20,7 @@ class TrainEvalBase:
   Returns:
       _type_: _description_
   """
+
   def __init__(self, param: ParamBase, model: ModelBase) -> None:
     self.param = param
     self._param = param

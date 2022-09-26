@@ -6,6 +6,7 @@ import os
 
 
 class EvalDataRecorderBase:
+
   def __init__(self,
                data=None,
                name='',
@@ -119,6 +120,7 @@ class EvalDataRecorderBase:
 
 
 class EvalDataRecorder(EvalDataRecorderBase):
+
   def __init__(self,
                data=None,
                name='',

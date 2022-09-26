@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*- 
 # @Time : {{time}}
 # @Author : by {{author}}
 # @Email : {{email}}
@@ -10,8 +10,10 @@ from palframe.pytorch.estimator7.param import ParamBase
 
 
 class Model(ModelBase):
-  def __init__(self, param: ParamBase):
+  def __init__(self, param:ParamBase):
     super().__init__(param)
-
-  def forward(self, *args, **kwargs):
+  
+  def forward(self,*args,**kwargs):
     raise NotImplementedError
+    
+

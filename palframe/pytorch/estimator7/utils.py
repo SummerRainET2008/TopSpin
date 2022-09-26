@@ -2,16 +2,15 @@
 #author: zhou xuan
 # implement some common class
 
-import os, time, json, pickle
+import os,time,json,pickle
 from signal import SIGTERM
 from datetime import datetime
 import numpy as np
 from datetime import date
-import threading
+import threading 
 from concurrent.futures import ProcessPoolExecutor as _ProcessPoolExecutor
 from palframe import nlp
 from palframe.nlp import Logger
-
 
 def start_thread_to_terminate_when_parent_process_dies(ppid):
   """
@@ -20,25 +19,21 @@ def start_thread_to_terminate_when_parent_process_dies(ppid):
       ppid (_type_): _description_
   """
   pid = os.getpid()
-
   def f():
     while True:
       try:
-        os.kill(ppid, 0)
+        os.kill(ppid,0)
       except OSError:
-        os.kill(pid, SIGTERM)
+        os.kill(pid,SIGTERM)
       time.sleep(1)
-
-  thread = threading.Thread(target=f, daemon=True)
+  thread = threading.Thread(target=f,daemon=True)
   thread.start()
+
 
 
 class ProcessPoolExecutor(_ProcessPoolExecutor):
   # 实现子进程跟着主进程退出
-  def __init__(
-      self,
-      max_workers=None,
-      mp_context=None,
+  def __init__(self, max_workers=None, mp_context=None,
   ):
     """Initializes a new ProcessPoolExecutor instance.
 
@@ -52,102 +47,100 @@ class ProcessPoolExecutor(_ProcessPoolExecutor):
         # initargs: A tuple of arguments to pass to the initializer.
     """
     super().__init__(
-        max_workers=max_workers,
-        mp_context=mp_context,
-        initializer=start_thread_to_terminate_when_parent_process_dies,
-        initargs=(os.getpid(), ))
+      max_workers=max_workers,
+      mp_context=mp_context,
+      initializer = start_thread_to_terminate_when_parent_process_dies,
+      initargs=(os.getpid(),)
+      )
 
 
 def _monitor_file_exist_helper(file_path):
   while True:
     if os.path.exists(file_path):
-      return
+      return 
     time.sleep(0.1)
 
-
-def monitor_file_exist(file_path, max_time_seconds):
+def monitor_file_exist(file_path,max_time_seconds):
   nlp.timeout(_monitor_file_exist_helper, [file_path], max_time_seconds)
   return True
 
 
+
 def _parse_server_infos(param):
-  servers_files = param.servers_file
-  if nlp.is_none_or_empty(servers_files):
-    # local run
-    yield (nlp.get_server_ip(), param.gpu_num, param.gpus)
+    servers_files = param.servers_file
+    if nlp.is_none_or_empty(servers_files):
+      # local run
+      yield (nlp.get_server_ip(),param.gpu_num,param.gpus)
 
-  else:
-    # for multiple servers
-    for sf in servers_files.split(","):
-      content = open(os.path.expanduser(sf)).read()
-      server_infos = content.split('\n')
-      for server_info in server_infos:
-        if not server_info:
-          continue
-        server_info_list = server_info.split(' ')
-        server_ip = server_info_list[0].strip()
-        # get gpu_num, if have
-        if len(server_info_list) >= 2:
-          gpu_num = int(server_info[1].replace('slots=', "").strip())
-        else:
-          gpu_num = param.gpu_num
+    else:
+      # for multiple servers
+      for sf in servers_files.split(","):
+        content = open(os.path.expanduser(sf)).read()
+        server_infos = content.split('\n')
+        for server_info in server_infos:
+          if not server_info:
+            continue
+          server_info_list = server_info.split(' ')
+          server_ip = server_info_list[0].strip()
+          # get gpu_num, if have 
+          if len(server_info_list)>=2:
+            gpu_num = int(server_info[1].replace('slots=',"").strip())
+          else:
+            gpu_num = param.gpu_num  
 
-        # get gpus if have
-        if len(server_info_list) >= 3:
-          gpus = eval(f'[{server_info_list[2]}]')
-        else:
-          gpus = param.gpus
-        yield (server_ip, gpu_num, gpus)
-
+          # get gpus if have  
+          if len(server_info_list) >=3:
+            gpus = eval(f'[{server_info_list[2]}]')
+          else:
+            gpus = param.gpus 
+          yield (server_ip,gpu_num,gpus) 
 
 def parse_server_infos(param):
   server_ips = []
-  for server_ip, gpu_num, gpus in _parse_server_infos(param):
+  for server_ip,gpu_num,gpus in _parse_server_infos(param):
     error_info = f"please check setting: "\
                   f"server_ip: {server_ip}, gpu_num: {gpu_num}, gpus: {gpus}"
-    assert gpu_num >= 1, error_info
+    assert gpu_num >=1, error_info
     if gpus is None:
       gpus = list(range(gpu_num))
     assert len(gpus) == gpu_num, error_info
     assert server_ip not in server_ips, f"duplicate ip: {server_ip}"
     server_ips.append(server_ip)
-    yield server_ip, gpu_num, gpus
+    yield server_ip,gpu_num,gpus
+
 
 
 class JsonComplexEncoder(json.JSONEncoder):
-  """
+    """
     json序列化辅助类
     """
-  def default(self, obj):
-    if isinstance(obj, datetime):
-      return obj.strftime('%Y-%m-%d %H:%M:%S')
-    elif isinstance(obj, date):
-      return obj.strftime('%Y-%m-%d')
-    elif isinstance(obj, np.integer):
-      return int(obj)
-    elif isinstance(obj, np.floating):
-      return float(obj)
-    elif isinstance(obj, np.ndarray):
-      return obj.tolist()
-    else:
-      try:
-        return obj.__dict__
-      except:
-        return str(obj)
+    def default(self, obj):
+        if isinstance(obj, datetime):
+          return obj.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(obj, date):
+          return obj.strftime('%Y-%m-%d')
+        elif isinstance(obj,np.integer):
+          return int(obj)
+        elif isinstance(obj,np.floating):
+          return float(obj)
+        elif isinstance(obj,np.ndarray):
+          return obj.tolist()
+        else:
+            try:
+                return obj.__dict__
+            except:
+                return str(obj)
 
 
 def json_dumps(obj, indent=2, ensure_ascii=False):
-  """
+    """
     定制化json_dumps
     :param obj:
     :param indent:
     :param ensure_ascii:
     :return:
     """
-  return json.dumps(obj,
-                    indent=indent,
-                    ensure_ascii=ensure_ascii,
-                    cls=JsonComplexEncoder)
+    return json.dumps(obj,indent=indent,ensure_ascii=ensure_ascii,cls=JsonComplexEncoder)
 
 
 class FolderMetaCache:
@@ -157,15 +150,15 @@ class FolderMetaCache:
   Returns:
       _type_: _description_
   """
-
+  
   meta_file_name = ".meta.palframe.pkl"
   valid_file_extension = ["pkl", "pydict"]
 
-  @staticmethod
-  def create_meta_file(feat_path,
-                       valid_file_extension=valid_file_extension,
-                       meta_file_name=meta_file_name):
-    """create meta file for load data files efficiently,
+
+  @staticmethod 
+  def create_meta_file(
+    feat_path,valid_file_extension=valid_file_extension,meta_file_name=meta_file_name):
+      """create meta file for load data files efficiently,
       Args:
           feat_path (_type_): _description_
           valid_file_extension (_type_): _description_
@@ -177,42 +170,46 @@ class FolderMetaCache:
       Yields:
           _type_: _description_
       """
-    if isinstance(feat_path, list):
-      for f in feat_path:
-        FolderMetaCache.create_meta_file(f, valid_file_extension,
-                                         meta_file_name)
-      return
-    assert isinstance(feat_path,str) and os.path.exists(feat_path), \
-      feat_path
-    assert os.path.isdir(feat_path), feat_path
-    meta_file_path = os.path.join(feat_path, meta_file_name)
-    Logger.info(f"create meta file {meta_file_path} ...")
-    full_files = list(
-        nlp.get_files_in_folder(feat_path, valid_file_extension, True))
-    rel_files = [os.path.basename(f) for f in full_files]
-    meta = {"valid_file_extension": valid_file_extension, "files": rel_files}
-    pickle.dump(meta, open(meta_file_path, "wb"))
-    Logger.info(
-        f"meta file {meta_file_path} completed, total file num: {len(full_files)}"
-    )
-
+      if isinstance(feat_path,list):
+        for f in feat_path:
+          FolderMetaCache.create_meta_file(
+            f,valid_file_extension,meta_file_name
+          )
+        return 
+      assert isinstance(feat_path,str) and os.path.exists(feat_path), \
+        feat_path
+      assert os.path.isdir(feat_path), feat_path
+      meta_file_path = os.path.join(feat_path,meta_file_name)
+      Logger.info(f"create meta file {meta_file_path} ...")
+      full_files = list(
+          nlp.get_files_in_folder(feat_path, valid_file_extension, True))
+      rel_files = [os.path.basename(f) for f in full_files]
+      meta = {
+        "valid_file_extension": valid_file_extension,
+         "files": rel_files
+         }
+      pickle.dump(meta, open(meta_file_path, "wb"))
+      Logger.info(f"meta file {meta_file_path} completed, total file num: {len(full_files)}")
+      
   @staticmethod
-  def create_meta_command_info(feat_path,
-                               valid_file_extension=valid_file_extension,
-                               meta_file_name=meta_file_name):
+  def create_meta_command_info(
+    feat_path,
+    valid_file_extension=valid_file_extension,
+    meta_file_name = meta_file_name
+    ):
     cmd = f"please use command:\n "\
           f"palframe create_folder_meta {feat_path} "\
           f"--valid_file_extension='{str(list(valid_file_extension))}' "\
           f"--meta_file_name='{meta_file_name}' \n" \
           "to create folder meta file for faster files loading"
-    return cmd
+    return cmd  
 
   @staticmethod
   def load_folder_files(
-      feat_path,
-      valid_file_extension=valid_file_extension,
-      meta_file_name=meta_file_name,
-  ):
+    feat_path,
+    valid_file_extension=valid_file_extension,
+    meta_file_name=meta_file_name,
+    ):
     """load folder files from 
 
     Args:
@@ -228,24 +225,27 @@ class FolderMetaCache:
     if nlp.is_none_or_empty(feat_path):
       return []
 
-    if isinstance(feat_path, list):
+    if isinstance(feat_path,list):
       ret = []
       for f in feat_path:
-        ret.extend(
-            FolderMetaCache.load_folder_files(f, valid_file_extension,
-                                              meta_file_name))
-      return ret
+        ret.extend(FolderMetaCache.load_folder_files(
+          f,valid_file_extension,meta_file_name)
+        )
+      return ret 
 
     if not os.path.isdir(feat_path):
-      assert os.path.exists(feat_path), feat_path
+      assert os.path.exists(feat_path),feat_path
       return [feat_path]
 
-    meta_file_path = os.path.join(feat_path, meta_file_name)
+    meta_file_path = os.path.join(feat_path,meta_file_name)
     Logger.info(f"read cached meta file '{meta_file_path}'")
 
     create_meta_info = FolderMetaCache.create_meta_command_info(
-        feat_path, valid_file_extension, meta_file_name)
-
+      feat_path,
+      valid_file_extension,
+      meta_file_name
+    )
+   
     assert os.path.exists(meta_file_path),\
       f"meta file: {meta_file_path} is not exist.\n" + create_meta_info
 
@@ -259,3 +259,10 @@ class FolderMetaCache:
     rel_files = meta["files"]
     full_files = [os.path.join(feat_path, f) for f in rel_files]
     return full_files
+
+
+
+
+
+
+      
