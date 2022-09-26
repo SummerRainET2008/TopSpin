@@ -16,7 +16,7 @@ DEFAULT_PARAMS = dict(
     is_save_model_at_first_step = True,
     model_saved_num = 3, # model save param
     # worker num in dataloader
-    train_num_workers_loading_data = 2,
+    train_num_workers_loading_data = 1,
     # worker num in processing example, i.e. create feat stage
     train_process_example_num_worker = 1,
     # For the case that each GPU worker consumes different batch size.

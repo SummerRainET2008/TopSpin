@@ -536,8 +536,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
       with nlp.Timer("data fetching syn"):
         if self._check_sync_stop_condition(batches == []):
-          Logger.info(f"Exit training. Batch is empty.")
-          break
+          #Logger.info(f"Exit training. Batch is empty.")
+          raise RuntimeError("Exit training. Batch is empty.")
 
       batch_accum_loss = []
       current_batch_size = 0
