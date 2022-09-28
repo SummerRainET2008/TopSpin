@@ -785,8 +785,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     checkpoint_file_path = os.path.join(self.param.path_model, "checkpoint")
     checkpoint_paths = self.parse_checkpoint_file(checkpoint_file_path)
     need_save_paths = []
-
-    if self.eval_data_recorder is not None:
+    
+    if model_saved_num == 0:
+      pass
+    elif self.eval_data_recorder is not None:
       optimal_records = self.eval_data_recorder.get_k_best_eval_res(
           model_saved_num)
       optimal_records.sort(key=lambda x: x['step'])

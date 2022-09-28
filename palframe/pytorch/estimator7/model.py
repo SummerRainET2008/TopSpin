@@ -43,10 +43,13 @@ class ModelBase(nn.Module, metaclass=ModelBaseMeta):
     self._param = param
     self._has_call_base_init = True
 
-  def load_model_from_file(self,
-                           checkpoint_path,
-                           device=torch.device('cpu'),
-                           strict: bool = True):
+  
+  def load_model_from_file(
+    self,
+    checkpoint_path, 
+    device=torch.device('cpu'),
+    strict: bool = False
+    ):
     """load checkpoint from local file 
     Args:
         checkpoint_path (_type_): _description_

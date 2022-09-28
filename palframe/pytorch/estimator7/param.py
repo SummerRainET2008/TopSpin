@@ -46,12 +46,13 @@ class ParamBaseMeta(type):
       else:
         assert not nlp.is_none_or_empty(param.run_tag)
         param.parse_path_work_name()
-
+      
+      
       param._instance_cache = None
-      # deal with multi value
-      param = next(param.generate_all_variants())
-      # for other case to call generate_all_variants
-      param._instance_cache = param
+      _param = param  
+      param =  next(param.generate_all_variants())
+      param._instance_cache = _param
+    
     else:
       # dist run, using cache from env
       Logger.info(f"loading param from '{file_name}'")
