@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 # @Time : {{time}}
 # @Author : by {{author}}
 # @Email : {{email}}
 # @Project: {{project}}
 # @File : train.py
 
-import typing 
+import typing
 from palframe.pytorch.estimator7.train import TrainerBase
 from palframe.pytorch.estimator7.evaluate import EvaluatorBase
 from palframe.pytorch.estimator7.model import ModelBase
@@ -20,36 +20,36 @@ class Trainer(TrainerBase):
                model: ModelBase,
                optimizer: typing.Union[Optimizer, None] = None,
                lr_scheduler: _LRScheduler = None,
-               evaluator: EvaluatorBase=None):
+               evaluator: EvaluatorBase = None):
     # here to implement your optimizer or lr_scheduler
     super().__init__(param, model, optimizer, lr_scheduler, evaluator)
 
-  def train_one_batch(self,*args,**kwargs) -> dict:
+  def train_one_batch(self, *args, **kwargs) -> dict:
     # here to return a dict with a key `loss`
     raise NotImplementedError
 
 
 def main():
-  from param import Param  
-  from model import Model  
-  from make_feature import Dataset,collate_fn
+  from param import Param
+  from model import Model
+  from make_feature import Dataset, collate_fn
   from functools import partial
   from evaluate import Evaluator
   import palframe
-  
+
   # init param
   param = Param()
-  # init distribute 
+  # init distribute
   palframe.distributed_init(param)
-  # model init 
+  # model init
   model = Model(param)
   # evaluator init
-  evaluator = Evaluator(param,model)
+  evaluator = Evaluator(param, model)
   # trainer init
-  trainer = Trainer(param,model,evaluator=evaluator)
+  trainer = Trainer(param, model, evaluator=evaluator)
   # next to create your train /dev/test dataset, and then call
   # trainer.train(train_data,dev_data,test_data) to start training
-  # attention to using world_size/rank in dataset if launching distribute train 
+  # attention to using world_size/rank in dataset if launching distribute train
   # here list one example code
   # create train_data
   # train_dataset = Dataset(

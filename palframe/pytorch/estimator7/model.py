@@ -4,7 +4,7 @@
 
 from palframe.pytorch.estimator7.param import ParamBase
 # from palframe.pytorch.estimator7 import starter
-import torch 
+import torch
 from torch import nn
 import os, psutil
 from palframe import nlp
@@ -12,18 +12,19 @@ from palframe.nlp import Logger
 
 
 class ModelBaseMeta(type):
-    """
+  """
     控制实例化过程
     """
-    def __call__(cls,param):
-      self = cls.__new__(cls,param)
-      self._has_call_base_init = False    
-      self.__init__(param)
-      assert self._has_call_base_init,\
-       f"you should use super().__init__(*args,**kwargs) in your own __init__ "
-      return self
+  def __call__(cls, param):
+    self = cls.__new__(cls, param)
+    self._has_call_base_init = False
+    self.__init__(param)
+    assert self._has_call_base_init,\
+     f"you should use super().__init__(*args,**kwargs) in your own __init__ "
+    return self
 
-class ModelBase(nn.Module,metaclass=ModelBaseMeta):
+
+class ModelBase(nn.Module, metaclass=ModelBaseMeta):
   """ model base
    implement: load model, save model
 
@@ -36,20 +37,16 @@ class ModelBase(nn.Module,metaclass=ModelBaseMeta):
   Returns:
       _type_: _description_
   """
-
-  def __init__(self,param):
+  def __init__(self, param):
     super().__init__()
-    self.param = param 
-    self._param = param  
+    self.param = param
+    self._param = param
     self._has_call_base_init = True
 
-  
-  def load_model_from_file(
-    self,
-    checkpoint_path, 
-    device=torch.device('cpu'),
-    strict: bool = True
-    ):
+  def load_model_from_file(self,
+                           checkpoint_path,
+                           device=torch.device('cpu'),
+                           strict: bool = True):
     """load checkpoint from local file 
     Args:
         checkpoint_path (_type_): _description_
@@ -76,7 +73,7 @@ class ModelBase(nn.Module,metaclass=ModelBaseMeta):
       Logger.error(f"Model load: {error}")
       assert False
 
-  def save_model(self, info: dict,path_model, tag=""):
+  def save_model(self, info: dict, path_model, tag=""):
     model_seen_sample_num = info["model_seen_sample_num"]
     batch_id = info['batch_id']
     info["model"] = self.state_dict()
@@ -87,16 +84,15 @@ class ModelBase(nn.Module,metaclass=ModelBaseMeta):
     model_save_path = os.path.join(path_model, name)
     info['model_save_path'] = model_save_path
     torch.save(info, model_save_path)
-    
+
     if os.path.exists(f'{path_model}/checkpoint'):
       cur_content = open(f'{path_model}/checkpoint').read()
       to_write = f"{cur_content}\n{name}"
     else:
-      to_write = name  
-    
-    with open(f'{path_model}/checkpoint','w') as f:
+      to_write = name
+
+    with open(f'{path_model}/checkpoint', 'w') as f:
       f.write(f"{to_write}")
 
     Logger.info(f"save model to {model_save_path}")
     return model_save_path
-    

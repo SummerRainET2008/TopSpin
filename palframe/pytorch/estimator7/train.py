@@ -4,7 +4,7 @@
 from palframe.pytorch.estimator7.model import ModelBase
 from palframe.pytorch.estimator7.param import ParamBase
 from palframe.pytorch.estimator7._train_eval_base import TrainEvalBase
-from palframe.pytorch.estimator7.draw_figure import draw_figure,draw_eval_figure
+from palframe.pytorch.estimator7.draw_figure import draw_figure, draw_eval_figure
 from palframe.pytorch.estimator7.data_record import EvalDataRecorder
 from palframe.pytorch.estimator7.utils import json_dumps
 from collections import defaultdict
@@ -28,7 +28,6 @@ class TrainerBaseMeta(type):
   """
     控制实例化过程
     """
-
   def __call__(cls, param, model, **kwargs):
     self = cls.__new__(cls, param, model, **kwargs)
     self.quickrun_mode = os.getenv("DIST_RUN") is None
@@ -58,7 +57,6 @@ class TrainerBaseMeta(type):
 
 
 class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
-
   @starter.exception_stop
   def __init__(self,
                param: ParamBase,
@@ -95,7 +93,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       self._optimizer = optimizer
     else:
       self._optimizer = getattr(torch.optim, param.optimizer_name)(
-          self.model.parameters(), lr=param.lr, weight_decay=param.weight_decay)
+          self.model.parameters(),
+          lr=param.lr,
+          weight_decay=param.weight_decay)
 
     # get lr_schedule
     self.lr_scheduler = self.create_scheduler(self.param.lr_scheduler_type,
@@ -111,8 +111,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       information in current stage.
       '''
       Logger.info(f"Loading initial model '{param.train_path_initial_model}'")
-      info = self._user_model.load_model_from_file(param.train_path_initial_model,
-                                             self.device)
+      info = self._user_model.load_model_from_file(
+          param.train_path_initial_model, self.device)
       # aviod to load optimizer param from pretrain model
 
       if self.param.train_path_initial_model_load_optimizer and \
@@ -132,11 +132,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self._figure_data["loss"] = self._loss_history
     # to save the data in eval stage
     # note that train loss will also be add (from estimation)
-    self._eval_figure_data = [] 
+    self._eval_figure_data = []
     self.train_loss_moving_average_step = self.param.train_loss_moving_average_step
     assert isinstance(self.train_loss_moving_average_step ,int) and\
        self.train_loss_moving_average_step>=1
-
 
     # self._vali_error_history = []
     self._model_size = None
@@ -177,14 +176,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.current_moving_avg_loss = None
     self.eval_loss_draw_combines = self.param.eval_loss_draw_combines
 
-  def save_trainer_states(self,info=None,tag='',save_detail_state=False):
+  def save_trainer_states(self, info=None, tag='', save_detail_state=False):
     base_info = {}
     if info is not None:
-      assert isinstance(info,dict)
+      assert isinstance(info, dict)
       base_info = info
-    base_info.update(**{
+    base_info.update(
+        **{
             "batch_id": self._batch_id,
-            "epoch_num":self.current_epoch,
+            "epoch_num": self.current_epoch,
             "model_seen_sample_num": self._model_seen_sample_num,
             "opt_evaluate_error": self._opt_evaluate_error,
             "last_evaluate_point": self._last_evaluate_point,
@@ -192,14 +192,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         })
     if save_detail_state:
       base_info.update(
-        **{
-          "figure_data": self._figure_data,
-          "optimizer_state": self._optimizer.state_dict(),
-          "lr_scheduler_state": self.lr_scheduler.state_dict()
-        }
-      )
+          **{
+              "figure_data": self._figure_data,
+              "optimizer_state": self._optimizer.state_dict(),
+              "lr_scheduler_state": self.lr_scheduler.state_dict()
+          })
     # TODO 分块保存
-    model_save_path = self._user_model.save_model(base_info, self.param.path_model, tag=tag)
+    model_save_path = self._user_model.save_model(base_info,
+                                                  self.param.path_model,
+                                                  tag=tag)
     return model_save_path
 
   def restore_trainer(self):
@@ -317,7 +318,6 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     assert False
 
   def _train_one_batch_check(self, batch) -> dict:
-
     def tracer(frame, event, arg):
       if event == "return":
         local_vars[0] = frame.f_locals
@@ -373,12 +373,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
                   "wb"))
 
         Logger.info("Saving debugging model")
-        
+
         self.save_trainer_states(
-          {'opt_evaluate_error':self._opt_evaluate_error},
-          tag='bug',
-          save_detail_state=True
-        )
+            {'opt_evaluate_error': self._opt_evaluate_error},
+            tag='bug',
+            save_detail_state=True)
 
         for name, var in self.model.named_parameters():
           if nlp_torch.isabnormal(var):
@@ -411,7 +410,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       nlp.command(f"cp {param_file} {param.path_work}")
       nlp.command(f"cp {model_file} {param.path_work}")
       nlp.command(f"cp {trainer_file} {param.path_work}")
-    
+
     # create the monitor thread
     nlp.command(f"touch {param.run_lock_file}")
     starter._MonitorStopThread(param.run_lock_file).start()
@@ -634,17 +633,16 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       )
       # loss moving average, for accurate estimate current loss
       moving_losses = self._loss_history[-self.train_loss_moving_average_step:]
-      self.current_moving_avg_loss = sum(
-         moving_losses
-        )/len(moving_losses)
-      Logger.info(f"{self._get_worker_info()}: "
-                  f"*Epoch: {epoch_id:.2f}, "
-                  f"batch_id: {self._batch_id:_}/{self.max_train_step}, "
-                  f"progress: {progress * 100:.2f} %, "
-                  f"sample_num: {self._model_seen_sample_num:_} "
-                  f"batch_size: [{current_batch_size} {real_batch_size}], "
-                  f"loss(avg): {batch_loss:.4f}({self.current_moving_avg_loss:.4f}), "
-                  f"batch time: {batch_duration:.4f} ")
+      self.current_moving_avg_loss = sum(moving_losses) / len(moving_losses)
+      Logger.info(
+          f"{self._get_worker_info()}: "
+          f"*Epoch: {epoch_id:.2f}, "
+          f"batch_id: {self._batch_id:_}/{self.max_train_step}, "
+          f"progress: {progress * 100:.2f} %, "
+          f"sample_num: {self._model_seen_sample_num:_} "
+          f"batch_size: [{current_batch_size} {real_batch_size}], "
+          f"loss(avg): {batch_loss:.4f}({self.current_moving_avg_loss:.4f}), "
+          f"batch time: {batch_duration:.4f} ")
       Logger.info("-" * 150)
 
       self._save_and_eval_model()
@@ -723,31 +721,29 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     """
     if not self._when_save_model():
       return
-  
+
     if not self.eval_during_training:
       # save model directly
-      model_save_path = self.save_trainer_states(
-        save_detail_state=False
-      )
+      model_save_path = self.save_trainer_states(save_detail_state=False)
       self.delete_model(self.param.model_saved_num)
-      return 
+      return
 
     # evaluate the model
     with Timer("evaluate"):
       torch.cuda.empty_cache()
       metric_res = self.evaluator.eval(dev_data=self.dev_data,
-                                        test_data=self.test_data)
+                                       test_data=self.test_data)
       torch.cuda.empty_cache()
     self.model.train()
     eval_ret_fields = list(metric_res.keys())
     metric_res.update({
         'step': self._batch_id,
         'epoch_num': self.current_epoch,
-        'train_loss':self.current_moving_avg_loss
+        'train_loss': self.current_moving_avg_loss
     })
-    # save metric_res to local 
-    with open(f"{self.param.path_work}/eval_metric_res.json",'a') as f:
-      f.write(json_dumps(metric_res,indent=None))
+    # save metric_res to local
+    with open(f"{self.param.path_work}/eval_metric_res.json", 'a') as f:
+      f.write(json_dumps(metric_res, indent=None))
       f.write('\n')
     current_score = metric_res[self.param.metric_primary_field]
     # best score
@@ -757,31 +753,24 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self._opt_evaluate_error = best_score
     # save_info
     info = {
-      'current_score': current_score,
-      'current_metric_res':metric_res,
-      'opt_evaluate_error':best_res,
-      'opt_metric_res':best_res
+        'current_score': current_score,
+        'current_metric_res': metric_res,
+        'opt_evaluate_error': best_res,
+        'opt_metric_res': best_res
     }
 
     # save model
-    model_save_path = self.save_trainer_states(
-      info,save_detail_state=False
-    )
+    model_save_path = self.save_trainer_states(info, save_detail_state=False)
 
     # draw eval figure
     with nlp.Timer("Draw evaluation metric"):
       self._draw_eval_figure(eval_ret_fields)
-    
-    metric_res.update({
-        'model_save_path': model_save_path
-    })
-    Logger.info(f"current evaluate result:"
-                f"\n{json_dumps(metric_res)}")
-    
-    Logger.info(f"current best evaluate result:"
-                f"\n{json_dumps(best_res)}")
 
-    
+    metric_res.update({'model_save_path': model_save_path})
+    Logger.info(f"current evaluate result:" f"\n{json_dumps(metric_res)}")
+
+    Logger.info(f"current best evaluate result:" f"\n{json_dumps(best_res)}")
+
     Logger.info(f"so far the best vali error: {best_score}")
     # save best to local file
     pickle.dump(best_score,
@@ -810,7 +799,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       need_save_paths = checkpoint_paths[-model_saved_num:]
     need_save_paths = [os.path.abspath(path) for path in need_save_paths]
     checkpoint_paths = [os.path.abspath(path) for path in checkpoint_paths]
-    
+
     assert set(need_save_paths).issubset(checkpoint_paths), \
       f"need_save_paths: {need_save_paths}, checkpoint_paths: {checkpoint_paths} "
     need_delete_paths = list(set(checkpoint_paths).difference(need_save_paths))
@@ -862,8 +851,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         figure_data[f"{line_id}.{key}"] = self._figure_data[key]
       draw_figure(figure_data, out_file)
 
-    
-  def _draw_eval_figure(self,eval_ret_fields):
+  def _draw_eval_figure(self, eval_ret_fields):
     """draw eval figure data
     """
     # draw eval figure
@@ -872,17 +860,16 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     eval_figure_data = {}
     for field in draw_y_labels:
       label_data = [r[field] for r in records]
-      eval_figure_data[field] = label_data 
-    # add x data 
+      eval_figure_data[field] = label_data
+    # add x data
     eval_figure_data['step'] = [r['step'] for r in records]
-    
+
     out_file = os.path.join(
-          self.param.path_work,
-          os.path.split(self.param.path_work)[1] + ".eval.metric.png")
+        self.param.path_work,
+        os.path.split(self.param.path_work)[1] + ".eval.metric.png")
     Logger.info(f"save eval image to: {out_file}")
-    draw_eval_figure(
-      eval_figure_data,
-      out_file,draw_y_labels,
-      x_label='step',
-      combines=self.eval_loss_draw_combines
-      )
+    draw_eval_figure(eval_figure_data,
+                     out_file,
+                     draw_y_labels,
+                     x_label='step',
+                     combines=self.eval_loss_draw_combines)

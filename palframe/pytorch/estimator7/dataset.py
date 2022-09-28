@@ -5,8 +5,8 @@ from typing import Iterable
 import torch
 from functools import lru_cache
 import itertools
-import os,time,random 
-from palframe.nlp import Logger 
+import os, time, random
+from palframe.nlp import Logger
 from palframe.pytorch.estimator7.utils import FolderMetaCache
 from palframe.pytorch.dataset.online_dataset import Dataset as _OnlineDataset
 from palframe.pytorch.dataset.offline_smalldataset import Dataset as _OfflineDataset
@@ -14,7 +14,6 @@ from palframe.pytorch.estimator7.file_io import load_file
 
 
 class OnlineDataset(_OnlineDataset):
-
   def __init__(self,
                feat_path,
                file_extension='auto',
@@ -50,7 +49,6 @@ class OnlineDataset(_OnlineDataset):
 
 
 class OfflineDataset(_OfflineDataset):
-
   def __init__(
       self,
       feat_path,  # folder or file, or list

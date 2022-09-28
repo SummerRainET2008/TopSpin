@@ -11,7 +11,7 @@ from palframe.pytorch.estimator5 import starter
 from torch import autograd
 from filelock import FileLock
 import math
-import numpy as np 
+import numpy as np
 
 
 def draw_figure(figure_data, out_file):
@@ -52,7 +52,7 @@ def draw_figure(figure_data, out_file):
     traceback.print_exc()
 
 
-def _parse_combines(y_labels,combines=None):
+def _parse_combines(y_labels, combines=None):
   """
 
   Args:
@@ -63,29 +63,29 @@ def _parse_combines(y_labels,combines=None):
       _type_: _description_
       return single and combines y_labels
   """
-  assert isinstance(y_labels,list),y_labels
-  assert len(set(y_labels)) == len(y_labels),y_labels
+  assert isinstance(y_labels, list), y_labels
+  assert len(set(y_labels)) == len(y_labels), y_labels
   single_labels = y_labels[:]
   combines_labels = []
   if combines is None:
-    return single_labels,combines_labels
-  
+    return single_labels, combines_labels
 
-  assert isinstance(combines,list),combines
+  assert isinstance(combines, list), combines
   for combine in combines:
-    assert isinstance(combine,list),combine
+    assert isinstance(combine, list), combine
     for y_label in combine:
       assert y_label in y_labels, f"{y_label}/{y_labels}"
       if y_label in single_labels:
         single_labels.remove(y_label)
     combines_labels.append(combine)
-  return single_labels,combines_labels
+  return single_labels, combines_labels
 
 
-def draw_eval_figure(
-  figure_data, out_file,y_labels:list, x_label='step',
-  combines=None
-  ):
+def draw_eval_figure(figure_data,
+                     out_file,
+                     y_labels: list,
+                     x_label='step',
+                     combines=None):
   """
 
   Args:
@@ -96,29 +96,29 @@ def draw_eval_figure(
       combines: list[list]
   """
 
-  if isinstance(y_labels,str):
+  if isinstance(y_labels, str):
     y_labels = [y_labels]
-  single_labels,combines_labels = _parse_combines(y_labels,combines)
+  single_labels, combines_labels = _parse_combines(y_labels, combines)
   from itertools import chain
-  all_y_labels = list(chain(single_labels,combines_labels))
+  all_y_labels = list(chain(single_labels, combines_labels))
   try:
     import matplotlib.pyplot as plt
     plt.figure()
-    for i,cur_y_labels in enumerate(all_y_labels):
-      ax = plt.subplot(len(all_y_labels),1,i+1)
+    for i, cur_y_labels in enumerate(all_y_labels):
+      ax = plt.subplot(len(all_y_labels), 1, i + 1)
       y_min = math.inf
       y_max = -math.inf
       xs = figure_data[x_label]
-      if isinstance(cur_y_labels,str):
+      if isinstance(cur_y_labels, str):
         cur_y_labels = [cur_y_labels]
       for y_label in cur_y_labels:
         ys = figure_data[y_label]
-        y_min = min(min(ys),y_min)
-        y_max = max(max(ys),y_max)
-        plt.plot(xs,ys,label=y_label)
-      
+        y_min = min(min(ys), y_min)
+        y_max = max(max(ys), y_max)
+        plt.plot(xs, ys, label=y_label)
+
       # show 10 y_tick by default
-      y_ticks = np.round(np.linspace(y_min,y_max,10),3)
+      y_ticks = np.round(np.linspace(y_min, y_max, 10), 3)
       ax.set_yticks(y_ticks)
       plt.grid(linestyle='--', linewidth=0.5)
       plt.legend()
@@ -175,7 +175,6 @@ def draw_eval_figure(
 #     cut_figure_data[f"{line_id}.{key}"] = values
 
 #   draw_figure(cut_figure_data, options.out_file)
-
 
 # if __name__ == "__main__":
 #   main()

@@ -35,7 +35,6 @@ DOWNSTREAM_STAGE_NAME = 'downstream'
 
 
 class _ParamBaseMixin:
-
   @staticmethod
   def load_module_from_module_path(module_path):
     return importlib.import_module(module_path)
@@ -60,15 +59,13 @@ class _ParamBaseMixin:
 
 class PretrainedParamBase(ParamBase):
   def __new__(cls, *args, **kwargs):
-    self = super().__new__(cls,*args,**kwargs)
+    self = super().__new__(cls, *args, **kwargs)
     self._stage_name = PRETRAINED_STAGE_NAME
-    return self  
-    
+    return self
 
 
 class DownStreamParamBase(ParamBase):
   """下游任务参数基础类的适配器，用于适配不同的预训练模型版本"""
-
   def __new__(cls, *args, **kwargs):
     file_name = os.getenv("param_file")
     pretrained_model_version = getattr(cls, 'pretrained_model_version', None)
@@ -112,7 +109,6 @@ class DownStreamParamBase(ParamBase):
     obj.process_example_batch_size = 100
     obj._stage_name = DOWNSTREAM_STAGE_NAME
     return obj
-    
 
   @property
   def vali_file(self):
@@ -125,7 +121,6 @@ class DownStreamParamBase(ParamBase):
 
 class PretrainModelBase(ModelBase):
   """预训练模型的基础类"""
-
   def backbone(self, *args, **kwargs):
     """预训练与下游任务公用的部分"""
     raise NotImplementedError
@@ -133,10 +128,10 @@ class PretrainModelBase(ModelBase):
 
 class DownStreamModelBase(ModelBase):
   """下游任务模型的适配基础类,模型版本必须由param给出"""
-
   def __new__(cls, param):
     pretrained_model_version = param.pretrained_model_version
-    Logger.info(f"load model from pretrianed model: {pretrained_model_version}")
+    Logger.info(
+        f"load model from pretrianed model: {pretrained_model_version}")
     _Model = _ParamBaseMixin.load_module_from_model_version(
         pretrained_model_version, py_name='model').Model
     Model = type(cls.__name__, (cls, _Model), {})

@@ -13,7 +13,6 @@ instance_local = threading.local()
 
 
 class ParameterRange:
-
   def __init__(self, values, grouped_attribute=False):
     '''
       for example:
@@ -29,7 +28,6 @@ class ParameterRange:
 
 
 class ParamBaseMeta(type):
-
   def __call__(cls):
     cls_str = str(cls)
     cache_key = f'{cls_str}_param_instance'
@@ -48,8 +46,8 @@ class ParamBaseMeta(type):
       else:
         assert not nlp.is_none_or_empty(param.run_tag)
         param.parse_path_work_name()
-      
-      param._instance_cache = None  
+
+      param._instance_cache = None
       # deal with multi value
       param = next(param.generate_all_variants())
       # for other case to call generate_all_variants
@@ -63,8 +61,8 @@ class ParamBaseMeta(type):
     Logger.set_level(param.debug_level)
     return param
 
-class ParamBase(metaclass=ParamBaseMeta):
 
+class ParamBase(metaclass=ParamBaseMeta):
   def __new__(cls):
     self = super().__new__(cls)
     self._workspace_created = False
@@ -73,17 +71,16 @@ class ParamBase(metaclass=ParamBaseMeta):
     return self
 
   def parse_path_work_name(self):
-    
+
     date_str = nlp.get_log_time(self.use_utc_time)
     date_str = date_str.replace(" ", "_").replace(":", "-")\
                          .replace("[utc]", "utc").replace("[local]","local")
-    
+
     self._ori_run_tag = self.run_tag
     self.run_tag = f"{self._ori_run_tag}.{date_str}"
     self.path_work = f"{self.experiment_folder}/run.{self.run_tag}"
 
-  
-  def _check_folder_meta(self,auto_create=False):
+  def _check_folder_meta(self, auto_create=False):
     """check train,dev, test folder 
     Returns:
         _type_: _description_
@@ -93,45 +90,37 @@ class ParamBase(metaclass=ParamBaseMeta):
     """
     # check train folder
     meta_file_name = self.folder_cache_meta_name
-    def __check_folder_meta(feat_path,valid_file_extension):
+
+    def __check_folder_meta(feat_path, valid_file_extension):
       if nlp.is_none_or_empty(feat_path):
-        return 
-      if isinstance(feat_path,list):
+        return
+      if isinstance(feat_path, list):
         for f in feat_path:
-          __check_folder_meta(f,valid_file_extension)
-        return 
+          __check_folder_meta(f, valid_file_extension)
+        return
       if os.path.isdir(feat_path):
-        if not os.path.exists(os.path.join(feat_path,meta_file_name)):
+        if not os.path.exists(os.path.join(feat_path, meta_file_name)):
           from palframe.pytorch.estimator7.utils import FolderMetaCache
           error_info = FolderMetaCache.create_meta_command_info(
-            feat_path,
-            valid_file_extension,
-            meta_file_name
-          )
+              feat_path, valid_file_extension, meta_file_name)
           if auto_create:
             # auto create meta, this is process unsafe
-            FolderMetaCache.create_meta_file(
-              feat_path,
-              valid_file_extension,
-              meta_file_name
-            )
+            FolderMetaCache.create_meta_file(feat_path, valid_file_extension,
+                                             meta_file_name)
           else:
             raise RuntimeError(error_info)
-    
+
     # check train
     __check_folder_meta(
-      self.train_files,
-      self.train_valid_file_extension,
+        self.train_files,
+        self.train_valid_file_extension,
     )
     # check dev
-    __check_folder_meta(
-      self.dev_files,
-      self.eval_valid_file_extension
-    )
+    __check_folder_meta(self.dev_files, self.eval_valid_file_extension)
     # check test
     __check_folder_meta(
-      self.test_files,
-      self.eval_valid_file_extension,
+        self.test_files,
+        self.eval_valid_file_extension,
     )
 
   @property
@@ -263,7 +252,6 @@ class ParamBase(metaclass=ParamBaseMeta):
 
     return param
 
-
   def create_workspace(self):
     if self._workspace_created:
       return
@@ -357,17 +345,21 @@ def distributed_init(param: ParamBase):
   HAS_RUN_DISTRIBUTED_INIT = True
   if not quickrun_mode:
     Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}")
-  
+
   if quickrun_mode:
     param._check_folder_meta(auto_create=True)
 
+
 from palframe.nlp import get_log_time as _get_log_time
+
+
 def get_log_time(utc_time: bool = False):
   return _get_log_time(utc_time)
 
+
 def modify_time_display(param):
   # modify timezone
-  from palframe import nlp  
+  from palframe import nlp
   nlp.get_log_time = get_log_time
 
 

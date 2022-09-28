@@ -3,15 +3,14 @@
 # makefeature base class
 
 from palframe.nlp import next_batch
-from typing import Iterable, Tuple,List,Callable
-import os,json,pickle
+from typing import Iterable, Tuple, List, Callable
+import os, json, pickle
 from tqdm import tqdm
 # from preprocess.ver_1_2.tokenizer import Tokenizer
 from palframe import nlp
 from palframe.nlp import Logger
 from functools import lru_cache
-from  torch.utils.data import Dataset
-
+from torch.utils.data import Dataset
 
 #from  make_feature.ver_3.utils import ProcessPoolExecutor
 
@@ -23,18 +22,17 @@ class FeatureBuilderBaseMeta(type):
 
 
 class FeatureBuilderBase(FeatureBuilderBaseMeta):
-
-  def __new__(cls,param):
+  def __new__(cls, param):
     self = super().__new__(cls)
-    self.param = param 
-    self._param = param 
-    # self.data_fils = None 
-    return self  
+    self.param = param
+    self._param = param
+    # self.data_fils = None
+    return self
 
   def __getnewargs__(self):
-    return (self.param,)
-  
-  def build_dataset(self,files)-> Dataset:
+    return (self.param, )
+
+  def build_dataset(self, files) -> Dataset:
     """
     create dataset
     Args:
@@ -48,8 +46,7 @@ class FeatureBuilderBase(FeatureBuilderBaseMeta):
     """
     raise NotImplementedError
 
-
-  def process_examples(self,examples:Iterable)-> Iterable:
+  def process_examples(self, examples: Iterable) -> Iterable:
     """process examples
 
     Args:
@@ -60,8 +57,7 @@ class FeatureBuilderBase(FeatureBuilderBaseMeta):
     """
     raise NotImplementedError
 
-
-  def collate_fn(self,examples:Iterable):
+  def collate_fn(self, examples: Iterable):
     """batch exmaples to tensor
 
     Args:
@@ -70,12 +66,11 @@ class FeatureBuilderBase(FeatureBuilderBaseMeta):
     raise NotImplementedError
 
 
-
 # class TrainFeatureBuilderBase(FeatureBuilderBase):
 #   def __new__(cls,param):
 #     self = super().__new__(param)
 #     self.data_type = 'train'
-#     self.data_files = param.train_files  
+#     self.data_files = param.train_files
 
 # class EvalFeatureBuilderBase(FeatureBuilderBase):
 #   def __new__(cls,param):
@@ -87,15 +82,10 @@ class FeatureBuilderBase(FeatureBuilderBaseMeta):
 #   def __new__(cls,param):
 #     self = super().__new__(param)
 #     self.data_type = 'pred'
-#     self.data_files = param.pred_files   
-
-
-
-
+#     self.data_files = param.pred_files
 
 if __name__ == "__main__":
-  pass  
-  
+  pass
 
 # def process_examples(
 #   examples: List[Tuple],
@@ -109,14 +99,14 @@ if __name__ == "__main__":
 #       param (_type_): _description_
 #       examples (List[Tuple]): _description_
 #       out_file_path (str, optional): _description_. Defaults to None.
-#       label_to_id_fn: function to convert label to 
+#       label_to_id_fn: function to convert label to
 #   Returns:
 #       _type_: _description_
 
 #   Yields:
 #       _type_: _description_
 #   """
-  
+
 #   if out_file_path:
 #     os.makedirs(os.path.dirname(out_file_path),exist_ok=True)
 
@@ -149,8 +139,7 @@ if __name__ == "__main__":
 #   data = list(data_generator())
 #   if out_file_path:
 #     pickle.dump(data, open(out_file_path, "wb"))
-#   return data 
-
+#   return data
 
 # def multiprocess_process_example(
 #   examples: list,
@@ -190,9 +179,7 @@ if __name__ == "__main__":
 #   mp.shutdown(True)
 #   if out_file_path:
 #     pickle.dump(data, open(out_file_path, "wb"))
-#   return data 
-
-
+#   return data
 
 # class ExampleBuilderBase:
 #   # 构造各类example
@@ -233,7 +220,6 @@ if __name__ == "__main__":
 #       else:
 #         sentence_2 = None
 #       yield sentence_1, sentence_2,label
-
 
 #   def run(
 #     self,
