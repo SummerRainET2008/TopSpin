@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Shuang Zhao
+#author: Tian Xia
 
 from example.nlp.intent_detection.estimator5 import *
 from example.nlp.intent_detection.estimator5.param import Param

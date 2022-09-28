@@ -468,8 +468,8 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
-        f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error")
+      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+      f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error")
 
     ratio = self._model_seen_sample_num / self._target_seen_sample_num
     if exit_code == 0 or (exit_code == 1 and ratio >= 0.99):

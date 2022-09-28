@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Shuang Zhao
+#author: Tian Xia
 
 from palframe.pytorch.estimator6.predict import PredictorBase
 from example.nlp.intent_detection.estimator6 import *

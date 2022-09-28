@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Shuang Zhao
+#author: Tian Xia
 
 from palframe.pytorch import *
 from palframe.pytorch.estimator6.param import ParamBase

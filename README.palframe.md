@@ -234,7 +234,7 @@ starter.start_train(
 In this case, two tasks can be run in **parallel**. Hence, our waiting time is
  reduced to `18/(4/2)=9` hours. Life looks a bit better.
  
-More luckily,  Jingwen sister said, my task is also done, you can use RTX8000
+More luckily,  xiaozhao sister said, my task is also done, you can use RTX8000
  that has 8 GPUs. We further update our script like this, 
 
 

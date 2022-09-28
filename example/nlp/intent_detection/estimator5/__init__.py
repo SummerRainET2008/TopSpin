@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Shuang Zhao
+#author: Tian Xia
 
 import pickle
 from palframe.pytorch import *

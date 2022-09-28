@@ -388,6 +388,7 @@ class TrainerBase:
     batch_iter = self._get_batches_data()
     run_samples_num = 0
     first_batch = True
+    exit_code = -1
 
     while True:
       batch_start_time = time.time()
@@ -414,6 +415,7 @@ class TrainerBase:
       with nlp.Timer("data fetching syn"):
         if self._check_sync_stop_condition(batches == []):
           Logger.info(f"Exit training. Batch is empty.")
+          exit_code = 1
           break
 
       batch_accum_loss = []
@@ -518,13 +520,16 @@ class TrainerBase:
 
       if self._model_seen_sample_num >= self._target_seen_sample_num:
         Logger.info(f"Exit training: enough training")
+        exit_code = 0
         break
 
-      is_early_stop = self._early_stop(
+      is_early_stop = self.early_stop(
+          self._batch_id,
           self._model_seen_sample_num // self._param.train_sample_num,
           self._loss_history, self._vali_error_history)
       if self._check_sync_stop_condition(is_early_stop):
         Logger.info(f"{self._get_worker_info()}: early stopped")
+        exit_code = 0
         break
 
       self._batch_id += 1
@@ -534,10 +539,16 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
-        f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error")
-    Logger.info(f"Training is Done.")
-    nlp.command(f"touch {param.path_meta}/train.done")
+      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+      f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error;")
+
+    ratio = self._model_seen_sample_num / self._target_seen_sample_num
+    if exit_code == 0 or (exit_code == 1 and ratio >= 0.99):
+      Logger.info(f"Training is Done.")
+      nlp.command(f"touch {param.path_meta}/TRAIN.DONE")
+    else:
+      Logger.info(f"Training is Done with an exception")
+      nlp.command(f"touch {param.path_meta}/TRAIN.FAILED")
 
     os._exit(0)
 
@@ -565,7 +576,7 @@ class TrainerBase:
       Logger.warn(f"memory: {used_memory:_} KB, "
                   f"{round(used_memory / 1024 ** 3, 2)} GB.")
 
-  def _early_stop(self, epoch_id, loss_history: list,
+  def early_stop(self, batch_id, epoch_id, loss_history: list,
                   vali_error_history: list):
     return False
 
