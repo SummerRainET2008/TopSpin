@@ -21,7 +21,7 @@ def main():
 
   starter.start_distributed_train(
       param,
-      "example/nlp/intent_detection/train.py",
+      "example/nlp/intent_detection/estimator5/train.py",
   )
 
 

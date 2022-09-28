@@ -7,7 +7,7 @@ class Param(ParamBase):
                                 experiment_folder="work")
 
     ################ training related settings ################
-    self.gpu_num = 2
+    self.gpu_num = 1
     self.gpus = [0]  # You should set it when running in the quick mode.
     self.use_gpu = False
     self.use_amp = False  # mixed precision based training

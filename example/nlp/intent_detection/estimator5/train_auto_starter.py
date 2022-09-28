@@ -16,7 +16,7 @@ def main():
   Logger.set_level(options.debug_level)
 
   starter.start_train(Param.get_instance(),
-                      "example/nlp/intent_detection/train.py",
+                      "example/nlp/intent_detection/estimator5/train.py",
                       [starter.Server(None, [1, 3, 4, 6, 7])])
 
 
