@@ -505,7 +505,8 @@ class TrainerBase:
       Logger.warn(f"memory: {used_memory:_} KB, "
                   f"{round(used_memory / 1024 ** 3, 2)} GB.")
 
-  def early_stop(self, epoch_id, loss_history: list, vali_error_history: list):
+  def early_stop(self, batch_id, epoch_id, loss_history: list,
+                 vali_error_history: list):
     return False
 
   def _early_stop(self):
