@@ -50,9 +50,9 @@ class TrainEvalBase:
         "param.epoch_num and param.max_train_step can not be None or not None "\
         "AT THE SAME TIME"
 
-    if self.param.max_train_step is None:
-      assert self.param.train_sample_num is not None, \
-        f"param.train_sample_num cannot be None if param.max_train_step is None"
+    # if self.param.max_train_step is None:
+    #   assert self.param.train_sample_num is not None, \
+    #     f"param.train_sample_num cannot be None if param.max_train_step is None"
 
     if not self._all_none_except_one_check(param.eval_gap_sample_num,
                                            param.eval_gap_step_num,
@@ -222,6 +222,8 @@ class TrainEvalBase:
 
     if eval_gap_epoch_num is not None:
       assert eval_gap_epoch_num > 0
+      if train_sample_num is None:
+        return None
       return math.ceil(train_sample_num * eval_gap_epoch_num /
                        global_batch_size)
 
@@ -272,14 +274,19 @@ class TrainEvalBase:
     global_batch_size = batch_size_one_gpu * iter_num_update_optimizer * world_size
     return global_batch_size
 
-  def parse_max_train_step(self, global_batch_size):
+  def parse_max_train_step(self, global_batch_size,train_sample_num):
     """find the max_train_step
     """
     max_train_step = self.param.max_train_step
     epoch_num = self.param.epoch_num
     if max_train_step is not None:
       return max_train_step
-    train_sample_num = self.param.train_sample_num
+     
+    # param.train_sample_num may be find in dataloader 
+    if train_sample_num is None:
+      return None
+    
+    # train_sample_num /= self.param.train_sample_num
     total_sample_num = train_sample_num * epoch_num
     return math.ceil(total_sample_num / global_batch_size)
 
