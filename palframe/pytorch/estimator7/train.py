@@ -37,7 +37,10 @@ class TrainerBaseMeta(type):
     self._world_size = palframe.get_world_size()
     # get global batch size
     self._global_batch_size = self.parse_global_batch_size(self._world_size)
-    self.max_train_step = self.parse_max_train_step(self._global_batch_size)
+    self.max_train_step = self.parse_max_train_step(
+      self._global_batch_size,
+      self.param.train_sample_num
+      )
     self.iter_num_update_optimizer = self.param.iter_num_update_optimizer
     self.model_save_gap_step_num = self.parse_model_save_gap_step_num(
         self._global_batch_size, self.param.train_sample_num)
@@ -97,30 +100,30 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           lr=param.lr,
           weight_decay=param.weight_decay)
 
-    # get lr_schedule
-    self.lr_scheduler = self.create_scheduler(self.param.lr_scheduler_type,
-                                              self.max_train_step,
-                                              self._optimizer)
+    # # get lr_schedule
+    # self.lr_scheduler = self.create_scheduler(self.param.lr_scheduler_type,
+    #                                           self.max_train_step,
+    #                                           self._optimizer)
 
     # load init model
 
-    if not nlp.is_none_or_empty(param.train_path_initial_model):
-      '''
-      If we loads a model as its initizaliazation, we ignore 
-      self._model_seen_sample_num and others, as these are recording their
-      information in current stage.
-      '''
-      Logger.info(f"Loading initial model '{param.train_path_initial_model}'")
-      info = self._user_model.load_model_from_file(
-          param.train_path_initial_model, self.device)
-      # aviod to load optimizer param from pretrain model
+    # if not nlp.is_none_or_empty(param.train_path_initial_model):
+    #   '''
+    #   If we loads a model as its initizaliazation, we ignore 
+    #   self._model_seen_sample_num and others, as these are recording their
+    #   information in current stage.
+    #   '''
+    #   Logger.info(f"Loading initial model '{param.train_path_initial_model}'")
+    #   info = self._user_model.load_model_from_file(
+    #       param.train_path_initial_model, self.device)
+    #   # aviod to load optimizer param from pretrain model
 
-      if self.param.train_path_initial_model_load_optimizer and \
-        info is not None and "optimizer_state" in info:
-        try:
-          self._optimizer.load_state_dict(info["optimizer_state"])
-        except:
-          pass
+    #   if self.param.train_path_initial_model_load_optimizer and \
+    #     info is not None and "optimizer_state" in info:
+    #     try:
+    #       self._optimizer.load_state_dict(info["optimizer_state"])
+    #     except:
+    #       pass
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
@@ -152,7 +155,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     #                             param.train_sample_num)
 
     # restore from last
-    self.restore_trainer()
+    # self.restore_trainer()
 
     # self._train_data_iter = train_data_iter
     # self._model_wrapper = model_wrapper
@@ -174,8 +177,23 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.current_epoch = None
     self._has_call_base_init = True
     self.current_moving_avg_loss = None
+    self.current_train_figure_data = {}
     self.eval_loss_draw_combines = self.param.eval_loss_draw_combines
-
+    self.eval_figure_label_in_combines = []
+    # check eval_loss_draw_combines
+    if self.eval_loss_draw_combines is not None:
+      assert isinstance(self.eval_loss_draw_combines,list),\
+        self.eval_loss_draw_combines
+      eval_figure_label_in_combines = set()
+      for combines in self.eval_loss_draw_combines:
+        assert isinstance(combines,list),combines
+        for label in combines:
+          assert isinstance(label,str),label
+          eval_figure_label_in_combines.add(label)
+      self.eval_figure_label_in_combines = list(
+        eval_figure_label_in_combines
+        )
+        
   def save_trainer_states(self, info=None, tag='', save_detail_state=False):
     base_info = {}
     if info is not None:
@@ -428,6 +446,37 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     if self.should_print_log():
       param.display()
       self._model_size = nlp_torch.display_model_parameters(self.model)
+    
+    # initialize lr_scheduler 
+    assert self.max_train_step is not None, \
+      f'you must set max_train_step before initialize lr_scheduler'
+    self.lr_scheduler = self.create_scheduler(
+      self.param.lr_scheduler_type,
+      self.max_train_step,
+      self._optimizer)
+
+    # restore model 
+    if not nlp.is_none_or_empty(param.train_path_initial_model):
+      '''
+      If we loads a model as its initizaliazation, we ignore 
+      self._model_seen_sample_num and others, as these are recording their
+      information in current stage.
+      '''
+      Logger.info(f"Loading initial model '{param.train_path_initial_model}'")
+      info = self._user_model.load_model_from_file(
+          param.train_path_initial_model, self.device)
+      # aviod to load optimizer param from pretrain model
+
+      if self.param.train_path_initial_model_load_optimizer and \
+        info is not None and "optimizer_state" in info:
+        try:
+          self._optimizer.load_state_dict(info["optimizer_state"])
+        except:
+          pass
+
+    # restore trainer
+    self.restore_trainer()
+
 
   def _run_minibatch(self, batch):
     if self._use_amp:
@@ -454,12 +503,14 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     for figure in figures:
       for key, value in figure.items():
         lines[key].append(value)
-
+    
     for key, values in lines.items():
       value = sum(values) / len(values)
       if isinstance(value, torch.Tensor):
         value = value.item()
       self._figure_data[key].append(value)
+      # write train figure data to current_train_figure_data
+      self.current_train_figure_data[key] = value
 
   @starter.exception_stop
   def train(self, train_data, dev_data=None, test_data=None):
@@ -494,7 +545,28 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         epoch_num=self.param.epoch_num or math.inf)
     run_samples_num = 0
     first_batch = True
+    
 
+    # conseder reset train_sample_num and max_train_step 
+    self.train_sample_num = param.train_sample_num
+    if self.train_sample_num is None:
+      try:
+        self.train_sample_num = len(train_data)
+        if self.max_train_step is None:
+          self.max_train_step = self.parse_max_train_step(
+            self._global_batch_size,
+            self.train_sample_num
+            )
+        self.model_save_gap_step_num = self.parse_model_save_gap_step_num(
+        self._global_batch_size,self.train_sample_num)
+      except:
+        if self.max_train_step is None or self.model_save_gap_step_num is None:
+          raise RuntimeError(
+            'if max_train_step is parse to None, ' \
+            'then train_sample_num should be given with either' \
+            'param.train_sample_num or len(train_data).'
+            )
+        Logger.warn(f"can not get train sample num")
     self.before_train()
 
     if self.eval_during_training:
@@ -503,13 +575,6 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           sort_key='step',
           eval_key=self.param.metric_primary_field,
           is_larger_better=self.param.eval_value_is_large_better)
-
-    self.train_sample_num = param.train_sample_num
-    if self.train_sample_num is None:
-      try:
-        self.train_sample_num = len(train_data)
-      except:
-        Logger.warn(f"can not get train sample num")
 
     while True:
       batch_start_time = time.time()
@@ -736,11 +801,27 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       torch.cuda.empty_cache()
     self.model.train()
     eval_ret_fields = list(metric_res.keys())
+    
     metric_res.update({
         'step': self._batch_id,
         'epoch_num': self.current_epoch,
         'train_loss': self.current_moving_avg_loss
     })
+    # add some fields in train stage
+    for label in self.eval_figure_label_in_combines:
+      if label not in eval_ret_fields:
+        eval_ret_fields.append(label)
+      if label in metric_res:
+        continue 
+      if label not in self.current_train_figure_data:
+        raise RuntimeError(
+          f'label: {label} must in return of evaluator.metric: {list(metric_res.keys())} '\
+          f'or return of trainer.train_one_batch: '
+          f'{list(self.current_train_figure_data.keys())}'
+        )
+      metric_res[label] = self.current_train_figure_data[label]
+      
+
     # save metric_res to local
     with open(f"{self.param.path_work}/eval_metric_res.json", 'a') as f:
       f.write(json_dumps(metric_res, indent=None))
@@ -858,7 +939,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     """
     # draw eval figure
     records = self.eval_data_recorder._data
-    draw_y_labels = eval_ret_fields + ['train_loss']
+    draw_y_labels = eval_ret_fields
+    if 'train_loss' not in eval_ret_fields:
+      draw_y_labels = eval_ret_fields + ['train_loss']
     eval_figure_data = {}
     for field in draw_y_labels:
       label_data = [r[field] for r in records]
