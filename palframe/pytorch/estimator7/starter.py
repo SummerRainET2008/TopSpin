@@ -43,6 +43,7 @@ def _check_server_gpus(server_gpu_info: list):
   return True
 
 
+
 def _get_vali_error(log_file):
   '''
   You can check path_meta/dev.eval.pkl, which includes all dev evaluation
@@ -488,6 +489,20 @@ def clear_server(ip):
     pid = int(ln.split()[1])
     if pid != os.getpid():
       nlp.command(f"kill -9 {pid}", server=ip)
+
+
+def parse_servers_from_files(server_files:str):
+  from palframe.pytorch.estimator7.utils import _parse_server_infos_from_server_files
+  server_infos = list(_parse_server_infos_from_server_files(server_files))
+  assert server_infos, server_infos
+  server_infos = [(server_IP,gpus) for server_IP, gpu_num, gpus in server_infos]
+  # check gpu 
+  _check_server_gpus(server_infos)
+
+  for server_IP, gpus in server_infos:
+    yield Server(server_IP,gpus)
+  
+  
 
 
 def exception_stop(class_func):

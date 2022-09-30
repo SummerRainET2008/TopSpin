@@ -5,6 +5,7 @@
 import os, time, json, pickle
 from signal import SIGTERM
 from datetime import datetime
+from xml.sax import default_parser_list
 import numpy as np
 from datetime import date
 import threading
@@ -78,26 +79,31 @@ def _parse_server_infos(param):
 
   else:
     # for multiple servers
-    for sf in servers_files.split(","):
-      content = open(os.path.expanduser(sf)).read()
-      server_infos = content.split('\n')
-      for server_info in server_infos:
-        if not server_info:
-          continue
-        server_info_list = server_info.split(' ')
-        server_ip = server_info_list[0].strip()
-        # get gpu_num, if have
-        if len(server_info_list) >= 2:
-          gpu_num = int(server_info[1].replace('slots=', "").strip())
-        else:
-          gpu_num = param.gpu_num
+    yield from _parse_server_infos_from_server_files(
+      servers_files,
+      param.gpu_num,
+      param.gpus
+    )
+    # for sf in servers_files.split(","):
+    #   content = open(os.path.expanduser(sf)).read()
+    #   server_infos = content.split('\n')
+    #   for server_info in server_infos:
+    #     if not server_info:
+    #       continue
+    #     server_info_list = server_info.split(' ')
+    #     server_ip = server_info_list[0].strip()
+    #     # get gpu_num, if have
+    #     if len(server_info_list) >= 2:
+    #       gpu_num = int(server_info[1].replace('slots=', "").strip())
+    #     else:
+    #       gpu_num = param.gpu_num
 
-        # get gpus if have
-        if len(server_info_list) >= 3:
-          gpus = eval(f'[{server_info_list[2]}]')
-        else:
-          gpus = param.gpus
-        yield (server_ip, gpu_num, gpus)
+    #     # get gpus if have
+    #     if len(server_info_list) >= 3:
+    #       gpus = eval(f'[{server_info_list[2]}]')
+    #     else:
+    #       gpus = param.gpus
+    #     yield (server_ip, gpu_num, gpus)
 
 
 def parse_server_infos(param):
@@ -113,6 +119,65 @@ def parse_server_infos(param):
     server_ips.append(server_ip)
     yield server_ip, gpu_num, gpus
 
+
+def _parse_server_infos_from_server_files(
+  servers_files:str,
+  default_gpu_num=None,
+  default_gpus=None
+  ):
+  """
+
+  Args:
+      servers_file (_type_): _description_
+
+  Raises:
+      RuntimeError: _description_
+
+  Returns:
+      _type_: _description_
+  """
+  all_gpu_infos = set()
+  
+  # for multiple servers
+  for sf in servers_files.split(","):
+    content = open(os.path.expanduser(sf)).read()
+    if content.startswith("#"):
+      continue
+    server_infos = content.split('\n')
+    
+    for server_info in server_infos:
+      if not server_info:
+        continue
+      
+      server_info_list = server_info.split(' ')
+      server_info_list = [s for s in server_info_list if s]
+      server_ip = server_info_list[0].strip()
+      Logger.info(f"{server_info}")
+      # get gpu_num, if have
+      if len(server_info_list) >= 2:
+        gpu_num = int(server_info_list[1].replace('slots=', "").strip())
+        if gpu_num == 0:
+          continue
+      else:
+        assert default_gpu_num is not None
+        gpu_num = default_gpu_num
+
+      # get gpus if have
+      if len(server_info_list) >= 3:
+        gpus = eval(f'[{server_info_list[2]}]')
+      else:
+        assert default_gpus is not None
+        gpus = default_gpus
+      
+      assert isinstance(gpus,list),gpus
+      
+      gpus.sort()
+      gpu_info = f"{server_ip}_{gpu_num}_{gpus}"
+      if gpu_info in all_gpu_infos:
+        raise RuntimeError(f"exist repeated server info: {gpu_info}")
+      all_gpu_infos.add(gpu_info)
+      Logger.info(f"parsed server info, ip:{server_ip}, gpus: {gpus}")
+      yield (server_ip, gpu_num, gpus)
 
 class JsonComplexEncoder(json.JSONEncoder):
   """
