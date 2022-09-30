@@ -581,6 +581,41 @@ def get_available_gpus(server_ip=None, account=None):
     Logger.error(error)
     return []
 
+def get_gpu_user(gpu_id, candidate_users: list=[], server_ip=None,
+                 account=None):
+  def get_user(info):
+    mark = "->"
+    if mark in info:
+      info = info.partition(mark)[2]
+
+    for user in candidate_users:
+      if user in info:
+        return user
+
+    return f"unknown_user:'{info}'"
+
+  def run():
+    cmd = f"sudo fuser -v /dev/nvidia{gpu_id}"
+    message = command(cmd, True, server_ip, account)[1]
+    pids = message.split()[1:]
+
+    for pid in pids:
+      cmd = f"sudo ls -lh /proc/{pid}/cwd"
+      info = command(cmd, True, server_ip, account)[1]
+      user = get_user(info)
+      yield user
+
+  users = list(set(run()))
+  if len(users) == 0:
+    return ""
+  elif len(users) == 1:
+    return users[0]
+  else:
+    for user in users:
+      if "unknown" not in user:
+        return user
+    return "unknown"
+
 
 def timeout(func, args: list, max_time_seconds):
   class _MonitorThread(threading.Thread):
