@@ -54,6 +54,7 @@ DEFAULT_PARAMS = dict(
     train_loss_moving_average_step=3,
     # to show with multiple label, should a list[list]
     # value should be in metric_fields or `train_loss`
+    train_loss_draw_combines=None,
     eval_loss_draw_combines=None,
     #### distribution params ####
     servers_file=None,

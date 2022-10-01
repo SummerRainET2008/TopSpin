@@ -131,11 +131,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     self._batch_id = 0
     self._loss_history = []
-    self._figure_data = defaultdict(list)
-    self._figure_data["loss"] = self._loss_history
+    # self._figure_data = defaultdict(list)
+    # self._figure_data["loss"] = self._loss_history
     # to save the data in eval stage
     # note that train loss will also be add (from estimation)
-    self._eval_figure_data = []
+    # self._eval_figure_data = []
     self.train_loss_moving_average_step = self.param.train_loss_moving_average_step
     assert isinstance(self.train_loss_moving_average_step ,int) and\
        self.train_loss_moving_average_step>=1
@@ -172,13 +172,16 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.train_data = None
     self.dev_data = None
     self.test_data = None
-
+    
+    self.train_data_recorder = []
     self.eval_data_recorder = None
     self.current_epoch = None
     self._has_call_base_init = True
     self.current_moving_avg_loss = None
     self.current_train_figure_data = {}
     self.eval_loss_draw_combines = self.param.eval_loss_draw_combines
+    self.train_loss_draw_combines = self.param.train_loss_draw_combines
+    
     self.eval_figure_label_in_combines = []
     # check eval_loss_draw_combines
     if self.eval_loss_draw_combines is not None:
@@ -209,9 +212,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
             "save_time": nlp.get_log_time()
         })
     if save_detail_state:
+      if self.eval_data_recorder is not None:
+        eval_data_records = self.eval_data_recorder._data 
+      else:
+        eval_data_records = []
+        
       base_info.update(
           **{
-              "figure_data": self._figure_data,
+              "train_data_records": self.train_data_recorder._data,
+              "eval_data_records": eval_data_records,
               "optimizer_state": self._optimizer.state_dict(),
               "lr_scheduler_state": self.lr_scheduler.state_dict()
           })
@@ -244,10 +253,18 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
                   f"_model_seen_sample_num: {self._model_seen_sample_num}"
                   )
 
-      if "figure_data" in info:
-        self._figure_data = info["figure_data"]
-        self._loss_history = self._figure_data["loss"]
-
+      if "train_data_records" in info:
+        self.train_data_recorder.restart_recorder(
+          info["train_data_records"]
+        )
+        # self._figure_data = info["figure_data"]
+        # self._loss_history = self._figure_data["loss"]
+      
+      if "eval_data_records" in info and self.eval_data_recorder is not None:
+        self.eval_data_recorder.restart_recorder(
+          info["eval_data_records"]
+        )
+        
       if "batch_id" in info:
         self._batch_id = info["batch_id"]
 
@@ -508,7 +525,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       value = sum(values) / len(values)
       if isinstance(value, torch.Tensor):
         value = value.item()
-      self._figure_data[key].append(value)
+      # self._figure_data[key].append(value)
       # write train figure data to current_train_figure_data
       self.current_train_figure_data[key] = value
 
@@ -569,9 +586,19 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         Logger.warn(f"can not get train sample num")
     self.before_train()
 
+
+    # train data recorder
+    self.train_data_recorder = EvalDataRecorder(
+      name='palframe.train',
+      sort_key='step', 
+      eval_key='loss',
+      # small loss always better 
+      is_larger_better=False
+    )
+
     if self.eval_during_training:
       self.eval_data_recorder = EvalDataRecorder(
-          name='palframe',
+          name='palframe.eval',
           sort_key='step',
           eval_key=self.param.metric_primary_field,
           is_larger_better=self.param.eval_value_is_large_better)
@@ -646,9 +673,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
             var.grad /= len(batches)
 
       self.reduce_batch_figure(batch_figure)
-      if self._batch_id > 0 and \
-        self._batch_id % self.train_draw_figure_gap_step_num == 0:
-        self._draw_train_figure()
+
+      self._save_and_draw_train_data()
+      # if self._batch_id > 0 and \
+      #   self._batch_id % self.train_draw_figure_gap_step_num == 0:
+      #   self._draw_train_figure()
 
       total_norm = torch.nn.utils.clip_grad_norm_(self.model.parameters(),
                                                   param.param_clip_norm)
@@ -725,7 +754,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         break
 
     self._save_and_eval_model()
-    self._draw_train_figure()
+    self._save_and_draw_train_data()
 
     nlp.execute_cmd(
         f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
@@ -907,8 +936,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     Returns:
         _type_: _description_
     """
-    if self._rank != 0:
+    if not self.is_master_rank():
       return False
+
     if self._batch_id == 0 and self.param.is_save_model_at_first_step:
       return True
 
@@ -916,23 +946,82 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       return True
     return False
 
-  def _draw_train_figure(self):
-    """draw train loss figure
+
+  def _save_and_draw_train_data(self):
+    """_summary_
     """
-    if self._rank != 0:
-      return
+    if not self.is_master_rank():
+      return 
+    
+    if not self._batch_id % self.train_draw_figure_gap_step_num == 0:
+      return 
 
+    self.current_train_figure_data['step'] = self._batch_id
+
+    # add data to recoder
+    self.train_data_recorder.add_acc({k:v for k,v in self.current_train_figure_data.items()})
+    # save to local file 
+    # save metric_res to local
+    with open(f"{self.param.path_work}/train_metric_data.json", 'a') as f:
+      f.write(json_dumps(self.current_train_figure_data, indent=None))
+      f.write('\n')
+
+    # draw figure
     with nlp.Timer("Draw training loss"):
-      pickle.dump(self._figure_data,
-                  open(f"{self._param.path_meta}/figure.data", "wb"))
       out_file = os.path.join(
-          self._param.path_work,
-          os.path.split(self._param.path_work)[1] + ".train.loss.png")
+            self._param.path_work,
+            os.path.split(self._param.path_work)[1] + ".train.metric.png")
 
-      figure_data = {}
-      for line_id, key in enumerate(sorted(self._figure_data.keys())):
-        figure_data[f"{line_id}.{key}"] = self._figure_data[key]
-      draw_figure(figure_data, out_file)
+      draw_y_labels = list(self.current_train_figure_data.keys())
+      
+      records = self.train_data_recorder._data
+      train_figure_data = {}
+      for field in draw_y_labels:
+        label_data = [r[field] for r in records]
+        train_figure_data[field] = label_data
+      
+      draw_y_labels.remove('step')
+      # Logger.info(f"loss_data: {train_figure_data}")
+      draw_eval_figure(
+          train_figure_data,
+          out_file,
+          draw_y_labels,
+          x_label='step',
+          combines=self.train_loss_draw_combines)
+
+
+
+  # def _draw_train_figure(self):
+  #   """draw train loss figure
+  #   """
+    
+
+  #   # with nlp.Timer("Draw training loss"):
+      
+
+  #     # pickle.dump(self._tr,
+  #     #             open(f"{self._param.path_meta}/figure.data", "wb"))
+  #     out_file = os.path.join(
+  #         self._param.path_work,
+  #         os.path.split(self._param.path_work)[1] + ".train.metric.png")
+
+      
+  #     # 
+      
+  #     draw_y_labels = 
+
+
+  #     draw_eval_figure(
+  #       eval_figure_data,
+  #       out_file,
+  #       draw_y_labels,
+  #       x_label='step',
+  #       combines=self.eval_loss_draw_combines)
+
+      # figure_data = {}
+      # for line_id, key in enumerate(sorted(self._figure_data.keys())):
+      #   figure_data[f"{line_id}.{key}"] = self._figure_data[key]
+      # draw_figure(figure_data, out_file)
 
   def _draw_eval_figure(self, eval_ret_fields):
     """draw eval figure data

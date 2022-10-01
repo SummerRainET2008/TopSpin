@@ -101,11 +101,28 @@ def draw_eval_figure(figure_data,
   single_labels, combines_labels = _parse_combines(y_labels, combines)
   from itertools import chain
   all_y_labels = list(chain(single_labels, combines_labels))
+  # print(all_y_labels)
   try:
     import matplotlib.pyplot as plt
     plt.figure()
+    # calculate hight 
+    width = 12
+    hight = 2.5*len(all_y_labels)
+    height_ratios = []
+    for cur_y_labels in all_y_labels:
+      if isinstance(cur_y_labels,str):
+        height_ratios.append(1)
+      else:
+        height_ratios.append(len(cur_y_labels))
+
+    fig, axs = plt.subplots(
+      len(all_y_labels), 1, 
+      figsize=(width,hight),
+      gridspec_kw={'height_ratios': height_ratios}
+      )
+    fig.tight_layout()
     for i, cur_y_labels in enumerate(all_y_labels):
-      ax = plt.subplot(len(all_y_labels), 1, i + 1)
+      ax = axs[i]
       y_min = math.inf
       y_max = -math.inf
       xs = figure_data[x_label]
@@ -115,15 +132,15 @@ def draw_eval_figure(figure_data,
         ys = figure_data[y_label]
         y_min = min(min(ys), y_min)
         y_max = max(max(ys), y_max)
-        plt.plot(xs, ys, label=y_label)
+        ax.plot(xs, ys, label=y_label)
 
       # show 10 y_tick by default
       y_ticks = np.round(np.linspace(y_min, y_max, 10), 3)
       ax.set_yticks(y_ticks)
-      plt.grid(linestyle='--', linewidth=0.5)
-      plt.legend()
-      plt.tight_layout(rect=[0, 0, 0.75, 1])
-
+      ax.grid(linestyle='--', linewidth=0.5)
+      ax.legend()
+      # ax.tight_layout(rect=[0, 0, 0.75, 1])
+   
     plt.savefig(out_file, bbox_inches="tight")
     plt.close()
 
