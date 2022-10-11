@@ -254,7 +254,7 @@ class FolderMetaCache:
     Logger.info(f"create meta file {meta_file_path} ...")
     full_files = list(
         nlp.get_files_in_folder(feat_path, valid_file_extension, True))
-    rel_files = [os.path.basename(f) for f in full_files]
+    rel_files = [os.path.relpath(f,feat_path) for f in full_files]
     meta = {"valid_file_extension": valid_file_extension, "files": rel_files}
     pickle.dump(meta, open(meta_file_path, "wb"))
     Logger.info(

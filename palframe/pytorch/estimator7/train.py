@@ -181,6 +181,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.current_train_figure_data = {}
     self.eval_loss_draw_combines = self.param.eval_loss_draw_combines
     self.train_loss_draw_combines = self.param.train_loss_draw_combines
+    self.model_save_stratyge = self.param.model_save_stratyge
+
     
     self.eval_figure_label_in_combines = []
     # check eval_loss_draw_combines
@@ -898,7 +900,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     
     if model_saved_num == 0:
       pass
-    elif self.eval_data_recorder is not None:
+    elif self.eval_data_recorder is not None and self.model_save_stratyge != 'recent':
       optimal_records = self.eval_data_recorder.get_k_best_eval_res(
           model_saved_num)
       optimal_records.sort(key=lambda x: x['step'])
