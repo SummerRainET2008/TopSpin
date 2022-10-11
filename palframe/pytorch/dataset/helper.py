@@ -6,14 +6,14 @@ from palframe.nlp import Logger
 
 
 def parse_feat_folder(feat_path: typing.Union[list, str, None],
-                      valid_file_extention: typing.List = ["pkl", "pydict"]):
+                      valid_file_extension: typing.List = ["pkl", "pydict"]):
   if nlp.is_none_or_empty(feat_path):
     return []
 
   elif isinstance(feat_path, str):
-    assert isinstance(valid_file_extention, (list, set))
-    assert len(valid_file_extention) > 0
-    valid_file_extention = set(valid_file_extention)
+    assert isinstance(valid_file_extension, (list, set))
+    assert len(valid_file_extension) > 0
+    valid_file_extension = set(valid_file_extension)
 
     if os.path.isdir(feat_path):
       feat_path = os.path.realpath(feat_path)
@@ -24,9 +24,9 @@ def parse_feat_folder(feat_path: typing.Union[list, str, None],
         meta = pickle.load(open(meta_file, "rb"))
 
         if not isinstance(meta, dict) or \
-          len(valid_file_extention - meta["valid_file_extention"]) > 0:
+          len(valid_file_extension - meta["valid_file_extension"]) > 0:
           nlp.command(f"rm {meta_file}")
-          return parse_feat_folder(feat_path, valid_file_extention)
+          return parse_feat_folder(feat_path, valid_file_extension)
 
         rel_files = meta["files"]
         full_files = [os.path.join(feat_path, f) for f in rel_files]
@@ -34,17 +34,17 @@ def parse_feat_folder(feat_path: typing.Union[list, str, None],
 
       else:
         full_files = list(
-            nlp.get_files_in_folder(feat_path, valid_file_extention, True))
+            nlp.get_files_in_folder(feat_path, valid_file_extension, True))
         rel_files = [f[len(feat_path) + 1:] for f in full_files]
         meta = {
-            "valid_file_extention": valid_file_extention,
+            "valid_file_extension": valid_file_extension,
             "files": rel_files
         }
         pickle.dump(meta, open(meta_file, "wb"))
         return full_files
 
     elif os.path.isfile(feat_path):
-      assert nlp.get_file_extension(feat_path) in valid_file_extention
+      assert nlp.get_file_extension(feat_path) in valid_file_extension
       return [feat_path]
 
     else:
@@ -54,7 +54,7 @@ def parse_feat_folder(feat_path: typing.Union[list, str, None],
   elif isinstance(feat_path, list):
     ret = []
     for f in feat_path:
-      ret.extend(parse_feat_folder(f, valid_file_extention))
+      ret.extend(parse_feat_folder(f, valid_file_extension))
     return ret
 
 
