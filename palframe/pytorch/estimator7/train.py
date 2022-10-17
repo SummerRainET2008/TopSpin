@@ -673,10 +673,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         for var in self.model.parameters():
           if var.grad is not None:
             var.grad /= len(batches)
-
+      
       self.reduce_batch_figure(batch_figure)
-
-      self._save_and_draw_train_data()
+      
       # if self._batch_id > 0 and \
       #   self._batch_id % self.train_draw_figure_gap_step_num == 0:
       #   self._draw_train_figure()
@@ -740,6 +739,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           f"loss(avg): {batch_loss:.4f}({self.current_moving_avg_loss:.4f}), "
           f"batch time: {batch_duration:.4f} ")
       Logger.info("-" * 150)
+      
+
+      self.current_train_figure_data['train_loss'] = self.current_moving_avg_loss
+      self._save_and_draw_train_data()
+
 
       self._save_and_eval_model()
 
@@ -1030,6 +1034,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     """
     # draw eval figure
     records = self.eval_data_recorder._data
+    
     draw_y_labels = eval_ret_fields
     if 'train_loss' not in eval_ret_fields:
       draw_y_labels = eval_ret_fields + ['train_loss']

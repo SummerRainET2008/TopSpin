@@ -116,13 +116,14 @@ class ParamBase(metaclass=ParamBaseMeta):
         self.train_files,
         self.train_valid_file_extension,
     )
-    # check dev
-    __check_folder_meta(self.dev_files, self.eval_valid_file_extension)
-    # check test
-    __check_folder_meta(
-        self.test_files,
-        self.eval_valid_file_extension,
-    )
+    if self.eval_during_training:
+      # check dev
+      __check_folder_meta(self.dev_files, self.eval_valid_file_extension)
+      # check test
+      __check_folder_meta(
+          self.test_files,
+          self.eval_valid_file_extension,
+      )
 
   @property
   def true_gradient(self):
