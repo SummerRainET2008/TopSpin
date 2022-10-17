@@ -47,6 +47,10 @@ def draw_figure(figure_data, out_file):
 
       plt.plot(xs, ys, label=shorten_label_name(key))
 
+      plt.minorticks_on()
+      plt.grid(which='major', color='#DDDDDD', linewidth=0.8)
+      plt.grid(which='minor', color='#EEEEEE', linestyle=':', linewidth=0.5)
+
       plt.grid(linestyle='--', linewidth=0.5)
       plt.legend()
       plt.tight_layout(rect=[0, 0, 0.75, 1])

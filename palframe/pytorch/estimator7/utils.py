@@ -315,7 +315,7 @@ class FolderMetaCache:
       f"meta file: {meta_file_path} is not exist.\n" + create_meta_info
 
     meta = pickle.load(open(meta_file_path, "rb"))
-    meta_valid_file_extension = meta.get('valid_file_extention',None) or\
+    meta_valid_file_extension = meta.get('valid_file_extension',None) or\
       meta['valid_file_extension']
     if not isinstance(meta, dict) or \
       len(set(valid_file_extension) - set(meta_valid_file_extension)) > 0:
