@@ -56,7 +56,7 @@ class ProcessPoolExecutor(_ProcessPoolExecutor):
         max_workers=max_workers,
         mp_context=mp_context,
         initializer=start_thread_to_terminate_when_parent_process_dies,
-        initargs=(os.getpid(), ))
+        initargs=(os.getpid(),))
 
 
 def _monitor_file_exist_helper(file_path):
@@ -79,11 +79,8 @@ def _parse_server_infos(param):
 
   else:
     # for multiple servers
-    yield from _parse_server_infos_from_server_files(
-      servers_files,
-      param.gpu_num,
-      param.gpus
-    )
+    yield from _parse_server_infos_from_server_files(servers_files,
+                                                     param.gpu_num, param.gpus)
     # for sf in servers_files.split(","):
     #   content = open(os.path.expanduser(sf)).read()
     #   server_infos = content.split('\n')
@@ -120,11 +117,9 @@ def parse_server_infos(param):
     yield server_ip, gpu_num, gpus
 
 
-def _parse_server_infos_from_server_files(
-  servers_files:str,
-  default_gpu_num=None,
-  default_gpus=None
-  ):
+def _parse_server_infos_from_server_files(servers_files: str,
+                                          default_gpu_num=None,
+                                          default_gpus=None):
   """
 
   Args:
@@ -137,18 +132,18 @@ def _parse_server_infos_from_server_files(
       _type_: _description_
   """
   all_gpu_infos = set()
-  
+
   # for multiple servers
   for sf in servers_files.split(","):
     content = open(os.path.expanduser(sf)).read()
     if content.startswith("#"):
       continue
     server_infos = content.split('\n')
-    
+
     for server_info in server_infos:
       if not server_info:
         continue
-      
+
       server_info_list = server_info.split(' ')
       server_info_list = [s for s in server_info_list if s]
       server_ip = server_info_list[0].strip()
@@ -168,9 +163,9 @@ def _parse_server_infos_from_server_files(
       else:
         assert default_gpus is not None
         gpus = default_gpus
-      
-      assert isinstance(gpus,list),gpus
-      
+
+      assert isinstance(gpus, list), gpus
+
       gpus.sort()
       gpu_info = f"{server_ip}_{gpu_num}_{gpus}"
       if gpu_info in all_gpu_infos:
@@ -179,10 +174,12 @@ def _parse_server_infos_from_server_files(
       Logger.info(f"parsed server info, ip:{server_ip}, gpus: {gpus}")
       yield (server_ip, gpu_num, gpus)
 
+
 class JsonComplexEncoder(json.JSONEncoder):
   """
     json序列化辅助类
     """
+
   def default(self, obj):
     if isinstance(obj, datetime):
       return obj.strftime('%Y-%m-%d %H:%M:%S')
@@ -254,7 +251,7 @@ class FolderMetaCache:
     Logger.info(f"create meta file {meta_file_path} ...")
     full_files = list(
         nlp.get_files_in_folder(feat_path, valid_file_extension, True))
-    rel_files = [os.path.relpath(f,feat_path) for f in full_files]
+    rel_files = [os.path.relpath(f, feat_path) for f in full_files]
     meta = {"valid_file_extension": valid_file_extension, "files": rel_files}
     pickle.dump(meta, open(meta_file_path, "wb"))
     Logger.info(
@@ -324,3 +321,18 @@ class FolderMetaCache:
     rel_files = meta["files"]
     full_files = [os.path.join(feat_path, f) for f in rel_files]
     return full_files
+
+
+class Example(dict):
+  """
+    实现一个可以使用点访问的字典
+    """
+
+  def __getattr__(self, item):
+    return self[item]
+
+  def __setattr__(self, key, value):
+    if key in self.__dict__:
+      self.__dict__[key] = value
+    else:
+      self[key] = value

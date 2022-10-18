@@ -570,7 +570,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.train_sample_num = param.train_sample_num
     if self.train_sample_num is None:
       try:
-        self.train_sample_num = len(train_data)
+        self.train_sample_num = len(train_data)*self._global_batch_size
         if self.max_train_step is None:
           self.max_train_step = self.parse_max_train_step(
             self._global_batch_size,

@@ -252,8 +252,8 @@ class RunManager:
     run_tag = kwargs.get("run_tag", "")
     if not nlp.is_none_or_empty(run_tag):
       run_root_path.append(run_tag)
+      
     run_root_path = ".".join(run_root_path)
-
     nlp.mkdir(run_root_path)
     self._run_lock_file = f"{run_root_path}/.run.lock"
     for task in tasks:
