@@ -127,6 +127,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
+    self.so_far_best_eval_res = {
+      'step':None,
+      'score':None
+    }
     self._last_evaluate_point = 0
 
     self._batch_id = 0
@@ -729,6 +733,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       # loss moving average, for accurate estimate current loss
       moving_losses = self._loss_history[-self.train_loss_moving_average_step:]
       self.current_moving_avg_loss = sum(moving_losses) / len(moving_losses)
+      if self.eval_during_training:
+        Logger.info(
+          f"so far best evaluate score: {self.so_far_best_eval_res['score']} "\
+          f"at step: {self.so_far_best_eval_res['step']}"
+        )
       Logger.info(
           f"{self._get_worker_info()}: "
           f"*Epoch: {epoch_id:.2f}, "
@@ -760,6 +769,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         break
 
     self._save_and_eval_model()
+    Logger.info(f"so far the best vali error: {self._opt_evaluate_error}")
     self._save_and_draw_train_data()
 
     nlp.execute_cmd(
@@ -867,6 +877,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     best_res = self.eval_data_recorder.get_k_best_eval_res(1)[0]
     best_score = best_res[self.param.metric_primary_field]
     self._opt_evaluate_error = best_score
+    self.so_far_best_eval_res.update({
+      'step': best_res['step'],
+      'score': best_score
+    })
     # save_info
     info = {
         'current_score': current_score,
