@@ -95,10 +95,13 @@ def draw_eval_figure(figure_data,
       x_labels: 
       combines: list[list]
   """
+  
 
   if isinstance(y_labels, str):
     y_labels = [y_labels]
   single_labels, combines_labels = _parse_combines(y_labels, combines)
+  
+  
   from itertools import chain
   all_y_labels = list(chain(single_labels, combines_labels))
   # print(all_y_labels)
@@ -114,15 +117,17 @@ def draw_eval_figure(figure_data,
         height_ratios.append(1)
       else:
         height_ratios.append(len(cur_y_labels))
-
+    
+    
     fig, axs = plt.subplots(
       len(all_y_labels), 1, 
       figsize=(width,hight),
-      gridspec_kw={'height_ratios': height_ratios}
+      gridspec_kw={'height_ratios': height_ratios},
+      squeeze=False
       )
     fig.tight_layout()
     for i, cur_y_labels in enumerate(all_y_labels):
-      ax = axs[i]
+      ax = axs[i][0]
       y_min = math.inf
       y_max = -math.inf
       xs = figure_data[x_label]

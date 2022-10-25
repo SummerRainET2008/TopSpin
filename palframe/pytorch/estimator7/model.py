@@ -74,7 +74,7 @@ class ModelBase(nn.Module, metaclass=ModelBaseMeta):
       return info
     except Exception as error:
       Logger.error(f"Model load: {error}")
-      assert False
+      raise 
 
   def save_model(self, info: dict, path_model, tag=""):
     model_seen_sample_num = info["model_seen_sample_num"]

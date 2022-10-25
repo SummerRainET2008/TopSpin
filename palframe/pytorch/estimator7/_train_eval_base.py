@@ -74,6 +74,8 @@ class TrainEvalBase:
           "please set param.eval_value_is_large_better that is type of bool,"\
           f" current is {self.param.eval_value_is_large_better}"
 
+    assert param.model_save_stratyge in ('auto','recent','top-k'), param.model_save_stratyge
+
   # def parse_data_folder(self,
   #                       feat_path: typing.Union[list, str, None],
   #                       valid_file_extension: typing.List = ["pkl", "pydict"]):

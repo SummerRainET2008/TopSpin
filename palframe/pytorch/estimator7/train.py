@@ -127,6 +127,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
+    self.so_far_best_eval_res = {
+      'step':None,
+      'score':None
+    }
     self._last_evaluate_point = 0
 
     self._batch_id = 0
@@ -181,6 +185,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.current_train_figure_data = {}
     self.eval_loss_draw_combines = self.param.eval_loss_draw_combines
     self.train_loss_draw_combines = self.param.train_loss_draw_combines
+    self.model_save_stratyge = self.param.model_save_stratyge
+
     
     self.eval_figure_label_in_combines = []
     # check eval_loss_draw_combines
@@ -568,7 +574,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.train_sample_num = param.train_sample_num
     if self.train_sample_num is None:
       try:
-        self.train_sample_num = len(train_data)
+        self.train_sample_num = len(train_data)*self._global_batch_size
         if self.max_train_step is None:
           self.max_train_step = self.parse_max_train_step(
             self._global_batch_size,
@@ -671,10 +677,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         for var in self.model.parameters():
           if var.grad is not None:
             var.grad /= len(batches)
-
+      
       self.reduce_batch_figure(batch_figure)
-
-      self._save_and_draw_train_data()
+      
       # if self._batch_id > 0 and \
       #   self._batch_id % self.train_draw_figure_gap_step_num == 0:
       #   self._draw_train_figure()
@@ -728,6 +733,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       # loss moving average, for accurate estimate current loss
       moving_losses = self._loss_history[-self.train_loss_moving_average_step:]
       self.current_moving_avg_loss = sum(moving_losses) / len(moving_losses)
+      if self.eval_during_training:
+        Logger.info(
+          f"so far best evaluate score: {self.so_far_best_eval_res['score']} "\
+          f"at step: {self.so_far_best_eval_res['step']}"
+        )
       Logger.info(
           f"{self._get_worker_info()}: "
           f"*Epoch: {epoch_id:.2f}, "
@@ -738,6 +748,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           f"loss(avg): {batch_loss:.4f}({self.current_moving_avg_loss:.4f}), "
           f"batch time: {batch_duration:.4f} ")
       Logger.info("-" * 150)
+      
+
+      self.current_train_figure_data['train_loss'] = self.current_moving_avg_loss
+      self._save_and_draw_train_data()
+
 
       self._save_and_eval_model()
 
@@ -754,6 +769,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         break
 
     self._save_and_eval_model()
+    Logger.info(f"so far the best vali error: {self._opt_evaluate_error}")
     self._save_and_draw_train_data()
 
     nlp.execute_cmd(
@@ -861,6 +877,10 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     best_res = self.eval_data_recorder.get_k_best_eval_res(1)[0]
     best_score = best_res[self.param.metric_primary_field]
     self._opt_evaluate_error = best_score
+    self.so_far_best_eval_res.update({
+      'step': best_res['step'],
+      'score': best_score
+    })
     # save_info
     info = {
         'current_score': current_score,
@@ -898,7 +918,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     
     if model_saved_num == 0:
       pass
-    elif self.eval_data_recorder is not None:
+    elif self.eval_data_recorder is not None and self.model_save_stratyge != 'recent':
       optimal_records = self.eval_data_recorder.get_k_best_eval_res(
           model_saved_num)
       optimal_records.sort(key=lambda x: x['step'])
@@ -1028,6 +1048,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     """
     # draw eval figure
     records = self.eval_data_recorder._data
+    
     draw_y_labels = eval_ret_fields
     if 'train_loss' not in eval_ret_fields:
       draw_y_labels = eval_ret_fields + ['train_loss']

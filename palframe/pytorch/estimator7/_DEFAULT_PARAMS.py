@@ -15,6 +15,7 @@ DEFAULT_PARAMS = dict(
     # whether save first step
     is_save_model_at_first_step=True,
     model_saved_num=3,  # model save param
+    model_save_stratyge='auto', #  `recent`: save recent, `top-k`: save best top-k, `auto` 
     # worker num in dataloader
     train_num_workers_loading_data=2,
     # worker num in processing example, i.e. create feat stage
