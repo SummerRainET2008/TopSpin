@@ -600,6 +600,11 @@ def get_gpu_user(gpu_id, candidate_users: list=[], server_ip=None,
     pids = message.split()[1:]
 
     for pid in pids:
+      cmd = f"sudo cat /proc/{pid}/cmdline"
+      info = command(cmd, True, server_ip, account)[1]
+      if "python" not in info:
+        continue
+
       cmd = f"sudo ls -lh /proc/{pid}/cwd"
       info = command(cmd, True, server_ip, account)[1]
       user = get_user(info)
