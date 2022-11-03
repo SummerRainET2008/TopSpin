@@ -136,12 +136,12 @@ def _parse_server_infos_from_server_files(servers_files: str,
   # for multiple servers
   for sf in servers_files.split(","):
     content = open(os.path.expanduser(sf)).read()
-    if content.startswith("#"):
-      continue
+
     server_infos = content.split('\n')
 
     for server_info in server_infos:
-      if not server_info:
+      server_info = server_info.strip()
+      if not server_info or server_info.startswith("#"):
         continue
 
       server_info_list = server_info.split(' ')

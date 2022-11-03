@@ -44,7 +44,9 @@ DEFAULT_PARAMS = dict(
     lr=0.001,
     #  Such in RoBERTa, l2 weight decay is 0.01
     weight_decay=0.01,
-    lr_scheduler_type='linear',  # "linear", default no lr schedule
+    # "linear" or "cosine" or "cosine_with_restarts"  or "polynomial"
+    # or "constant" or "constant_with_warmup"
+    lr_scheduler_type='linear',  
     num_warmup_steps=None,
     num_warmup_ratio=None,
     param_clip_norm=1,

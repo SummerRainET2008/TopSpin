@@ -516,6 +516,17 @@ def group_by_key_fun(data, key_fun=None):
 
 
 def get_server_ip(buffer={}):
+  """
+  modify by xuan, 2022-11-3
+  """
+  if "ip" in buffer:
+    return buffer["ip"]
+  hostname = socket.gethostname()
+  local_ip = socket.gethostbyname(hostname)
+  buffer["ip"] = local_ip
+  return local_ip
+
+def __get_server_ip(buffer={}):
   if "ip" in buffer:
     return buffer["ip"]
 

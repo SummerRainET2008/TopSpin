@@ -379,6 +379,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       if self._param.true_gradient:
         ret["loss"] *= ret["batch_num"]
       if nlp_torch.isabnormal(ret["loss"]):
+        Logger.error(f"rank: {self._rank}: loss is NAN")
         raise ValueError("loss is NaN")
 
       return ret
@@ -590,8 +591,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
             'param.train_sample_num or len(train_data).'
             )
         Logger.warn(f"can not get train sample num")
-    self.before_train()
-
+    
 
     # train data recorder
     self.train_data_recorder = EvalDataRecorder(
@@ -608,6 +608,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           sort_key='step',
           eval_key=self.param.metric_primary_field,
           is_larger_better=self.param.eval_value_is_large_better)
+
+
+    self.before_train()
 
     while True:
       batch_start_time = time.time()
@@ -704,6 +707,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         epoch_id = self._model_seen_sample_num / self.train_sample_num
       else:
         epoch_id = self.current_epoch
+      
+
+
       a = train_duration / (self._batch_id + 1)
       b = self.max_train_step - self._batch_id
       remaining_time = a * b

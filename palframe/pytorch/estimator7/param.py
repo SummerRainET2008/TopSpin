@@ -342,6 +342,7 @@ def distributed_init(param: ParamBase):
   else:
     assert False, f"wrong backhand: {param.backhand}"
   os.environ[socket_ifname] = param._try_get_net_name(param)
+  
   import torch.distributed as dist
   dist.init_process_group(backend=param.backhand)
   HAS_RUN_DISTRIBUTED_INIT = True
