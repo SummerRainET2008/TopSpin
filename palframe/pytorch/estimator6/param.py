@@ -143,6 +143,18 @@ class ParamBase(abc.ABC):
     self.cudnn_deterministic = True
     self.cudnn_benchmark = False
 
+  @property
+  def use_gpu(self):
+    return self.__use_gpu
+
+  @use_gpu.setter
+  def use_gpu(self, value):
+    import torch
+    if torch.cuda.is_available():
+      self.__use_gpu = value
+    else:
+      self.__use_gpu = False
+
   def _check_instance_validity(self):
     cls_str = str(type(self))
     assert cls_str is not ParamBase

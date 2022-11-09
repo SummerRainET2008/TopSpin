@@ -149,6 +149,18 @@ class ParamBase(abc.ABC):
       assert False, "Use Param.get_instance(cls), rather than Param()"
 
   @property
+  def use_gpu(self):
+    return self.__use_gpu
+
+  @use_gpu.setter
+  def use_gpu(self, value):
+    import torch
+    if torch.cuda.is_available():
+      self.__use_gpu = value
+    else:
+      self.__use_gpu = False
+
+  @property
   def lr_decay_strategy(self):
     return self.__lr_decay_strategy, self.__lr_decay_strategy_id
 

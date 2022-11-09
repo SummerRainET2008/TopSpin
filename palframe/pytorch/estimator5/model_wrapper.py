@@ -127,21 +127,21 @@ class ModelWrapperBase:
     try:
       assert model_file.endswith(".pt")
       info = torch.load(model_file, map_location=self._device)
-      if isinstance(info, list):
-        # estimator3 model
-        # extral_info = [
-        #   self._global_step_id,
-        #   self._opt_vali_error,
-        #   self._run_sample_num
-        # ]
-        state_dict = info[3]
-      else:
-        assert isinstance(info, dict)
-        state_dict = info["model"]
+      assert isinstance(info, dict)
+      assert isinstance(info, dict)
+      state_dict = info["model"]
 
-      incompatible_keys = self._model.load_state_dict(state_dict, strict=False)
+      state_dict2 = {}
+      prefix = "module."
+      for n, v in state_dict.items():
+        if n.startswith(prefix):
+          n = n[len(prefix):]
+        state_dict2[n] = v
+
+      incompatible_keys = self._user_model.load_state_dict(state_dict2,
+                                                           strict=False)
       Logger.info(f"Incompatible keys: {incompatible_keys}")
-      Logger.info(f"Model load succeeds: {model_file}")
+      Logger.info(f"Model loading is done: {model_file}")
 
       return info
 
@@ -181,7 +181,7 @@ class ModelWrapperBase:
       return
 
     model_seen_sample_num = info["model_seen_sample_num"]
-    info["model"] = self._dist_model.state_dict()
+    info["model"] = self._user_model.state_dict()
     if tag != "":
       name = f'model_{model_seen_sample_num:015}.{tag}.pt'
     else:

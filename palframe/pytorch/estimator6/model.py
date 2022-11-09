@@ -26,17 +26,9 @@ class ModelBase(nn.Module):
       assert isinstance(info, dict)
       state_dict = info["model"]
 
-      # clean_state_dict = collections.OrderedDict()
-      # prefix = "module."
-      # for key, value in state_dict.items():
-      #   if key.startswith(prefix):
-      #     key = key[len(prefix):]
-      #   clean_state_dict[key] = value
-
-      # incompatible_keys = self.load_state_dict(clean_state_dict, strict=False)
       incompatible_keys = self.load_state_dict(state_dict, strict=False)
       Logger.info(f"Incompatible keys: {incompatible_keys}")
-      Logger.info(f"Model load succeeds: {model_file}")
+      Logger.info(f"Model loading is done: {model_file}")
 
       return info
 
