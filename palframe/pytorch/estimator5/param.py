@@ -35,6 +35,7 @@ class ParamBase(abc.ABC):
     self._check_instance_validity()
 
     self.seed = 0  # 0 means random.
+    self.country_city = country_city
     Logger.country_city = country_city
 
     if not nlp.is_none_or_empty(path_work_restored_training):

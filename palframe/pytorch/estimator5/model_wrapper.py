@@ -11,6 +11,7 @@ class ModelWrapperBase:
     '''
     model = user_model_cls(param)
     '''
+    Logger.country_city = param.country_city
     self._quickrun_mode = os.getenv("DIST_RUN") is None
 
     if self._quickrun_mode:
