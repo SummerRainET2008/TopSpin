@@ -378,18 +378,29 @@ def to_readable_time(seconds: float):
   return " ".join(result)
 
 
-def get_log_time(utc_time: bool = True):
+def get_log_time(utc_time: bool = True, country_city: str=None):
   '''
-  e.g., SF time is utf-8, then get_log_time(True) - 8 = get_log_time(False)
+  utc_time: if False, return local time(server);
+            if True, return local time(city).
+  country_city : When utc_time is true,  if city is None, return UTC(0).
+                See pytz/__init__.py:510, all_timezones
+
+  e.g., SF time is UTC+8, then get_log_time(True) - 8 = get_log_time(False)
   '''
   if utc_time:
-    now = datetime.datetime.utcnow()
-    ts = now.strftime("%Y-%m-%d %H:%M:%S")
-    return f"[utc] {ts}"
+    if is_none_or_empty(country_city):
+      now = datetime.datetime.utcnow()
+      ts = now.strftime("%Y-%m-%d %I:%M %p")
+      return f"[utc] {ts}"
+    else:
+      now = datetime.datetime.now(pytz.timezone(country_city))
+      ts = now.strftime("%Y-%m-%d %I:%M %p")
+      city = country_city.split("/")[-1]
+      return f"[{city}] {ts}"
 
   else:
     now = datetime.datetime.now()
-    ts = now.strftime("%Y-%m-%d %H:%M:%S")
+    ts = now.strftime("%Y-%m-%d %I:%M %p")
     return f"[local] {ts}"
 
 
@@ -762,6 +773,7 @@ class Logger:
   '''
   level = 1
   outstream = sys.stdout
+  country_city = "" #"Asia/Chongqing", 'America/Los_Angeles'
 
   @staticmethod
   def reset_outstream(out_file: str, append=False):
@@ -779,25 +791,29 @@ class Logger:
   @staticmethod
   def debug(*args):
     if Logger.level <= 0:
-      print(get_log_time(), "DEBUG:", *args, file=Logger.outstream)
+      print(get_log_time(country_city=Logger.country_city),
+            "DEBUG:", *args, file=Logger.outstream)
       Logger.outstream.flush()
 
   @staticmethod
   def info(*args):
     if Logger.level <= 1:
-      print(get_log_time(), "INFO:", *args, file=Logger.outstream)
+      print(get_log_time(country_city=Logger.country_city),
+            "INFO:", *args, file=Logger.outstream)
       Logger.outstream.flush()
 
   @staticmethod
   def warn(*args):
     if Logger.level <= 2:
-      print(get_log_time(), "WARN:", *args, file=Logger.outstream)
+      print(get_log_time(country_city=Logger.country_city),
+            "WARN:", *args, file=Logger.outstream)
       Logger.outstream.flush()
 
   @staticmethod
   def error(*args):
     if Logger.level <= 3:
-      print(get_log_time(), "ERR:", *args, file=Logger.outstream)
+      print(get_log_time(country_city=Logger.country_city),
+            "ERR:", *args, file=Logger.outstream)
       Logger.outstream.flush()
 
 
