@@ -661,14 +661,17 @@ class TrainerBase:
     with nlp.Timer("Draw training loss"):
       pickle.dump(self._figure_data,
                   open(f"{self._param.path_meta}/figure.data", "wb"))
-      out_file = os.path.join(
-          self._param.path_work,
-          os.path.split(self._param.path_work)[1] + ".train.loss.png")
-
       figure_data = {}
       for line_id, key in enumerate(sorted(self._figure_data.keys())):
         figure_data[f"{line_id}.{key}"] = self._figure_data[key]
+
+      out_file = os.path.join(
+        self._param.path_work,
+        os.path.split(self._param.path_work)[1] + ".train.loss.png")
       draw_figure(figure_data, out_file)
+
+      out_file = out_file.replace(".train.loss.png", ".train.loss.smoothed.png")
+      draw_figure(figure_data, out_file, smooth_width=256)
 
   def _save_model(self, tag=""):
     param = self._param

@@ -2,15 +2,9 @@
 #author: Tian Xia
 
 from palframe.pytorch import *
-from torch.optim import Optimizer
-from torch.cuda import amp
-from palframe.pytorch.dataset.offline_bigdataset import parse_feat_folder
-from palframe.pytorch.estimator6 import starter
-from torch import autograd
-from filelock import FileLock
 
 
-def draw_figure(figure_data, out_file):
+def draw_figure(figure_data, out_file, smooth_width=1):
   def shorten_label_name(name, max_prefix_len=12, max_len=30):
     if len(name) <= max_len:
       return name
@@ -20,6 +14,21 @@ def draw_figure(figure_data, out_file):
     new_name = prefix + "..." + suffix
 
     return new_name
+
+  def smooth(y_data):
+    ret_y = []
+    accum_y = 0
+    for p, y in enumerate(y_data):
+      accum_y += y
+      if (p + 1) > smooth_width:
+        accum_y -= y_data[p - smooth_width]
+        num = smooth_width
+      else:
+        num = p + 1
+
+      ret_y.append(accum_y / num)
+
+    return ret_y
 
   try:
     import matplotlib.pyplot as plt
@@ -44,7 +53,7 @@ def draw_figure(figure_data, out_file):
       else:
         plt.subplot(3, 1, 3)
 
-      plt.plot(xs, ys, label=shorten_label_name(key))
+      plt.plot(xs, smooth(ys), label=shorten_label_name(key))
 
       plt.minorticks_on()
       plt.grid(which='major', color='#DDDDDD', linewidth=0.8)
