@@ -30,10 +30,13 @@ class ParamBase(abc.ABC):
   def __init__(self,
                run_tag: str,
                path_work_restored_training=None,
-               experiment_folder="work"):
+               experiment_folder="work",
+               country_city=""):
     self._check_instance_validity()
 
     self.seed = 0  # 0 means random.
+    self.country_city = country_city
+    Logger.country_city = country_city
 
     if not nlp.is_none_or_empty(path_work_restored_training):
       self.path_work = path_work_restored_training
@@ -43,9 +46,8 @@ class ParamBase(abc.ABC):
       assert not nlp.is_none_or_empty(run_tag)
       self.restore_from_last_train = False
 
-      date_str = nlp.get_log_time(True)
-      date_str = date_str.replace(" ", "_").replace(":", "-")\
-                         .replace("[utc]", "utc")
+      date_str = nlp.get_log_time(True, country_city=country_city)
+      date_str = date_str.replace(" ", "_").replace(":", "-")
       self.run_tag = f"{run_tag}.{date_str}"
       self.path_work = f"{experiment_folder}/run.{self.run_tag}"
 

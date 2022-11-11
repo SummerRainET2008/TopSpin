@@ -21,6 +21,7 @@ class TrainerBase:
   def __init__(self, model: ModelBase, user_predictor_cls,
                optimizer: typing.Union[Optimizer, None]):
     param = model._param
+    Logger.country_city = param.country_city
     self._param = param
 
     nlp.set_random_seeds(param.seed)
@@ -499,9 +500,13 @@ class TrainerBase:
             f"taking {100 * est_net_time / batch_duration:.2f} %.")
 
       self._memory_information()
+
+      finished_time = nlp.get_future_time(seconds=remaining_time,
+                                          country_city=Logger.country_city)
       Logger.info(
           f"Training time: {nlp.to_readable_time(train_duration)}, "
           f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"to finish on {finished_time}"
       )
       Logger.info(f"{self._get_worker_info()}: "
                   f"*Epoch: {epoch_id:.2f}, "

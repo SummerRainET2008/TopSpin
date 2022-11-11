@@ -45,8 +45,7 @@ class ParamBase(abc.ABC):
       assert not nlp.is_none_or_empty(run_tag)
 
       date_str = nlp.get_log_time(True, country_city=country_city)
-      # date_str = date_str.replace(" ", "_").replace(":", "-")\
-      #                    .replace("[", "").replace("]", "")
+      date_str = date_str.replace(" ", "_").replace(":", "-")
       date_str = date_str.replace(" ", "_")
       self.run_tag = f"{run_tag}.{date_str}"
       self.path_work = f"{experiment_folder}/run.{self.run_tag}"
