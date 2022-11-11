@@ -1,5 +1,7 @@
 #coding: utf8
 #author: Tian Xia
+import datetime
+import pytz
 
 from palframe import *
 
@@ -390,19 +392,32 @@ def get_log_time(utc_time: bool = True, country_city: str=None):
   if utc_time:
     if is_none_or_empty(country_city):
       now = datetime.datetime.utcnow()
-      ts = now.strftime("%Y-%m-%d %I:%M %p")
+      ts = now.strftime("%Y-%m-%d %I:%M:%S %p")
       return f"[utc] {ts}"
     else:
       now = datetime.datetime.now(pytz.timezone(country_city))
-      ts = now.strftime("%Y-%m-%d %I:%M %p")
+      ts = now.strftime("%Y-%m-%d %I:%M:%S %p")
       city = country_city.split("/")[-1]
       return f"[{city}] {ts}"
 
   else:
     now = datetime.datetime.now()
-    ts = now.strftime("%Y-%m-%d %I:%M %p")
+    ts = now.strftime("%Y-%m-%d %I:%M:%S %p")
     return f"[local] {ts}"
 
+def get_future_time(days=0, hours=0, minutes=0, seconds=0,
+                    country_city: str=None):
+  if is_none_or_empty(country_city):
+    current_time = datetime.datetime.now()
+  else:
+    current_time = datetime.datetime.now(pytz.timezone(country_city))
+
+  finished_time = current_time + datetime.timedelta(
+    days=days, hours=hours, minutes=minutes, seconds=seconds)
+
+  ts = finished_time.strftime("%Y-%m-%d %I:%M:%S %p")
+
+  return str(ts)
 
 #deprecated
 def execute_cmd(*cmds) -> int:

@@ -1,5 +1,6 @@
 #coding: utf8
 #author: Tian Xia
+import datetime
 
 from palframe.pytorch.estimator5.model_wrapper import ModelWrapperBase
 from palframe.pytorch.estimator5.draw_figure import draw_figure
@@ -431,9 +432,13 @@ class TrainerBase:
             f"taking {100 * est_net_time / batch_duration:.2f} %.")
 
       self._memory_information()
+
+      finished_time = nlp.get_future_time(seconds=remaining_time,
+                                          country_city=Logger.country_city)
       Logger.info(
           f"Training time: {nlp.to_readable_time(train_duration)}, "
-          f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"and remaining time: {nlp.to_readable_time(remaining_time)}, "
+          f"to finish on {finished_time}"
       )
       Logger.info(f"{self._get_worker_info()}: "
                   f"*Epoch: {epoch_id:.2f}, "
