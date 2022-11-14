@@ -613,7 +613,7 @@ class TrainerBase:
     lr_ratio = param.stepwise_lr_decay_ratio ** \
                (epoch_id // param.stepwise_lr_decay_epochs)
 
-    self._update_lr_ratioi(lr_ratio)
+    self._update_lr_ratio(lr_ratio)
 
   def _update_lr_liner_decay(self):
     param = self._param
@@ -629,14 +629,15 @@ class TrainerBase:
       flag = "-"
 
     Logger.info(f"lr[{flag}]")
-    self._update_lr_ratioi(lr_ratio)
+    self._update_lr_ratio(lr_ratio)
 
-  def _update_lr_ratioi(self, ratio):
+  def _update_lr_ratio(self, ratio):
     lrs = []
     for param_group in self._optimizer.param_groups:
       if "initial_lr" not in param_group:
         param_group["initial_lr"] = param_group["lr"]
 
+      # param_group["initial_lr"] = 1.0e-4
       lr = ratio * param_group["initial_lr"]
       lrs.append(lr)
       param_group["lr"] = lr

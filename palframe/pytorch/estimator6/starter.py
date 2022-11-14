@@ -86,7 +86,7 @@ class Server:
   def __init__(self, ip, gpus):
     assert isinstance(gpus, list)
 
-    self._ip = nlp.get_server_ip() if nlp.is_none_or_empty(ip) else ip
+    self._ip = nlp.get_server_ip0() if nlp.is_none_or_empty(ip) else ip
     self._avail_gpus = gpus
 
   def avail_gpu_num(self):
@@ -153,7 +153,7 @@ class _RunTaskThread(threading.Thread):
     self._task = task
     self._shared = shared
     self._lock = lock
-    self._is_current_node = nlp.get_server_ip() == task._avail_server
+    self._is_current_node = nlp.get_server_ip0() == task._avail_server
     self._is_alive = True
 
   def clear_threads(self):
@@ -435,7 +435,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
   def get_server_ips():
     servers_files = param.servers_file
     if nlp.is_none_or_empty(servers_files):
-      yield nlp.get_server_ip()
+      yield nlp.get_server_ip0()
 
     else:
       for sf in servers_files.split(","):

@@ -549,7 +549,7 @@ def get_server_ip(buffer={}):
   buffer["ip"] = local_ip
   return local_ip
 
-def __get_server_ip(buffer={}):
+def get_server_ip0(buffer={}):
   if "ip" in buffer:
     return buffer["ip"]
 
