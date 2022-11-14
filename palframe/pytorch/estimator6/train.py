@@ -458,7 +458,8 @@ class TrainerBase:
             var.grad /= len(batches)
 
       reduce_batch_figure(batch_figure)
-      if self._batch_id > 0 and self._batch_id % 100 == 0:
+      if self._batch_id > 0 and \
+        self._batch_id % param.draw_figure_frequency == 0:
         self._draw_figure()
 
       total_norm = torch.nn.utils.clip_grad_norm_(self._model.parameters(),
@@ -666,13 +667,21 @@ class TrainerBase:
       for line_id, key in enumerate(sorted(self._figure_data.keys())):
         figure_data[f"{line_id}.{key}"] = self._figure_data[key]
 
-      out_file = os.path.join(
+      out_file_prefix = os.path.join(
         self._param.path_work,
         os.path.split(self._param.path_work)[1] + ".train.loss.png")
-      draw_figure(figure_data, out_file)
 
-      out_file = out_file.replace(".train.loss.png", ".train.loss.smoothed.png")
-      draw_figure(figure_data, out_file, smooth_width=256)
+      smooth_widths = self._param.draw_figure_smooth_width
+      if not isinstance(smooth_widths, list):
+        smooth_widths = [smooth_widths]
+
+      for smooth in smooth_widths:
+        if smooth == 1:
+          out_file = out_file_prefix
+        else:
+          out_file = out_file_prefix.replace(
+            f".train.loss.png", f".train.loss.smoothed_{smooth}.png")
+        draw_figure(figure_data, out_file, smooth_width=smooth)
 
   def _save_model(self, tag=""):
     param = self._param
