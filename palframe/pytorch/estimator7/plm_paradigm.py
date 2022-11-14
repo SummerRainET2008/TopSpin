@@ -83,24 +83,30 @@ class DownStreamParamBase(ParamBase):
     # 读取版本中的模型类
     param_module_in_version = _ParamBaseMixin.load_module_from_model_version(
         pretrained_model_version, py_name='param')
-    _PreTrainParam = param_module_in_version.Param
-    _DownStreamParam = param_module_in_version.DownStreamParam
+    _PreTrainParam_in_model_version = param_module_in_version.Param
+    _DownStreamParam = getattr(param_module_in_version, 'DownStreamParam', None)
     if pretrained_path_work is not None:
       # 读取执行时对应的参数
       param_in_path_work = os.path.join(pretrained_path_work, 'param.py')
       param_module_in_path_work = _ParamBaseMixin.load_module_from_full_path(
           param_in_path_work)
-      _PreTrainParam = param_module_in_path_work.Param
+      _PreTrainParam_in_path_work = param_module_in_path_work.Param
       _DownStreamParam = getattr(param_module_in_path_work, 'DownStreamParam',
                                  _DownStreamParam)
 
-    pretrained_param = _PreTrainParam.get_instance()
-    downstream_param = _DownStreamParam.get_instance()
+    pretrained_param_in_model_version = _PreTrainParam_in_model_version.get_instance()
+    preTrainParam_in_path_work = _PreTrainParam_in_path_work.get_instance()
+
+    downstream_param = None if not _DownStreamParam else _DownStreamParam.get_instance()
 
     obj = super().__new__(cls)
     # 更新预训练参数
-    obj.__dict__.update(pretrained_param.__dict__)
-    obj.__dict__.update(downstream_param.__dict__)
+    # Logger.info(pretrained_param_in_model_version.__dict__)
+    obj.__dict__.update(pretrained_param_in_model_version.__dict__)
+    obj.__dict__.update(preTrainParam_in_path_work.__dict__)
+
+    if downstream_param is not None:
+      obj.__dict__.update(downstream_param.__dict__)
     obj.pretrained_model_version = pretrained_model_version
     obj.pretrained_path_work = pretrained_path_work
     # obj._pretrained_param = pretrained_param

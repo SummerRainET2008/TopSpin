@@ -38,7 +38,11 @@ class ModelBase(nn.Module, metaclass=ModelBaseMeta):
       _type_: _description_
   """
   def __init__(self, param):
-    super().__init__()
+    try:
+      super().__init__()
+    except TypeError:
+      super().__init__(param)
+
     self.param = param
     self._param = param
     self._has_call_base_init = True
