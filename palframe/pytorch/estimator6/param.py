@@ -145,6 +145,9 @@ class ParamBase(abc.ABC):
     self.cudnn_deterministic = True
     self.cudnn_benchmark = False
 
+    self.draw_figure_frequency = 1000
+    self.draw_figure_smooth_width = [1, 256]
+
   @property
   def use_gpu(self):
     return self.__use_gpu
