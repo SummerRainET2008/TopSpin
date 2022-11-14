@@ -59,19 +59,6 @@ def async_function(f):
   return wrapper
 
 
-def get_GPU_info(gpu_id):
-  with Timer(f"get_GPU_info({gpu_id})"):
-    nvidia_smi.nvmlInit()
-    handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)
-    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
-    total = info.total / 1024**2
-    free = info.free / 1024**2
-    used = info.used / 1024**2
-    nvidia_smi.nvmlShutdown()
-
-    return {"Total memory": total, "Free memory": free, "Used memory": used}
-
-
 def coloring(s, value=TerminalColors.HEADER):
   return f"{value}{s}{TerminalColors.ENDC}"
 
@@ -614,6 +601,23 @@ def get_available_gpus(server_ip=None, account=None):
   except Exception as error:
     Logger.error(error)
     return []
+
+def get_GPU_num():
+  return torch.cuda.device_count()
+
+
+def get_GPU_info(gpu_id):
+  with Timer(f"get_GPU_info({gpu_id})"):
+    nvidia_smi.nvmlInit()
+    handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    total = info.total / 1024**2
+    free = info.free / 1024**2
+    used = info.used / 1024**2
+    nvidia_smi.nvmlShutdown()
+
+    return {"Total memory": total, "Free memory": free, "Used memory": used}
+
 
 def get_gpu_user(gpu_id, candidate_users: list=[], server_ip=None,
                  account=None):

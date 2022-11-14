@@ -87,9 +87,7 @@ class ParamBase(abc.ABC):
 
     # Default settings that work fine.
     self.param_norm = 1
-    # Training GPUs. Do not set it, as it will be set automatically,
-    # except for debug mode.
-    self.gpus = [0]
+
     # Only support single-GPU inference. DataParallel is not applicable as
     # it does not support module.parameters(), while in some important models,
     # such as pytorch_transformers, they call module.parameters().

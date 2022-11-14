@@ -116,7 +116,6 @@ class Task:
   def acquire_server(self, server: Server):
     self._avail_server = server
     self._avail_gpus = server.acquire_gpus(self._gpu_num)
-    self._param.gpus = self._avail_gpus
 
   def release_server(self):
     self._avail_server.release_gpus(self._avail_gpus)
@@ -184,9 +183,10 @@ class _RunTaskThread(threading.Thread):
           f"DIST_RUN=1 " \
           f"PYTHONPATH=./:{pythonpath} " \
           f"param_file={param_file} " \
+          f"avail_gpus={','.join(self._task._avail_gpus)} " \
           f"{sys.executable} -m " \
           f"torch.distributed.launch " \
-          f"--nproc_per_node={len(param.gpus)} " \
+          f"--nproc_per_node={len(self._task._avail_gpus)} " \
           f"--nnodes=1 " \
           f"--node_rank=0 " \
           f"--master_addr={server_ip} " \
@@ -387,22 +387,24 @@ def stop_train(run_id):
 
 
 def start_distributed_train(param: ParamBase, source_script_and_params):
-  def start(param_file, server_ips):
-    master_node_ip = server_ips[-1]
+  def start(param_file, server_gpus):
+    master_node_ip = server_gpus[-1]
     port = _get_netport()
     pythonpath = ":".join(sys.path)
 
-    for server_id, server_IP in enumerate(server_ips):
+    for server_id, server_IP in enumerate(server_gpus):
+      avail_gpus = server_gpus[server_IP]
       Logger.info(f"starting {server_IP} ...")
-      node_rank = (server_id + 1) % len(server_ips)
+      node_rank = (server_id + 1) % len(server_gpus)
       cmd_base = f"cd {os.getcwd()}; " \
                  f"DIST_RUN=1 " \
                  f"PYTHONPATH=./:{pythonpath} " \
                  f"param_file={param_file} " \
                  f"worker_IP={server_IP} " \
+                 f"avail_gpus={','.join(avail_gpus)} " \
                  f"<mask1> {sys.executable} -m torch.distributed.launch " \
                  f"--nproc_per_node={param.gpu_num} " \
-                 f"--nnodes={len(server_ips)} " \
+                 f"--nnodes={len(server_gpus)} " \
                  f"--node_rank={node_rank} " \
                  f"--master_addr={master_node_ip} " \
                  f"--master_port={port} " \
@@ -425,20 +427,29 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
 
     return True
 
-  def check_servers(server_ips):
-    if param.use_gpu:
-      server_gpu_info = [[ip, list(range(param.gpu_num))] for ip in server_ips]
-      assert _check_server_gpus(server_gpu_info)
-
+  def check_availabel_GPUs(server_ips):
     assert _check_server_disk_path(server_ips, os.getcwd())
 
+    server_gpus = {}
+    for ip in server_ips:
+      if param.use_gpu:
+        avail_gpus = nlp.get_available_gpus(ip)
+        if len(avail_gpus) < param.gpu_num:
+          assert False, f"{ip} does not have sufficient GPUs ({avail_gpus})."
+        server_gpus[ip] = avail_gpus
+
+      else:
+        server_gpus[ip] = []
+
+    return server_gpus
+
   def get_server_ips():
-    servers_files = param.servers_file
-    if nlp.is_none_or_empty(servers_files):
+    servers_file = param.servers_file
+    if nlp.is_none_or_empty(servers_file):
       yield nlp.get_server_ip0()
 
     else:
-      for sf in servers_files.split(","):
+      for sf in servers_file.split(","):
         content = open(os.path.expanduser(sf)).read()
         yield from re.sub(r"(:\d+)", " ", content).replace(",", " ").split()
 
@@ -449,15 +460,14 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     "use starter.start_train(...)"
 
   server_ips = list(get_server_ips())
-  check_servers(server_ips)
+  server_gpus = check_availabel_GPUs(server_ips)
 
   param.create_workspace()
-  param.gpus = list(range(param.gpu_num))
-  param.worker_IPs = ",".join(server_ips)
+  param.worker_IPs = ",".join(server_gpus)
   param_file = f"{param.path_meta}/param.pkl"
   pickle.dump(param, open(param_file, "wb"))
 
-  if not start(param_file, server_ips):
+  if not start(param_file, server_gpus):
     Logger.error(f"Distributed running '{param.path_work}' fails.")
     stop_distributed_train(param.path_work)
 
