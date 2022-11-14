@@ -87,6 +87,7 @@ class TrainerBase:
       # os.environ["CUDA_VISIBLE_DEVICES"] = f"{param.gpus[self._local_rank]}"
       # gpu_id = 0
       gpu_id = self._avail_gpus[self._local_rank]
+      Logger.info(f"Currently used GPU: {gpu_id}")
       self._device = torch.device(f"cuda:{gpu_id}")
       torch.cuda.set_device(self._device)
       self._user_model = model.to(self._device)

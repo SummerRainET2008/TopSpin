@@ -179,11 +179,12 @@ class _RunTaskThread(threading.Thread):
         f"best vali_error: %f",
     ).start()
 
+    avail_gpus = ",".join([str(g) for g in self._task._avail_gpus])
     cmd = f"cd {os.getcwd()}; " \
           f"DIST_RUN=1 " \
           f"PYTHONPATH=./:{pythonpath} " \
           f"param_file={param_file} " \
-          f"avail_gpus={','.join(self._task._avail_gpus)} " \
+          f"avail_gpus={avail_gpus} " \
           f"{sys.executable} -m " \
           f"torch.distributed.launch " \
           f"--nproc_per_node={len(self._task._avail_gpus)} " \
@@ -388,12 +389,14 @@ def stop_train(run_id):
 
 def start_distributed_train(param: ParamBase, source_script_and_params):
   def start(param_file, server_gpus):
-    master_node_ip = server_gpus[-1]
+    server_ips = sorted(server_gpus.keys())
+    master_node_ip = server_ips[-1]
     port = _get_netport()
     pythonpath = ":".join(sys.path)
 
-    for server_id, server_IP in enumerate(server_gpus):
+    for server_id, server_IP in enumerate(server_ips):
       avail_gpus = server_gpus[server_IP]
+      avail_gpus_str = ",".join([str(g) for g in avail_gpus])
       Logger.info(f"starting {server_IP} ...")
       node_rank = (server_id + 1) % len(server_gpus)
       cmd_base = f"cd {os.getcwd()}; " \
@@ -401,7 +404,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
                  f"PYTHONPATH=./:{pythonpath} " \
                  f"param_file={param_file} " \
                  f"worker_IP={server_IP} " \
-                 f"avail_gpus={','.join(avail_gpus)} " \
+                 f"avail_gpus={avail_gpus_str} " \
                  f"<mask1> {sys.executable} -m torch.distributed.launch " \
                  f"--nproc_per_node={param.gpu_num} " \
                  f"--nnodes={len(server_gpus)} " \
