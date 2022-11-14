@@ -244,8 +244,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       return
 
     Logger.info(f"{self._get_worker_info()} "
-                f"Restoring from last training from: {param.path_work}...")
-    info = self.load_model_from_folder()
+                f"Restoring from last training from: {param.path_work_restored_training}...")
+    info = self.load_model_from_folder(param.path_work_restored_training)
     if info is not None:
       self._model_seen_sample_num = info["model_seen_sample_num"]
       self._batch_id = info['batch_id']
@@ -315,9 +315,9 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       )
     return self.lr_scheduler
 
-  def load_model_from_folder(self):
+  def load_model_from_folder(self,path_work):
     param = self._param
-    check_point_file = f"{param.path_model}/checkpoint"
+    check_point_file = f"{path_work}/model/checkpoint"
     if os.path.isfile(check_point_file):
       model_names = open(check_point_file).read().split()
       if len(model_names) > 0:
@@ -331,7 +331,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       Logger.info("No model to load")
       return None
 
-    model_file = f"{param.path_model}/{model_name}"
+    model_file = f"{path_work}/model/{model_name}"
     return self._user_model.load_model_from_file(model_file)
 
   def _get_worker_info(self):
@@ -365,13 +365,13 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     try:
       local_vars = [None]
-      sys.setprofile(tracer)
+      # sys.setprofile(tracer)
       ret = self.train_one_batch(*batch["args"], **batch["kwargs"])
 
       if type(ret) is not dict:
         raise Exception(f"train_one_batch(...) should return a dict.")
 
-      sys.setprofile(None)
+      # sys.setprofile(None)
 
       if "batch_num" not in ret:
         ret["batch_num"] = self._extract_real_batch_num(batch)
@@ -385,7 +385,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       return ret
 
     except Exception as error:
-      sys.setprofile(None)
+      # sys.setprofile(None)
 
       Logger.error(f"{error}")
       traceback.print_exc()
@@ -535,9 +535,18 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       # self._figure_data[key].append(value)
       # write train figure data to current_train_figure_data
       self.current_train_figure_data[key] = value
-
+  
   @starter.exception_stop
-  def train(self, train_data, dev_data=None, test_data=None):
+  def train(self, train_data, dev_data=None, test_data=None,exit_when_finish=True):
+    return self._train(
+      train_data,
+      dev_data=dev_data,
+      test_data=test_data,
+      exit_when_finish=exit_when_finish
+      )
+
+
+  def _train(self, train_data, dev_data=None, test_data=None,exit_when_finish=True):
     """
 
     Args:
@@ -611,7 +620,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
 
     self.before_train()
-
+    # must not be zero when continue train
+    start_batch_id = self._batch_id
     while True:
       batch_start_time = time.time()
       self.model.train()
@@ -708,9 +718,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       else:
         epoch_id = self.current_epoch
       
-
-
-      a = train_duration / (self._batch_id + 1)
+      a = train_duration / (self._batch_id-start_batch_id + 1)
       b = self.max_train_step - self._batch_id
       remaining_time = a * b
       progress = self._batch_id / self.max_train_step
@@ -730,7 +738,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
             f"Estimated network gradient sync time: {est_net_time:.2f} seconds "
             f"for {self._world_size} GPUs, "
             f"taking {100 * est_net_time / batch_duration:.2f} %.")
-
+      
+      # 3% time expand 
       self._memory_information()
       Logger.info(
           f"Training time: {nlp.to_readable_time(train_duration)}, "
@@ -783,7 +792,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         f"grep ERR {param.path_log}/log.node_* >> {param.path_work}/log.error")
     Logger.info(f"Training is Done.")
     nlp.command(f"touch {param.path_meta}/train.done")
+    if exit_when_finish:
+      Logger.info('exiting......')
+      self.exit()
 
+  def exit(self):
     os._exit(0)
 
   def _memory_information(self, buff={}):

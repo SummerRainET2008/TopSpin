@@ -187,6 +187,10 @@ def start_dist_train(args):
     value = getattr(args, name)
     if value is not None:
       setattr(param_obj, name, value)
+  
+
+  # if param_obj.
+  #   param_obj.create_restart_work_path_name()
   from palframe.pytorch.estimator7 import starter
   starter.start_distributed_train(param_obj, train_script_path)
 

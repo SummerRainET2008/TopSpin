@@ -2,7 +2,7 @@
 #author: zhouxuan553
 
 from functools import partial
-import os, pickle, copy, itertools, math, psutil, random
+import os, pickle, copy, itertools, math, psutil, random,sys
 import threading
 import copy
 from palframe import nlp
@@ -41,12 +41,11 @@ class ParamBaseMeta(type):
       param.__init__()
       # after init
       if not nlp.is_none_or_empty(param.path_work_restored_training):
-        param.path_work = param.path_work_restored_training
         assert os.path.isdir(param.path_work), param.path_work
+        # param.create_restart_work_path_name()
       else:
         assert not nlp.is_none_or_empty(param.run_tag)
         param.parse_path_work_name()
-      
       
       param._instance_cache = None
       _param = param  
@@ -68,8 +67,23 @@ class ParamBase(metaclass=ParamBaseMeta):
     self = super().__new__(cls)
     self._workspace_created = False
     self._true_gradient = False
+    self._path_work_restored_training = None
     self.__dict__.update(**copy.deepcopy(DEFAULT_PARAMS))
     return self
+
+
+
+  @property
+  def path_work_restored_training(self):
+    return self._path_work_restored_training
+  
+  @path_work_restored_training.setter
+  def path_work_restored_training(self,v):
+    self._path_work_restored_training = v
+    self.path_work = v + '_continue'
+
+  # def create_restart_work_path_name(self):
+  #   self.path_work = self.path_work_restored_training + '_continue'
 
   def parse_path_work_name(self):
 
@@ -259,7 +273,7 @@ class ParamBase(metaclass=ParamBaseMeta):
       return
     Logger.info(f"ParamBase.create_workspace: {self.path_work}")
     self._workspace_created = True
-    nlp.mkdir("work")
+    nlp.mkdir(self.experiment_folder)
     nlp.mkdir(self.path_work)
     nlp.mkdir(self.path_model)
     nlp.mkdir(self.path_log, True)
@@ -274,6 +288,8 @@ class ParamBase(metaclass=ParamBaseMeta):
     nlp.display_server_info()
     for key in sorted(self.__dict__):
       Logger.info(f"{key:20}: {self.__dict__[key]}")
+
+    Logger.info(f"python_path: {sys.executable}")
     try:
       import torch.distributed as dist
       Logger.info("#GPU:", dist.get_world_size())
@@ -356,8 +372,8 @@ def distributed_init(param: ParamBase):
 from palframe.nlp import get_log_time as _get_log_time
 
 
-def get_log_time(utc_time: bool = False):
-  return _get_log_time(utc_time)
+def get_log_time(utc_time: bool = False,country_city: str=None):
+  return _get_log_time(utc_time,country_city=country_city)
 
 
 def modify_time_display(param):

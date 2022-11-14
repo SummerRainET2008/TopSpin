@@ -6,6 +6,7 @@
 from palframe.pytorch.estimator7.param import ParamBase
 # from palframe.pytorch import *
 from palframe import nlp
+from functools import wraps
 from palframe.nlp import Logger
 from palframe.pytorch.estimator7.utils import parse_server_infos
 import threading, os, traceback, time, pickle, sys, re
@@ -506,6 +507,7 @@ def parse_servers_from_files(server_files:str):
 
 
 def exception_stop(class_func):
+  @wraps(class_func)
   def f(*args, **kwargs):
     try:
       ret = class_func(*args, **kwargs)
