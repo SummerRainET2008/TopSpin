@@ -108,11 +108,6 @@ class TrainerBase:
       '''
       Logger.info(f"Loading initial model '{param.path_initial_model}'")
       info = self._user_model.load_model(param.path_initial_model)
-      if info is not None and "optimizer_state" in info:
-        try:
-          self._optimizer.load_state_dict(info["optimizer_state"])
-        except:
-          pass
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
@@ -640,6 +635,7 @@ class TrainerBase:
     for param_group in self._optimizer.param_groups:
       if "initial_lr" not in param_group:
         param_group["initial_lr"] = param_group["lr"]
+
       lr = ratio * param_group["initial_lr"]
       lrs.append(lr)
       param_group["lr"] = lr
