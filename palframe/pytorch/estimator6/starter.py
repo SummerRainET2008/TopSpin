@@ -65,9 +65,10 @@ def _get_netport(buffer=set()):
 
 
 class _MonitorStopThread(threading.Thread):
-  def __init__(self, monitor_file, action_func=None, sleep_time=1):
+  def __init__(self, monitor_file, trainer, action_func=None, sleep_time=1):
     threading.Thread.__init__(self, daemon=True)
     self._monitor_file = monitor_file
+    self._trainer = trainer
     self._action_func = action_func
     self._sleep_time = sleep_time
 
@@ -77,7 +78,8 @@ class _MonitorStopThread(threading.Thread):
         if self._action_func is not None:
           self._action_func()
 
-        nlp.command(f"kill -9 {os.getpid()}")
+        self._trainer._to_stop = True
+        # nlp.command(f"kill -9 {os.getpid()}")
         break
       time.sleep(self._sleep_time)
 

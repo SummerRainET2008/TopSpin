@@ -62,8 +62,9 @@ class TrainerBase:
     else:
       self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
 
+    self._to_stop = False
     nlp.command(f"touch {param.run_lock_file}")
-    starter._MonitorStopThread(param.run_lock_file).start()
+    starter._MonitorStopThread(param.run_lock_file, self).start()
 
     param_file = param.__module__.replace(".", "/") + ".py"
     nlp.command(f"cp {param_file} {param.path_work}")
@@ -401,6 +402,11 @@ class TrainerBase:
     exit_code = -1
 
     while True:
+      if self._to_stop:
+        if self._rank == 0:
+          self._save_model()
+        os._exit(0)
+
       batch_start_time = time.time()
       self._model.train()
       self._optimizer.zero_grad()
