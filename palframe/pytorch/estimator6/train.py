@@ -56,7 +56,11 @@ class TrainerBase:
     self._local_rank = int(os.getenv("LOCAL_RANK"))
     self._rank = dist.get_rank()
     self._world_size = dist.get_world_size()
-    self._avail_gpus = [int(g) for g in os.getenv("avail_gpus").split(",")]
+    avail_gpus = os.getenv("avail_gpus").strip()
+    if nlp.is_none_or_empty(avail_gpus):
+      self._avail_gpus = []
+    else:
+      self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
 
     nlp.command(f"touch {param.run_lock_file}")
     starter._MonitorStopThread(param.run_lock_file).start()
