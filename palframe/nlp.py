@@ -338,9 +338,11 @@ def is_none_or_empty(data) -> bool:
   '''This applies to any data type which has a __len__ method'''
   if data is None:
     return True
-  if isinstance(data, (str, list, set, dict)):
+
+  try:
     return len(data) == 0
-  return False
+  except:
+    return False
 
 
 def to_readable_time(seconds: float):

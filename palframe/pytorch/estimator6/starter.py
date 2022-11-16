@@ -436,9 +436,15 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     assert _check_server_disk_path(server_ips, os.getcwd())
 
     server_gpus = {}
-    for ip in server_ips:
+    for ip, designated_gpus in server_ips.items():
+      designated_gpus= set(designated_gpus)
       if param.use_gpu:
-        avail_gpus = nlp.get_available_gpus(ip)
+        avail_gpus = set(nlp.get_available_gpus(ip))
+        if not nlp.is_none_or_empty(designated_gpus):
+          assert designated_gpus.issubset(avail_gpus), \
+            "Not all user designated GPUS are available"
+          avail_gpus = designated_gpus
+
         if len(avail_gpus) < param.gpu_num:
           assert False, f"{ip} does not have sufficient GPUs ({avail_gpus})."
         server_gpus[ip] = avail_gpus
@@ -451,12 +457,18 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
   def get_server_ips():
     servers_file = param.servers_file
     if nlp.is_none_or_empty(servers_file):
-      yield nlp.get_server_ip0()
+      yield nlp.get_server_ip0(), []
 
     else:
+      reg = re.compile(r"(\d+\.\d+\.\d+\.\d+)(:((\d,)*\d))?");
       for sf in servers_file.split(","):
         content = open(os.path.expanduser(sf)).read()
-        yield from re.sub(r"(:\d+)", " ", content).replace(",", " ").split()
+        for match in reg.findall(content):
+          ip, gpus = match[0], match[2]
+          gpus = [int(g) for g in gpus.replace(",", " ").split()]
+          # Be careful, ''.split(',') == [''], not []
+
+          yield ip, gpus
 
   whole_run_starting_time = time.time()
   nlp.set_random_seeds(0)
@@ -464,7 +476,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     "Distributed training model permits only one param variant, or You can" \
     "use starter.start_train(...)"
 
-  server_ips = list(get_server_ips())
+  server_ips = dict(list(get_server_ips()))
   server_gpus = check_availabel_GPUs(server_ips)
 
   param.create_workspace()
