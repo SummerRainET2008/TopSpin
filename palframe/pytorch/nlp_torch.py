@@ -754,3 +754,12 @@ class TranformerEncoder(nn.Module):
       x = x4
 
     return x
+
+def entropy(logit):
+    prob = torch.exp(torch.log_softmax(logit, 1))
+    x = -prob * torch.log(prob)
+    y = torch.ones(x.size(1), 1, device=x.device)
+    z = x @ y
+    ret = torch.mean(z)
+
+    return ret

@@ -39,10 +39,16 @@ class TrainerBase:
       current_env["RANK"] = "0"
       current_env["LOCAL_RANK"] = "0"
 
-      param.gpu_num = 1
-      param.gpus = param.gpus[:1]
-      param.servers_file = None
+      if param.use_gpu:
+        param.gpu_num = 1
+        avail_gpus = nlp.get_available_gpus() 
+        if nlp.is_none_or_empty(avail_gpus):
+          assert False, f"No available GPUs"
+        current_env["avail_gpus"] = str(avail_gpus[0])
+      else:
+        current_env["avail_gpus"] = ""
 
+      param.servers_file = None
       param.create_workspace()
 
     nlp.timeout(self._init_distributed_training, [param], 30)
@@ -50,9 +56,15 @@ class TrainerBase:
     self._local_rank = int(os.getenv("LOCAL_RANK"))
     self._rank = dist.get_rank()
     self._world_size = dist.get_world_size()
+    avail_gpus = os.getenv("avail_gpus").strip()
+    if nlp.is_none_or_empty(avail_gpus):
+      self._avail_gpus = []
+    else:
+      self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
 
+    self._to_stop = False
     nlp.command(f"touch {param.run_lock_file}")
-    starter._MonitorStopThread(param.run_lock_file).start()
+    starter._MonitorStopThread(param.run_lock_file, self).start()
 
     param_file = param.__module__.replace(".", "/") + ".py"
     nlp.command(f"cp {param_file} {param.path_work}")
@@ -79,7 +91,8 @@ class TrainerBase:
     else:
       # os.environ["CUDA_VISIBLE_DEVICES"] = f"{param.gpus[self._local_rank]}"
       # gpu_id = 0
-      gpu_id = param.gpus[self._local_rank]
+      gpu_id = self._avail_gpus[self._local_rank]
+      Logger.info(f"Currently used GPU: {gpu_id}")
       self._device = torch.device(f"cuda:{gpu_id}")
       torch.cuda.set_device(self._device)
       self._user_model = model.to(self._device)
@@ -207,7 +220,8 @@ class TrainerBase:
 
       if not nlp.is_none_or_empty(param.vali_file) or \
         not nlp.is_none_or_empty(param.test_files):
-        param.gpu_inference = param.gpus[0]
+        if param.use_gpu:
+          param.gpu_inference = self._avail_gpus[0]
         param.path_inference_model = ""
         predictor = self._user_predictor_cls(param)
         predictor._model.load_state_dict(self._user_model.state_dict(),
@@ -388,6 +402,11 @@ class TrainerBase:
     exit_code = -1
 
     while True:
+      if self._to_stop:
+        if self._rank == 0:
+          self._save_model()
+        os._exit(0)
+
       batch_start_time = time.time()
       self._model.train()
       self._optimizer.zero_grad()
@@ -613,7 +632,7 @@ class TrainerBase:
     lr_ratio = param.stepwise_lr_decay_ratio ** \
                (epoch_id // param.stepwise_lr_decay_epochs)
 
-    self._update_lr_ratioi(lr_ratio)
+    self._update_lr_ratio(lr_ratio)
 
   def _update_lr_liner_decay(self):
     param = self._param
@@ -629,14 +648,15 @@ class TrainerBase:
       flag = "-"
 
     Logger.info(f"lr[{flag}]")
-    self._update_lr_ratioi(lr_ratio)
+    self._update_lr_ratio(lr_ratio)
 
-  def _update_lr_ratioi(self, ratio):
+  def _update_lr_ratio(self, ratio):
     lrs = []
     for param_group in self._optimizer.param_groups:
       if "initial_lr" not in param_group:
         param_group["initial_lr"] = param_group["lr"]
 
+      # param_group["initial_lr"] = 1.0e-4
       lr = ratio * param_group["initial_lr"]
       lrs.append(lr)
       param_group["lr"] = lr
