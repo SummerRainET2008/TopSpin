@@ -48,7 +48,7 @@ def _get_vali_error(log_file):
   try:
     cmd = f"grep -i 'so far' {log_file} | tail -n 1"
     line = list(os.popen(cmd))[-1]
-    error = float(line.split()[10])
+    error = float(line.split()[8])
     return error
   except Exception as error:
     # Logger.warn(error)
