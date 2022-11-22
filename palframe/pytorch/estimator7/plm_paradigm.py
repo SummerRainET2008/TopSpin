@@ -85,6 +85,7 @@ class DownStreamParamBase(ParamBase):
         pretrained_model_version, py_name='param')
     _PreTrainParam_in_model_version = param_module_in_version.Param
     _DownStreamParam = getattr(param_module_in_version, 'DownStreamParam', None)
+    _PreTrainParam_in_path_work = None
     if pretrained_path_work is not None:
       # 读取执行时对应的参数
       param_in_path_work = os.path.join(pretrained_path_work, 'param.py')
@@ -95,7 +96,10 @@ class DownStreamParamBase(ParamBase):
                                  _DownStreamParam)
 
     pretrained_param_in_model_version = _PreTrainParam_in_model_version.get_instance()
-    preTrainParam_in_path_work = _PreTrainParam_in_path_work.get_instance()
+    if _PreTrainParam_in_path_work is not None:
+      preTrainParam_in_path_work = _PreTrainParam_in_path_work.get_instance()
+    else:
+      preTrainParam_in_path_work = None 
 
     downstream_param = None if not _DownStreamParam else _DownStreamParam.get_instance()
 
@@ -103,7 +107,8 @@ class DownStreamParamBase(ParamBase):
     # 更新预训练参数
     # Logger.info(pretrained_param_in_model_version.__dict__)
     obj.__dict__.update(pretrained_param_in_model_version.__dict__)
-    obj.__dict__.update(preTrainParam_in_path_work.__dict__)
+    if preTrainParam_in_path_work is not None:
+      obj.__dict__.update(preTrainParam_in_path_work.__dict__)
 
     if downstream_param is not None:
       obj.__dict__.update(downstream_param.__dict__)

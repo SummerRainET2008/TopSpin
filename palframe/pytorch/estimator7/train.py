@@ -12,6 +12,7 @@ import typing, torch, math, os, sys, traceback, pickle, time, psutil
 from transformers.optimization import get_scheduler
 import palframe
 import json, inspect
+import threading
 from palframe import nlp
 from palframe.nlp import Logger, Timer
 from palframe.pytorch import nlp_torch
@@ -100,37 +101,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           lr=param.lr,
           weight_decay=param.weight_decay)
 
-    # # get lr_schedule
-    # self.lr_scheduler = self.create_scheduler(self.param.lr_scheduler_type,
-    #                                           self.max_train_step,
-    #                                           self._optimizer)
-
-    # load init model
-
-    # if not nlp.is_none_or_empty(param.train_path_initial_model):
-    #   '''
-    #   If we loads a model as its initizaliazation, we ignore 
-    #   self._model_seen_sample_num and others, as these are recording their
-    #   information in current stage.
-    #   '''
-    #   Logger.info(f"Loading initial model '{param.train_path_initial_model}'")
-    #   info = self._user_model.load_model_from_file(
-    #       param.train_path_initial_model, self.device)
-    #   # aviod to load optimizer param from pretrain model
-
-    #   if self.param.train_path_initial_model_load_optimizer and \
-    #     info is not None and "optimizer_state" in info:
-    #     try:
-    #       self._optimizer.load_state_dict(info["optimizer_state"])
-    #     except:
-    #       pass
-
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
     self.so_far_best_eval_res = {
       'step':None,
       'score':None
     }
+    #
+    self.is_continue_training = threading.Event()
+    self.is_at_train_start = threading.Event()
     self._last_evaluate_point = 0
 
     self._batch_id = 0
@@ -432,6 +411,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       Logger.error(f"Exit training abnormally. Check your bug folder.")
       os._exit(1)
 
+
   def before_train(self):
     """do some thing before training, including:
         1. create the work space
@@ -455,7 +435,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     # create the monitor thread
     nlp.command(f"touch {param.run_lock_file}")
-    starter._MonitorStopThread(param.run_lock_file).start()
+    starter._MonitorStopThread(param.run_lock_file,action_func=self.exit_on_run_lock_removed).start()
     # redirect Logger output
     if not self.quickrun_mode:
       Logger.reset_outstream(f"{param.path_log}/log.rank_{self._rank}")
@@ -622,7 +602,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.before_train()
     # must not be zero when continue train
     start_batch_id = self._batch_id
+    self.is_continue_training.set()
     while True:
+      if not self.is_continue_training.isSet():
+        self.is_at_train_start.set()
+        self.is_continue_training.wait()
       batch_start_time = time.time()
       self.model.train()
       self._optimizer.zero_grad()
@@ -798,6 +782,30 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
   def exit(self):
     os._exit(0)
+
+
+  def exit_on_run_lock_removed(self):
+    """
+    save when run_lock
+    """
+    if self._batch_id > self.max_train_step or not self.is_master_rank():
+      # normal
+      return 
+
+    # aviod save more model 
+    if self.param.model_saved_num == 0:
+      return 
+
+    # save current_model
+    self.is_continue_training.clear()
+    self.is_at_train_start.wait()
+    self.save_trainer_states(
+      info={'msg':'run.lock is removed'},
+      tag='breakpoint',
+      save_detail_state=True
+    )
+  
+
 
   def _memory_information(self, buff={}):
     if self._rank % self._param.gpu_num != 0:
