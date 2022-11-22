@@ -45,7 +45,7 @@ def _check_server_gpus(server_gpu_info: list):
 
 
 
-def _get_vali_error(log_file):
+def ____get_vali_error(log_file):
   '''
   You can check path_meta/dev.eval.pkl, which includes all dev evaluation
   errors.
@@ -60,6 +60,25 @@ def _get_vali_error(log_file):
     # Logger.warn(error)
     Logger.warn(f"No evaluation found in '{log_file}'")
     return 0
+
+
+def _get_vali_error(best_eval_score_file_path):
+  '''
+  You can check path_meta/dev.eval.pkl, which includes all dev evaluation
+  errors.
+  '''
+
+  try:
+    with open(best_eval_score_file_path) as f:
+      best_score = float(f.read().strip())
+    return best_score
+  except FileNotFoundError:
+    Logger.warn(f"file: {best_eval_score_file_path} not exist")
+  except Exception as error:
+    Logger.error(error)
+    Logger.warn(f"No evaluation found in '{best_eval_score_file_path}'")
+  return 0
+
 
 
 def _get_netport(buffer=set()):
@@ -83,8 +102,9 @@ class _MonitorStopThread(threading.Thread):
         if self._action_func is not None:
           self._action_func()
 
-        nlp.command(f"kill -9 {os.getpid()}")
-        break
+        close_processes()
+        # nlp.command(f"kill -9 {os.getpid()}")
+        # break
       time.sleep(self._sleep_time)
 
 
@@ -180,7 +200,7 @@ class _RunTaskThread(threading.Thread):
                 f"'{param.path_work}' starts.")
 
     _MonitorResultThread(
-        f"{param.path_log}/log.rank_0",
+        f"{param.path_meta}/{param.best_eval_score_file_name}",
         self._lock,
         f"Task[{self._thread_id}] '{param.path_work}' running, "
         f"best vali_error: %f",
@@ -228,8 +248,14 @@ class _RunTaskThread(threading.Thread):
       self._is_alive = False
 
 
+def close_processes():
+  os.system(f"kill -9 -{os.getpid()}")
+  os.system(f"kill -9 {os.getpid()}")
+  os._exit(0)
+
+
 class RunManager:
-  avail_opts = ["no_GPU_check", "run_tag"]
+  avail_opts = ["no_GPU_check", "run_tag","experiment_folder"]
 
   def __init__(self, tasks, servers, **kwargs):
     Logger.info("-" * 80)
@@ -243,13 +269,16 @@ class RunManager:
 
     self._check_tasks_condition(tasks)
     self._check_servers(servers, tasks)
+    
+
+    experiment_folder = kwargs.get('experiment_folder','work')
 
     num_gpu = sum([len(s._avail_gpus) for s in servers])
     Logger.info(f"#task: {len(tasks)}, #gpu: {num_gpu}")
 
     nlp.set_random_seeds(0)
     self._run_id = random.randint(0, 1024 * 1024)
-    run_root_path = [f"work/batch_task", f"run_id_{self._run_id}"]
+    run_root_path = [f"{experiment_folder}/batch_task", f"run_id_{self._run_id}"]
     run_tag = kwargs.get("run_tag", "")
     if not nlp.is_none_or_empty(run_tag):
       run_root_path.append(run_tag)
@@ -259,7 +288,7 @@ class RunManager:
     self._run_lock_file = f"{run_root_path}/.run.lock"
     for task in tasks:
       task._param.path_work = task._param.path_work.replace(
-          "work", run_root_path)
+          experiment_folder, run_root_path)
 
     self._tasks = tasks
     self._servers = servers
@@ -356,7 +385,11 @@ class RunManager:
         if to_stop:
           Logger.info(f"Running is stopping")
           stop_thread_function()
-          return
+          close_processes()
+          # os.system(f"kill -9 -{os.getpid()}")
+          # os.system(f"kill -9 {os.getpid()}")
+          # os._exit(0)
+          # return 
 
         sleep_time = 3
         Logger.debug(f"waiting for {sleep_time} seconds.")
@@ -368,6 +401,7 @@ class RunManager:
         run_thread.start()
         self._all_threads.append(run_thread)
 
+    Logger.info(f"all tasks are dipatched, waiting to finish...")
     _MonitorStopThread(self._run_lock_file, stop_thread_function).start()
 
     for thread in self._all_threads:
@@ -389,8 +423,8 @@ def start_train(param: ParamBase, source_script_and_params: str,
   run_manager.run()
 
 
-def stop_train(run_id):
-  nlp.execute_cmd(f"rm work/batch_task.run_id_{run_id}/.run.lock")
+def stop_train(path_work):
+  nlp.execute_cmd(f"rm {path_work}/.run.lock")
 
 
 def start_distributed_train(param: ParamBase, source_script_and_params):
@@ -434,7 +468,6 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
       if code != 0:
         Logger.info(f"starting {server_IP} failed")
         return False
-
       Logger.info(f"starting {server_IP} succeeds")
 
     return True
@@ -502,9 +535,6 @@ def parse_servers_from_files(server_files:str):
 
   for server_IP, gpus in server_infos:
     yield Server(server_IP,gpus)
-  
-  
-
 
 def exception_stop(class_func):
   @wraps(class_func)
@@ -513,9 +543,7 @@ def exception_stop(class_func):
       ret = class_func(*args, **kwargs)
       return ret
     except Exception as error:
-      Logger.error(f"{traceback.format_exc()}")
-      #traceback.print_exc()
+      Logger.error(f"function {class_func} execute error:\n {traceback.format_exc()}")
       stop_distributed_train(args[0]._param.path_work)
-      raise
-
+      close_processes()
   return f

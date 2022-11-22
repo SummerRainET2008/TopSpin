@@ -31,17 +31,21 @@ class TrainerBaseMeta(type):
     """
   def __call__(cls, param, model, **kwargs):
     self = cls.__new__(cls, param, model, **kwargs)
+    Logger.debug(f" trainer start __call__")
     self.quickrun_mode = os.getenv("DIST_RUN") is None
     self.param = param
     self._local_rank = self.parse_local_rank()
+    Logger.debug(f"local_rank: {self._local_rank}")
     self._rank = palframe.get_rank()
     self._world_size = palframe.get_world_size()
     # get global batch size
     self._global_batch_size = self.parse_global_batch_size(self._world_size)
+    Logger.debug(f"_global_batch_size: {self._global_batch_size}")
     self.max_train_step = self.parse_max_train_step(
       self._global_batch_size,
       self.param.train_sample_num
       )
+    Logger.debug(f"max_train_step: {self.max_train_step}")
     self.iter_num_update_optimizer = self.param.iter_num_update_optimizer
     self.model_save_gap_step_num = self.parse_model_save_gap_step_num(
         self._global_batch_size, self.param.train_sample_num)
@@ -50,7 +54,10 @@ class TrainerBaseMeta(type):
     assert self.train_draw_figure_gap_step_num is not None
     # get device
     self.device, self.gpu_id = self.parse_device(self._local_rank)
+    Logger.debug(f"parsed device: {self.device}")
     self._dist_model = self.wrap_model_with_ddp(model)
+    Logger.debug(f"has executed wrap_model_with_ddp")
+
     self._user_model = model
     self.model = self._dist_model
     self._has_call_base_init = False
@@ -77,7 +84,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
         lr_scheduler:
         evaluator: 
     """
-
+    Logger.debug(f" trainer start __init__")
     super().__init__(param, model)
     #self.is_eval_first_step = param.is_save_model_at_first_step
     self.eval_during_training = param.eval_during_training
@@ -564,7 +571,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     self.train_sample_num = param.train_sample_num
     if self.train_sample_num is None:
       try:
-        self.train_sample_num = len(train_data)*self._global_batch_size
+        self.train_sample_num = len(train_data)*train_data.batch_size
         if self.max_train_step is None:
           self.max_train_step = self.parse_max_train_step(
             self._global_batch_size,
@@ -788,8 +795,13 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     """
     save when run_lock
     """
-    if self._batch_id > self.max_train_step or not self.is_master_rank():
-      # normal
+
+    Logger.warn(f"rank: {self._rank} is stopping trainning as the run.lock is removed")
+    # watch all rank go to start of the step
+    self.is_continue_training.clear()
+    self.is_at_train_start.wait()
+
+    if self._batch_id > self.max_train_step or not self.is_master_rank(): 
       return 
 
     # aviod save more model 
@@ -797,15 +809,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       return 
 
     # save current_model
-    self.is_continue_training.clear()
-    self.is_at_train_start.wait()
-    self.save_trainer_states(
+    # self.is_continue_training.clear()
+    # self.is_at_train_start.wait()
+    model_save_path = self.save_trainer_states(
       info={'msg':'run.lock is removed'},
       tag='breakpoint',
       save_detail_state=True
     )
+    Logger.info(f"master rank has save model to: {model_save_path}")
   
-
 
   def _memory_information(self, buff={}):
     if self._rank % self._param.gpu_num != 0:
@@ -930,8 +942,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     Logger.info(f"so far the best vali error: {best_score}")
     # save best to local file
-    pickle.dump(best_score,
-                file=open(f"{self.param.path_meta}/dev.eval.pkl", "wb"))
+    with open(f"{self.param.path_meta}/{self.param.best_eval_score_file_name}", "w") as f:
+      f.write(f"{best_score}")
 
     # delete model
     self.delete_model(self.param.model_saved_num)
@@ -1036,39 +1048,6 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           x_label='step',
           combines=self.train_loss_draw_combines)
 
-
-
-  # def _draw_train_figure(self):
-  #   """draw train loss figure
-  #   """
-    
-
-  #   # with nlp.Timer("Draw training loss"):
-      
-
-  #     # pickle.dump(self._tr,
-  #     #             open(f"{self._param.path_meta}/figure.data", "wb"))
-  #     out_file = os.path.join(
-  #         self._param.path_work,
-  #         os.path.split(self._param.path_work)[1] + ".train.metric.png")
-
-      
-  #     # 
-      
-  #     draw_y_labels = 
-
-
-  #     draw_eval_figure(
-  #       eval_figure_data,
-  #       out_file,
-  #       draw_y_labels,
-  #       x_label='step',
-  #       combines=self.eval_loss_draw_combines)
-
-      # figure_data = {}
-      # for line_id, key in enumerate(sorted(self._figure_data.keys())):
-      #   figure_data[f"{line_id}.{key}"] = self._figure_data[key]
-      # draw_figure(figure_data, out_file)
 
   def _draw_eval_figure(self, eval_ret_fields):
     """draw eval figure data

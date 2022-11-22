@@ -108,6 +108,8 @@ DEFAULT_PARAMS = dict(
     cudnn_deterministic=True,
     cudnn_benchmark=False,
     experiment_folder="work",
+    # file name to save current best score
+    best_eval_score_file_name = 'current_best_score.txt',
     run_tag=None,
     use_utc_time=True,
     folder_cache_meta_name=".meta.palframe.pkl")

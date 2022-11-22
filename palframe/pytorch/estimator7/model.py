@@ -3,6 +3,7 @@
 # model base code
 
 from palframe.pytorch.estimator7.param import ParamBase
+import palframe.pytorch.estimator7.starter as starter
 # from palframe.pytorch.estimator7 import starter
 import torch
 from torch import nn
@@ -15,6 +16,8 @@ class ModelBaseMeta(type):
   """
     控制实例化过程
     """
+
+  @starter.exception_stop
   def __call__(cls, param):
     self = cls.__new__(cls, param)
     self._has_call_base_init = False

@@ -194,10 +194,11 @@ class TrainEvalBase:
       device = torch.device("cpu")
       gpu_id = -1
     else:
-      gpu_id = param.gpus[local_rank]
+      gpu_id = 0
+      # gpu_id = param.gpus[local_rank]
       # os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
       # gpu_id = 0
-      device = torch.device(f"cuda:{gpu_id}")
+      device = torch.device(f"cuda:{0}")
     return device, gpu_id
 
   def parse_model_save_gap_step_num(self, global_batch_size: int,

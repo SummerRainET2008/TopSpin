@@ -72,7 +72,6 @@ class ParamBase(metaclass=ParamBaseMeta):
     return self
 
 
-
   @property
   def path_work_restored_training(self):
     return self._path_work_restored_training
@@ -173,21 +172,6 @@ class ParamBase(metaclass=ParamBaseMeta):
   @classmethod
   def get_instance(cls):
     return cls()
-    # cls_str = str(cls)
-    # if cls_str not in ParamBase.instances:
-    #   file_name = os.getenv("param_file")
-    #   if nlp.is_none_or_empty(file_name):
-    #     ParamBase.cls_locks[cls_str] = True
-    #     param = cls()
-    #     param = next(param.generate_all_variants())
-    #     param._instance_cache = param
-    #   else:
-    #     Logger.info(f"loading param from '{file_name}'")
-    #     param = pickle.load(open(file_name, "rb"))
-
-    #   ParamBase.instances[cls_str] = param
-
-    # return ParamBase.instances[cls_str]
 
   def has_param_range(self):
     """check whether containt ParamRange param
@@ -221,7 +205,7 @@ class ParamBase(metaclass=ParamBaseMeta):
                    "candidate values.")
       assert False
     cand_key_values_grouped = list(zip(*cand_key_values_grouped))
-
+     
     idx = 0
     if cand_key_values == [] and cand_key_values_grouped == []:
       yield self
@@ -358,6 +342,11 @@ def distributed_init(param: ParamBase):
   else:
     assert False, f"wrong backhand: {param.backhand}"
   os.environ[socket_ifname] = param._try_get_net_name(param)
+  
+  # set env CUDA_VISIBLE_DEVICES
+  local_rank = int(os.getenv("LOCAL_RANK"))
+  gpu_id = param.gpus[local_rank]
+  os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
   
   import torch.distributed as dist
   dist.init_process_group(backend=param.backhand)
