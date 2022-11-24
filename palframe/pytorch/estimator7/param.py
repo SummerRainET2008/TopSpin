@@ -51,6 +51,12 @@ class ParamBaseMeta(type):
       _param = param  
       param =  next(param.generate_all_variants())
       param._instance_cache = _param
+      if param.eval_batch_size is None:
+        Logger.debug(f"set eval_batch_size to {param.train_batch_size}")
+        param.eval_batch_size = param.train_batch_size
+      if param.pred_batch_size is None:
+        Logger.debug(f"set pred_batch_size to {param.train_batch_size}")
+        param.pred_batch_size = param.train_batch_size
     
     else:
       # dist run, using cache from env

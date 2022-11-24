@@ -74,7 +74,7 @@ DEFAULT_PARAMS = dict(
     dev_file=None,
     test_files=None,
     eval_valid_file_extension=["pkl", "pydict", "json"],
-    eval_batch_size=32,
+    eval_batch_size=None, # defualt is train batch size
     eval_num_workers_loading_data=2,
     eval_process_example_num_worker=1,
     eval_path_initial_model=None,
@@ -93,7 +93,7 @@ DEFAULT_PARAMS = dict(
     eval_value_is_large_better=None,
     #### Pred params ####
     # pred batch size
-    pred_batch_size=32,
+    pred_batch_size=None,
     pred_num_workers_loading_data=2,
     pred_path_initial_model=None,
 

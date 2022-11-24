@@ -61,6 +61,7 @@ class PretrainedParamBase(ParamBase):
   def __new__(cls, *args, **kwargs):
     self = super().__new__(cls, *args, **kwargs)
     self._stage_name = PRETRAINED_STAGE_NAME
+    self.experiment_folder = 'pretraining_work'
     return self
 
 
@@ -119,6 +120,10 @@ class DownStreamParamBase(ParamBase):
     obj.process_example_worker_num = psutil.cpu_count()
     obj.process_example_batch_size = 100
     obj._stage_name = DOWNSTREAM_STAGE_NAME
+    obj.experiment_folder = 'downstream_work'
+    obj.train_batch_size = None
+    obj.eval_batch_size = None 
+    obj.pred_batch_size = None  
     return obj
 
   @property
@@ -128,7 +133,6 @@ class DownStreamParamBase(ParamBase):
   @vali_file.setter
   def vali_file(self, v):
     self.dev_files = v
-
 
 class PretrainModelBase(ModelBase):
   """预训练模型的基础类"""
