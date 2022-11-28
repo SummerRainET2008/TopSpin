@@ -4,15 +4,18 @@
 from palframe.pytorch.estimator7.model import ModelBase
 from palframe.pytorch.estimator7.param import ParamBase
 from palframe.pytorch.estimator7._train_eval_base import TrainEvalBase
-from palframe.pytorch.estimator7.draw_figure import draw_figure, draw_eval_figure
+from palframe.pytorch.estimator7.draw_figure import draw_figure, draw_eval_figure,write_train_or_eval_res_to_html
 from palframe.pytorch.estimator7.data_record import EvalDataRecorder
-from palframe.pytorch.estimator7.utils import json_dumps
+from palframe.pytorch.estimator7.utils import json_dumps,get_now_time_str
 from collections import defaultdict
 import typing, torch, math, os, sys, traceback, pickle, time, psutil
 from transformers.optimization import get_scheduler
 import palframe
 import json, inspect
 import threading
+import random 
+import numpy as np  
+from datetime import datetime  
 from palframe import nlp
 from palframe.nlp import Logger, Timer
 from palframe.pytorch import nlp_torch
@@ -121,6 +124,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
     self._batch_id = 0
     self._loss_history = []
+    self.train_duration = None 
+    self.remaining_time = None
     # self._figure_data = defaultdict(list)
     # self._figure_data["loss"] = self._loss_history
     # to save the data in eval stage
@@ -270,9 +275,16 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     """set kinds of random seeds
     """
     param = self.param
+    seed = param.seed
     nlp.set_random_seeds(param.seed)
     torch.backends.cudnn.deterministic = param.cudnn_deterministic
     torch.backends.cudnn.benchmark = param.cudnn_benchmark
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
     torch.set_num_threads(param.num_threads_cpu)
 
   def create_scheduler(self,
@@ -445,7 +457,11 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     starter._MonitorStopThread(param.run_lock_file,action_func=self.exit_on_run_lock_removed).start()
     # redirect Logger output
     if not self.quickrun_mode:
-      Logger.reset_outstream(f"{param.path_log}/log.rank_{self._rank}")
+      Logger.reset_outstream(
+        f"{param.path_log}/log.rank_{self._rank}",
+        append=True
+        )
+
       Logger.info(f"rank: {self._rank} start to trainning")
     if self.should_print_log():
       Logger.set_level(param.debug_level)
@@ -716,7 +732,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
 
       # if self.should_print_log():
       #   self._writer.add_scalar("loss", batch_loss, self._model_seen_sample_num)
-
+      self.train_duration = nlp.to_readable_time(train_duration)
+      self.remaining_time = nlp.to_readable_time(remaining_time)
       mini_batch_num = len(mini_batch_train_time)
       if mini_batch_num > 1:
         avg_mini_batch_time = \
@@ -733,8 +750,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       # 3% time expand 
       self._memory_information()
       Logger.info(
-          f"Training time: {nlp.to_readable_time(train_duration)}, "
-          f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"Training time: {self.train_duration}, "
+          f"and estimated remaining time: {self.remaining_time} "
       )
       # loss moving average, for accurate estimate current loss
       moving_losses = self._loss_history[-self.train_loss_moving_average_step:]
@@ -828,7 +845,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       buff["memory"] = m
       buff["time"] = time.time()
 
-    elif self._batch_id % 10 == 0:
+    elif self._batch_id % self.param.train_draw_figure_gap_step_num == 0:
       m = psutil.virtual_memory()
       speed = (buff["memory"].free - m.free) / (time.time() - buff["time"])
       depletion_time = m.free / (speed + 1e-6)
@@ -889,7 +906,8 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
     metric_res.update({
         'step': self._batch_id,
         'epoch_num': self.current_epoch,
-        'train_loss': self.current_moving_avg_loss
+        'train_loss': self.current_moving_avg_loss,
+        'create_time': get_now_time_str()
     })
     # add some fields in train stage
     for label in self.eval_figure_label_in_combines:
@@ -1016,6 +1034,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       return 
 
     self.current_train_figure_data['step'] = self._batch_id
+    self.current_train_figure_data['create_time'] = get_now_time_str()
 
     # add data to recoder
     self.train_data_recorder.add_acc({k:v for k,v in self.current_train_figure_data.items()})
@@ -1032,10 +1051,13 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
             os.path.split(self._param.path_work)[1] + ".train.metric.png")
 
       draw_y_labels = list(self.current_train_figure_data.keys())
-      
+
+      draw_y_labels.remove('create_time')
       records = self.train_data_recorder._data
       train_figure_data = {}
       for field in draw_y_labels:
+        # if field == 'create_time':
+        #   continue
         label_data = [r[field] for r in records]
         train_figure_data[field] = label_data
       
@@ -1047,6 +1069,15 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           draw_y_labels,
           x_label='step',
           combines=self.train_loss_draw_combines)
+      
+      write_train_or_eval_res_to_html(
+          out_file,
+          self.train_duration,
+          self.remaining_time,
+          self.param.path_work,
+          self.current_train_figure_data,
+          output_file_path = None
+          )
 
 
   def _draw_eval_figure(self, eval_ret_fields):
@@ -1074,3 +1105,18 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
                      draw_y_labels,
                      x_label='step',
                      combines=self.eval_loss_draw_combines)
+    
+    Logger.info(f"save html to: {out_file}")
+    write_train_or_eval_res_to_html(
+      out_file,
+      self.train_duration,
+     self.remaining_time,
+     self.param.path_work,
+     records[-1],
+     output_file_path = None
+    )
+    
+    
+
+
+      

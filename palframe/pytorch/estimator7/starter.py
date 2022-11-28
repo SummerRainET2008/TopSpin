@@ -75,7 +75,7 @@ def _get_vali_error(best_eval_score_file_path):
   except FileNotFoundError:
     Logger.warn(f"file: {best_eval_score_file_path} not exist")
   except Exception as error:
-    Logger.error(error)
+    # Logger.error(error)
     Logger.warn(f"No evaluation found in '{best_eval_score_file_path}'")
   return 0
 
@@ -91,7 +91,7 @@ def _get_netport(buffer=set()):
 
 class _MonitorStopThread(threading.Thread):
   def __init__(self, monitor_file, action_func=None, sleep_time=1):
-    threading.Thread.__init__(self, daemon=True)
+    threading.Thread.__init__(self)
     self._monitor_file = monitor_file
     self._action_func = action_func
     self._sleep_time = sleep_time
@@ -152,7 +152,7 @@ class Task:
 
 class _MonitorResultThread(threading.Thread):
   def __init__(self, monitor_file, lock, title, sleep_time=10):
-    threading.Thread.__init__(self, daemon=True)
+    threading.Thread.__init__(self)
     self._monitor_file = monitor_file
     self._lock = lock
     self._title = title
@@ -230,7 +230,7 @@ class _RunTaskThread(threading.Thread):
       remaining_time = duration / shared["finished_task"] * remaining_task
 
       if code == 0:
-        vali_error = _get_vali_error(f"{param.path_log}/log.rank_0")
+        vali_error = _get_vali_error(f"{param.path_meta}/{param.best_eval_score_file_name}")
         Logger.info(f"Task[{self._thread_id}] '{param.path_work}' succeeds, "
                     f"best vali_error: {-vali_error}, "
                     f"taking {nlp.to_readable_time(duration)} seconds, "
@@ -365,7 +365,8 @@ class RunManager:
     def stop_thread_function():
       for thread in self._all_threads:
         thread.clear_threads()
-
+    
+    start_time = time.time()
     nlp.execute_cmd(f"touch {self._run_lock_file}")
 
     while len(self._tasks) > 0:
@@ -408,7 +409,9 @@ class RunManager:
       thread.join()
 
     nlp.execute_cmd(f"rm {self._run_lock_file}")
-    Logger.info(f"RunManager.run() is done")
+    Logger.info(
+      f"RunManager.run() is done, total time: {nlp.to_readable_time(time.time()-start_time)}"
+      )
 
 
 def start_train(param: ParamBase, source_script_and_params: str,
@@ -502,7 +505,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     stop_distributed_train(param.path_work)
 
   else:
-    vali_error = _get_vali_error(f"{param.path_log}/log.rank_0")
+    vali_error = _get_vali_error(f"{param.path_meta}/{param.best_eval_score_file_name}")
     duration = time.time() - whole_run_starting_time
     Logger.info(f"best vali_error: {-vali_error}, "
                 f"taking {nlp.to_readable_time(duration)}.")

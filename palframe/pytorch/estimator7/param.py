@@ -51,13 +51,8 @@ class ParamBaseMeta(type):
       _param = param  
       param =  next(param.generate_all_variants())
       param._instance_cache = _param
-      if param.eval_batch_size is None:
-        Logger.debug(f"set eval_batch_size to {param.train_batch_size}")
-        param.eval_batch_size = param.train_batch_size
-      if param.pred_batch_size is None:
-        Logger.debug(f"set pred_batch_size to {param.train_batch_size}")
-        param.pred_batch_size = param.train_batch_size
-    
+      param.param_normalize()
+      
     else:
       # dist run, using cache from env
       Logger.info(f"loading param from '{file_name}'")
@@ -222,6 +217,7 @@ class ParamBase(metaclass=ParamBaseMeta):
         for k, v in attr_set:
           param.__dict__[k] = v
         param.path_work = f"{param.path_work}.automl_{idx}"
+        param.param_normalize()
         yield param
         idx += 1
 
@@ -231,6 +227,7 @@ class ParamBase(metaclass=ParamBaseMeta):
         for k, v in param_value:
           param.__dict__[k] = v
         param.path_work = f"{param.path_work}.automl_{idx}"
+        param.param_normalize()
         yield param
         idx += 1
 
@@ -246,8 +243,22 @@ class ParamBase(metaclass=ParamBaseMeta):
             param1.__dict__[k] = v
 
           param1.path_work = f"{param1.path_work}.automl_{idx}"
+          param.param_normalize()
           yield param1
           idx += 1
+
+  
+  def param_normalize(self):
+    """
+    对于某些参数做一些默认处理
+    """
+    param = self
+    if param.eval_batch_size is None:
+      Logger.debug(f"cls: {param.__class__} set eval_batch_size to {param.train_batch_size}")
+      param.eval_batch_size = param.train_batch_size
+    if param.pred_batch_size is None:
+      Logger.debug(f"cls: {param.__class__}, set pred_batch_size to {param.train_batch_size}")
+      param.pred_batch_size = param.train_batch_size
 
   def clone(self, buff={}):
     clone_id = buff.setdefault("clone_num", 0)
@@ -358,7 +369,10 @@ def distributed_init(param: ParamBase):
   dist.init_process_group(backend=param.backhand)
   HAS_RUN_DISTRIBUTED_INIT = True
   if not quickrun_mode:
-    Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}")
+    Logger.reset_outstream(
+      f"{param.path_log}/log.rank_{get_rank()}",
+      append=True
+      )
 
   if quickrun_mode:
     param._check_folder_meta(auto_create=True)

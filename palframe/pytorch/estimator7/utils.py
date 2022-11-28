@@ -8,7 +8,7 @@ from datetime import datetime
 from xml.sax import default_parser_list
 import numpy as np
 from datetime import date
-import threading
+import threading,base64
 from concurrent.futures import ProcessPoolExecutor as _ProcessPoolExecutor
 from palframe import nlp
 from palframe.nlp import Logger
@@ -336,3 +336,30 @@ class Example(dict):
       self.__dict__[key] = value
     else:
       self[key] = value
+
+  
+def get_now_time_str(format='%Y-%m-%d %H:%M:%S'):
+  """get now time 
+  Args:
+      format (str, optional): _description_. Defaults to '%Y-%m-%d %H:%M:%S'.
+
+  Returns:
+      _type_: _description_
+  """
+  return datetime.now().strftime(
+      format
+      )
+
+def img_to_base64(img_path):
+  """img to base64
+
+  Args:
+      img_path (_type_): _description_
+
+  Returns:
+      _type_: _description_
+  """
+  with open(img_path,"rb") as f:
+    encoded_string = base64.b64encode(f.read()).decode('utf-8')
+  return encoded_string
+

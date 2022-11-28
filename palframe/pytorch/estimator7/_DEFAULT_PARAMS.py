@@ -26,7 +26,7 @@ DEFAULT_PARAMS = dict(
     log_print_ranks=[0],
     # Mixed-precision optimization
     use_amp=True,
-    seed=0,
+    seed=42,
     # parallel num on one node, attention that
     gpu_num=1,
     use_gpu=False,
