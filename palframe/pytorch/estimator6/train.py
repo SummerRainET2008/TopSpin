@@ -1,8 +1,6 @@
 #coding: utf8
 #author: Tian Xia
-import \
-  torch
-
+import torch
 from palframe.pytorch.estimator6.model import ModelBase
 from palframe.pytorch.estimator6.predict import PredictorBase
 from palframe.pytorch.estimator6.param import ParamBase
