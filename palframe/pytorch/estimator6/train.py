@@ -1,8 +1,7 @@
 #coding: utf8
 #author: Tian Xia
-import \
-  torch
-
+import copy
+import torch
 from palframe.pytorch.estimator6.model import ModelBase
 from palframe.pytorch.estimator6.predict import PredictorBase
 from palframe.pytorch.estimator6.param import ParamBase
@@ -121,6 +120,14 @@ class TrainerBase:
       '''
       Logger.info(f"Loading initial model '{param.path_initial_model}'")
       info = self._user_model.load_model(param.path_initial_model)
+      if "optimizer_state" in info:
+        try:
+          param_groups = copy.deepcopy(self._optimizer.param_groups)
+          self._optimizer.load_state_dict(info["optimizer_state"])
+          self._optimizer.param_groups = param_groups
+
+        except Exception as error:
+          Logger.warn(f"In self._optimizer.load_state_dict: {error}")
 
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
