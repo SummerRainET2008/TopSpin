@@ -120,6 +120,18 @@ class TrainerBase:
       Logger.info(f"Loading initial model '{param.path_initial_model}'")
       info = self._user_model.load_model(param.path_initial_model)
 
+      optimizer_state = info.get("optimizer_state", None)
+      if optimizer_state is not None:
+        try:
+          for pg1, pg2 in zip(self._optimizer.param_groups,
+                              optimizer_state["param_groups"]):
+            pg2["initial_lr"] = pg1["lr"]
+
+          self._optimizer.load_state_dict(optimizer_state)
+          Logger.info(f"Optimizer.load_state_dict: successful")
+        except Exception as error:
+          Logger.warn(f"Optimizer.load_state_dict: failed, {error}")
+
     self._model_seen_sample_num = 0
     self._opt_evaluate_error = 0
     self._last_evaluate_point = 0
