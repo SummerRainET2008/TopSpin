@@ -98,10 +98,11 @@ class DownStreamParamBase(ParamBase):
 
     pretrained_param_in_model_version = _PreTrainParam_in_model_version.get_instance()
     if _PreTrainParam_in_path_work is not None:
+      Logger.info(f'load param from pretrained path work: {pretrained_path_work}')
       preTrainParam_in_path_work = _PreTrainParam_in_path_work.get_instance()
     else:
       preTrainParam_in_path_work = None 
-
+    
     downstream_param = None if not _DownStreamParam else _DownStreamParam.get_instance()
 
     obj = super().__new__(cls)
@@ -120,6 +121,7 @@ class DownStreamParamBase(ParamBase):
     obj.process_example_worker_num = psutil.cpu_count()
     obj.process_example_batch_size = 100
     obj._stage_name = DOWNSTREAM_STAGE_NAME
+    obj.path_work_restored_training = None  
     obj.experiment_folder = 'downstream_work'
     obj.train_batch_size = None
     obj.eval_batch_size = None 

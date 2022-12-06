@@ -22,61 +22,72 @@ class TrainerBase:
     Logger.country_city = param.country_city
     self._param = param
 
-    nlp.set_random_seeds(param.seed)
-    torch.backends.cudnn.deterministic = param.cudnn_deterministic
-    torch.backends.cudnn.benchmark = param.cudnn_benchmark
-    torch.set_num_threads(param.num_threads_cpu)
+    # nlp.set_random_seeds(param.seed)
+    # torch.backends.cudnn.deterministic = param.cudnn_deterministic
+    # torch.backends.cudnn.benchmark = param.cudnn_benchmark
+    # torch.set_num_threads(param.num_threads_cpu)
 
-    debug_mode = os.getenv("DIST_RUN") is None
+    # debug_mode = os.getenv("DIST_RUN") is None
 
-    if debug_mode:
-      current_env = os.environ
-      current_env["MASTER_ADDR"] = "127.0.0.1"
-      current_env["MASTER_PORT"] = f"{random.randint(1000, 10_000)}"
-      current_env["WORLD_SIZE"] = "1"
-      current_env["RANK"] = "0"
-      current_env["LOCAL_RANK"] = "0"
+    # if debug_mode:
+    #   current_env = os.environ
+    #   current_env["MASTER_ADDR"] = "127.0.0.1"
+    #   current_env["MASTER_PORT"] = f"{random.randint(1000, 10_000)}"
+    #   current_env["WORLD_SIZE"] = "1"
+    #   current_env["RANK"] = "0"
+    #   current_env["LOCAL_RANK"] = "0"
 
-      if param.use_gpu:
-        param.gpu_num = 1
-        avail_gpus = nlp.get_available_gpus() 
-        if nlp.is_none_or_empty(avail_gpus):
-          assert False, f"No available GPUs"
-        current_env["avail_gpus"] = str(avail_gpus[0])
-      else:
-        current_env["avail_gpus"] = ""
+    #   if param.use_gpu:
+    #     param.gpu_num = 1
+    #     avail_gpus = nlp.get_available_gpus() 
+    #     if nlp.is_none_or_empty(avail_gpus):
+    #       assert False, f"No available GPUs"
+    #     current_env["avail_gpus"] = str(avail_gpus[0])
+    #   else:
+    #     current_env["avail_gpus"] = ""
 
-      param.servers_file = None
-      param.create_workspace()
+    #   param.servers_file = None
+    #   param.create_workspace()
+    
+    
 
-    nlp.timeout(self._init_distributed_training, [param], 30)
+    # self._local_rank = int(os.getenv("LOCAL_RANK"))
+    # self._rank = dist.get_rank()
+    # self._world_size = dist.get_world_size()
+    # avail_gpus = os.getenv("avail_gpus").strip()
+    
 
-    self._local_rank = int(os.getenv("LOCAL_RANK"))
-    self._rank = dist.get_rank()
-    self._world_size = dist.get_world_size()
-    avail_gpus = os.getenv("avail_gpus").strip()
-    if nlp.is_none_or_empty(avail_gpus):
-      self._avail_gpus = []
-    else:
-      self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
+    # if nlp.is_none_or_empty(avail_gpus):
+    #   self._avail_gpus = []
+    # else:
+    #   self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
 
-    self._to_stop = False
-    nlp.command(f"touch {param.run_lock_file}")
-    starter._MonitorStopThread(param.run_lock_file, self).start()
 
-    param_file = param.__module__.replace(".", "/") + ".py"
-    nlp.command(f"cp {param_file} {param.path_work}")
+    
+    # gpu_id = self._avail_gpus[self._local_rank]
 
-    if not debug_mode:
-      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
-                             append=param.restore_from_last_train)
-    if dist.get_rank() == 0:
-      Logger.set_level(param.debug_level)
-    else:
-      Logger.set_level(2)
+    # os.environ['CUDA_VISIBLE_DEVICES'] = 'gpu_id'
 
-    param.worker_IP = os.getenv("worker_IP")
-    param.display()
+    # nlp.timeout(self._init_distributed_training, [param], 30)
+
+
+    # self._to_stop = False
+    # nlp.command(f"touch {param.run_lock_file}")
+    # starter._MonitorStopThread(param.run_lock_file, self).start()
+
+    # param_file = param.__module__.replace(".", "/") + ".py"
+    # nlp.command(f"cp {param_file} {param.path_work}")
+
+    # if not debug_mode:
+    #   Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
+    #                          append=param.restore_from_last_train)
+    # if dist.get_rank() == 0:
+    #   Logger.set_level(param.debug_level)
+    # else:
+    #   Logger.set_level(2)
+
+    # param.worker_IP = os.getenv("worker_IP")
+    # param.display()
 
     if not param.use_gpu:
       self._device = torch.device("cpu")
@@ -88,8 +99,8 @@ class TrainerBase:
       )
     else:
       # os.environ["CUDA_VISIBLE_DEVICES"] = f"{param.gpus[self._local_rank]}"
-      # gpu_id = 0
-      gpu_id = self._avail_gpus[self._local_rank]
+      gpu_id = 0
+      # gpu_id = self._avail_gpus[self._local_rank]
       Logger.info(f"Currently used GPU: {gpu_id}")
       self._device = torch.device(f"cuda:{gpu_id}")
       torch.cuda.set_device(self._device)
@@ -174,6 +185,77 @@ class TrainerBase:
       self._grad_scaler = amp.GradScaler()
 
     self._user_predictor_cls = user_predictor_cls
+
+  def _before_init(self,param=None):
+    """things before __init__
+    """
+    if param is None:
+      param = self.param
+    nlp.set_random_seeds(param.seed)
+    torch.backends.cudnn.deterministic = param.cudnn_deterministic
+    torch.backends.cudnn.benchmark = param.cudnn_benchmark
+    torch.set_num_threads(param.num_threads_cpu)
+
+    debug_mode = os.getenv("DIST_RUN") is None
+    Logger.info(f'debug_mode: {debug_mode}')
+    if debug_mode:
+      current_env = os.environ
+      current_env["MASTER_ADDR"] = "127.0.0.1"
+      current_env["MASTER_PORT"] = f"{random.randint(1000, 10_000)}"
+      current_env["WORLD_SIZE"] = "1"
+      current_env["RANK"] = "0"
+      current_env["LOCAL_RANK"] = "0"
+
+      if param.use_gpu:
+        param.gpu_num = 1
+        avail_gpus = nlp.get_available_gpus() 
+        Logger.info(f'avail_gpus from auto search: {avail_gpus}')
+        if nlp.is_none_or_empty(avail_gpus):
+          assert False, f"No available GPUs"
+        current_env["avail_gpus"] = str(avail_gpus[0])
+      else:
+        current_env["avail_gpus"] = ""
+
+      param.servers_file = None
+      param.create_workspace()
+    
+    self._local_rank = int(os.getenv("LOCAL_RANK"))
+    
+    avail_gpus = os.getenv("avail_gpus").strip()
+    
+    if nlp.is_none_or_empty(avail_gpus):
+      self._avail_gpus = []
+    else:
+      self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
+
+    # set CUDA_VISIBLE_DEVICES
+    gpu_id = self._avail_gpus[self._local_rank]
+    Logger.info(f'set CUDA_VISIBLE_DEVICES to: {gpu_id}')
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = f"{gpu_id}"
+
+    nlp.timeout(self._init_distributed_training, [param], 30)
+    self._rank = dist.get_rank()
+    self._world_size = dist.get_world_size()
+
+    self._to_stop = False
+    nlp.command(f"touch {param.run_lock_file}")
+    starter._MonitorStopThread(param.run_lock_file, self).start()
+
+    param_file = param.__module__.replace(".", "/") + ".py"
+    nlp.command(f"cp {param_file} {param.path_work}")
+
+    if not debug_mode:
+      Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
+                             append=param.restore_from_last_train)
+    if dist.get_rank() == 0:
+      Logger.set_level(param.debug_level)
+    else:
+      Logger.set_level(2)
+
+    param.worker_IP = os.getenv("worker_IP")
+    param.display()
+
 
   def _get_worker_info(self):
     return f"rank[{self._rank}/{self._world_size}]"

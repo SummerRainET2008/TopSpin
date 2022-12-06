@@ -41,7 +41,8 @@ class ParamBaseMeta(type):
       param.__init__()
       # after init
       if not nlp.is_none_or_empty(param.path_work_restored_training):
-        assert os.path.isdir(param.path_work), param.path_work
+        assert os.path.isdir(param._path_work_restored_training), \
+          param._path_work_restored_training
         # param.create_restart_work_path_name()
       else:
         assert not nlp.is_none_or_empty(param.run_tag)
@@ -69,6 +70,7 @@ class ParamBase(metaclass=ParamBaseMeta):
     self._workspace_created = False
     self._true_gradient = False
     self._path_work_restored_training = None
+    self._current_grid_search_params = None
     self.__dict__.update(**copy.deepcopy(DEFAULT_PARAMS))
     return self
 
@@ -79,8 +81,19 @@ class ParamBase(metaclass=ParamBaseMeta):
   
   @path_work_restored_training.setter
   def path_work_restored_training(self,v):
+    if v is None:
+      self._path_work_restored_training = None
+      return 
     self._path_work_restored_training = v
-    self.path_work = v + '_continue'
+    i=1
+    while True:
+      candiate_path_work = v + f'.continue.{i}'
+      if not os.path.exists(candiate_path_work):
+        self.path_work = candiate_path_work
+        return 
+      if i > 100:
+        raise RuntimeError(f'too many continue times for path work {v}, it is limited to 100')
+      i += 1
 
   # def create_restart_work_path_name(self):
   #   self.path_work = self.path_work_restored_training + '_continue'
@@ -206,7 +219,7 @@ class ParamBase(metaclass=ParamBaseMeta):
                    "candidate values.")
       assert False
     cand_key_values_grouped = list(zip(*cand_key_values_grouped))
-     
+    # Logger.info('cand_key_values: ',cand_key_values, 'cand_key_values_grouped: ', cand_key_values_grouped )
     idx = 0
     if cand_key_values == [] and cand_key_values_grouped == []:
       yield self
@@ -216,18 +229,27 @@ class ParamBase(metaclass=ParamBaseMeta):
         param = copy.deepcopy(self)
         for k, v in attr_set:
           param.__dict__[k] = v
+          
         param.path_work = f"{param.path_work}.automl_{idx}"
         param.param_normalize()
+        _current_grid_search_params = copy.deepcopy(dict(attr_set))
+        param._current_grid_search_params = _current_grid_search_params
+        # Logger.info(f"current search cand_key_values_grouped :{str(_current_grid_search_params)}, path_work: {param.path_work}")
         yield param
         idx += 1
 
     elif cand_key_values != [] and cand_key_values_grouped == []:
+      # Logger.info('next',cand_key_values)
+      # Logger.info(list(itertools.product(*cand_key_values)))
       for param_value in itertools.product(*cand_key_values):
         param = copy.deepcopy(self)
         for k, v in param_value:
           param.__dict__[k] = v
         param.path_work = f"{param.path_work}.automl_{idx}"
         param.param_normalize()
+        _current_grid_search_params = copy.deepcopy(dict(param_value))
+        param._current_grid_search_params = _current_grid_search_params
+        # Logger.info(f"idx: {idx}, current search param_value :{str(param_value)}")
         yield param
         idx += 1
 
@@ -241,9 +263,12 @@ class ParamBase(metaclass=ParamBaseMeta):
           param1 = copy.deepcopy(param)
           for k, v in attr_set:
             param1.__dict__[k] = v
-
+        
           param1.path_work = f"{param1.path_work}.automl_{idx}"
           param.param_normalize()
+          _current_grid_search_params = copy.deepcopy(dict(param_value+cand_key_values_grouped))
+          param._current_grid_search_params = _current_grid_search_params
+          # Logger.info(f"current search param_value: {str(param_value)}, cand_key_values_grouped:  {str(cand_key_values_grouped)}, path_work: {param.path_work}")
           yield param1
           idx += 1
 

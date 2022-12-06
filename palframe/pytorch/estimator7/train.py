@@ -1074,7 +1074,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
           out_file,
           self.train_duration,
           self.remaining_time,
-          self.param.path_work,
+          os.path.abspath(self.param.path_work),
           self.current_train_figure_data,
           output_file_path = None
           )
@@ -1111,7 +1111,7 @@ class TrainerBase(TrainEvalBase, metaclass=TrainerBaseMeta):
       out_file,
       self.train_duration,
      self.remaining_time,
-     self.param.path_work,
+     os.path.abspath(self.param.path_work),
      records[-1],
      output_file_path = None
     )
