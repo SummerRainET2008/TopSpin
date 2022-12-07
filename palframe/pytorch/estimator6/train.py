@@ -44,22 +44,26 @@ class TrainerBase:
           assert False, f"No available GPUs"
         current_env["avail_gpus"] = str(avail_gpus[0])
       else:
-        current_env["avail_gpus"] = ""
+        current_env["avail_gpus"] = "-1"
 
       param.servers_file = None
       param.create_workspace()
 
-    nlp.timeout(self._init_distributed_training, [param], 30)
-
-    self._local_rank = int(os.getenv("LOCAL_RANK"))
-    self._rank = dist.get_rank()
-    self._world_size = dist.get_world_size()
     avail_gpus = os.getenv("avail_gpus").strip()
     if nlp.is_none_or_empty(avail_gpus):
       self._avail_gpus = []
     else:
       self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
 
+    self._local_rank = int(os.getenv("LOCAL_RANK"))
+    gpu_id = self._avail_gpus[self._local_rank]
+    Logger.info(f"Currently used GPU: {gpu_id}")
+    os.environ["CUDA_VISIBLE_DEVICES"] = f"{gpu_id}"
+
+    nlp.timeout(self._init_distributed_training, [param], 30)
+
+    self._rank = dist.get_rank()
+    self._world_size = dist.get_world_size()
     self._to_stop = False
     nlp.command(f"touch {param.run_lock_file}")
     starter._MonitorStopThread(param.run_lock_file, self).start()
@@ -87,17 +91,13 @@ class TrainerBase:
           find_unused_parameters=param.find_unused_parameters,
       )
     else:
-      # os.environ["CUDA_VISIBLE_DEVICES"] = f"{param.gpus[self._local_rank]}"
-      # gpu_id = 0
-      gpu_id = self._avail_gpus[self._local_rank]
-      Logger.info(f"Currently used GPU: {gpu_id}")
-      self._device = torch.device(f"cuda:{gpu_id}")
+      self._device = torch.device(f"cuda:0")
       torch.cuda.set_device(self._device)
       self._user_model = model.to(self._device)
       self._model = torch.nn.parallel.DistributedDataParallel(
           self._user_model,
-          device_ids=[gpu_id],
-          output_device=gpu_id,
+          device_ids=[0],
+          output_device=0,
           bucket_cap_mb=param.bucket_cap_mb,
           find_unused_parameters=param.find_unused_parameters,
       )
