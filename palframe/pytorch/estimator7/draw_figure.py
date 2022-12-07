@@ -1,11 +1,10 @@
 #coding: utf8
 #author: Tian Xia
 
-from palframe.nlp import Logger 
-import math,traceback,os
+from palframe.nlp import Logger
+import math, traceback, os
 import numpy as np
-from palframe.pytorch.estimator7.utils import img_to_base64,json_dumps
-
+from palframe.pytorch.estimator7.utils import img_to_base64, json_dumps
 
 
 def draw_figure(figure_data, out_file):
@@ -89,36 +88,32 @@ def draw_eval_figure(figure_data,
       x_labels: 
       combines: list[list]
   """
-  
 
   if isinstance(y_labels, str):
     y_labels = [y_labels]
   single_labels, combines_labels = _parse_combines(y_labels, combines)
-  
-  
+
   from itertools import chain
   all_y_labels = list(chain(single_labels, combines_labels))
   # print(all_y_labels)
   try:
     import matplotlib.pyplot as plt
     plt.figure()
-    # calculate hight 
-    width = 8 + min(math.floor(len(figure_data[x_label])/1e6),4)
-    hight = 2.5*len(all_y_labels)
+    # calculate hight
+    width = 8 + min(math.floor(len(figure_data[x_label]) / 1e6), 4)
+    hight = 2.5 * len(all_y_labels)
     height_ratios = []
     for cur_y_labels in all_y_labels:
-      if isinstance(cur_y_labels,str):
+      if isinstance(cur_y_labels, str):
         height_ratios.append(1)
       else:
         height_ratios.append(len(cur_y_labels))
-    
-    
-    fig, axs = plt.subplots(
-      len(all_y_labels), 1, 
-      figsize=(width,hight),
-      gridspec_kw={'height_ratios': height_ratios},
-      squeeze=False
-      )
+
+    fig, axs = plt.subplots(len(all_y_labels),
+                            1,
+                            figsize=(width, hight),
+                            gridspec_kw={'height_ratios': height_ratios},
+                            squeeze=False)
     fig.tight_layout()
     for i, cur_y_labels in enumerate(all_y_labels):
       ax = axs[i][0]
@@ -139,7 +134,7 @@ def draw_eval_figure(figure_data,
       ax.grid(linestyle='--', linewidth=0.5)
       ax.legend()
       # ax.tight_layout(rect=[0, 0, 0.75, 1])
-   
+
     plt.savefig(out_file, bbox_inches="tight")
     plt.close()
 
@@ -148,15 +143,12 @@ def draw_eval_figure(figure_data,
     traceback.print_exc()
 
 
-
-def write_train_or_eval_res_to_html(
-  img_file_path,
-  already_time,
-  remain_time,
-  work_path,
-  current_record,
-  output_file_path = None
-  ):
+def write_train_or_eval_res_to_html(img_file_path,
+                                    already_time,
+                                    remain_time,
+                                    work_path,
+                                    current_record,
+                                    output_file_path=None):
   """write infomation to one html file
 
   Args:
@@ -168,19 +160,19 @@ def write_train_or_eval_res_to_html(
   """
   if output_file_path is None:
     basename = os.path.basename(img_file_path)
-    dirname  = os.path.dirname(img_file_path)
+    dirname = os.path.dirname(img_file_path)
     basename_split = basename.split('.')
-    if len(basename_split)>1:
-        basename_split[-1] = 'html'
+    if len(basename_split) > 1:
+      basename_split[-1] = 'html'
 
     new_basename = '.'.join(basename_split)
-    output_file_path = os.path.join(dirname,f"{new_basename}")
-  
+    output_file_path = os.path.join(dirname, f"{new_basename}")
+
   # img to base64
   img_base64 = img_to_base64(img_file_path)
   current_record_str = json_dumps(current_record)
 
-  # create html 
+  # create html
 
   html = f"""
   <html>
@@ -192,10 +184,8 @@ def write_train_or_eval_res_to_html(
     </body>
   </html>
   """
-  with open(output_file_path,'w') as f:
+  with open(output_file_path, 'w') as f:
     f.write(html)
-  
-  
 
 
 # def main():

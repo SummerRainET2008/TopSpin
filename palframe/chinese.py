@@ -6,6 +6,7 @@ from palframe.nlp import *
 import jieba
 import jieba.posseg as pseg
 
+
 def _is_chinese_char(cp):
   return ((cp >= 0x4E00 and cp <= 0x9FFF) or  #
           (cp >= 0x3400 and cp <= 0x4DBF) or  #

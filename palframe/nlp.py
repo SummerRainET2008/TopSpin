@@ -368,12 +368,14 @@ def to_readable_time(seconds: float):
 
   return " ".join(result)
 
+
 def __strdate(timezone: str, now):
   city = timezone.split("/")[-1]
   ts = now.strftime("%Y-%m-%d_%Ih-%Mm-%Ss_%p")
   return f"{city}_{ts}"
 
-def get_log_time(utc_time: bool = True, country_city: str=None):
+
+def get_log_time(utc_time: bool = True, country_city: str = None):
   '''
   utc_time: if False, return local time(server);
             if True, return local time(city).
@@ -394,16 +396,23 @@ def get_log_time(utc_time: bool = True, country_city: str=None):
     now = datetime.datetime.now()
     return __strdate("local", now)
 
-def get_future_time(days=0, hours=0, minutes=0, seconds=0,
-                    country_city: str=None):
-  delta = datetime.timedelta(
-    days=days, hours=hours, minutes=minutes, seconds=seconds)
+
+def get_future_time(days=0,
+                    hours=0,
+                    minutes=0,
+                    seconds=0,
+                    country_city: str = None):
+  delta = datetime.timedelta(days=days,
+                             hours=hours,
+                             minutes=minutes,
+                             seconds=seconds)
   if is_none_or_empty(country_city):
     finished_time = datetime.datetime.now() + delta
     return __strdate("utc", finished_time)
   else:
     finished_time = datetime.datetime.now(pytz.timezone(country_city)) + delta
     return __strdate(country_city, finished_time)
+
 
 #deprecated
 def execute_cmd(*cmds) -> int:
@@ -538,6 +547,7 @@ def get_server_ip(buffer={}):
   buffer["ip"] = local_ip
   return local_ip
 
+
 def get_server_ip0(buffer={}):
   if "ip" in buffer:
     return buffer["ip"]
@@ -604,6 +614,7 @@ def get_available_gpus(server_ip=None, account=None):
     Logger.error(error)
     return []
 
+
 def get_GPU_num():
   return torch.cuda.device_count()
 
@@ -621,7 +632,9 @@ def get_GPU_info(gpu_id):
     return {"Total memory": total, "Free memory": free, "Used memory": used}
 
 
-def get_gpu_user(gpu_id, candidate_users: list=[], server_ip=None,
+def get_gpu_user(gpu_id,
+                 candidate_users: list = [],
+                 server_ip=None,
                  account=None):
   def get_user(info):
     mark = "->"
@@ -791,7 +804,7 @@ class Logger:
   '''
   level = 1
   outstream = sys.stdout
-  country_city = "" #"Asia/Chongqing", 'America/Los_Angeles'
+  country_city = ""  #"Asia/Chongqing", 'America/Los_Angeles'
 
   @staticmethod
   def reset_outstream(out_file: str, append=False):
@@ -810,28 +823,36 @@ class Logger:
   def debug(*args):
     if Logger.level <= 0:
       print(get_log_time(country_city=Logger.country_city),
-            "DEBUG:", *args, file=Logger.outstream)
+            "DEBUG:",
+            *args,
+            file=Logger.outstream)
       Logger.outstream.flush()
 
   @staticmethod
   def info(*args):
     if Logger.level <= 1:
       print(get_log_time(country_city=Logger.country_city),
-            "INFO:", *args, file=Logger.outstream)
+            "INFO:",
+            *args,
+            file=Logger.outstream)
       Logger.outstream.flush()
 
   @staticmethod
   def warn(*args):
     if Logger.level <= 2:
       print(get_log_time(country_city=Logger.country_city),
-            "WARN:", *args, file=Logger.outstream)
+            "WARN:",
+            *args,
+            file=Logger.outstream)
       Logger.outstream.flush()
 
   @staticmethod
   def error(*args):
     if Logger.level <= 3:
       print(get_log_time(country_city=Logger.country_city),
-            "ERR:", *args, file=Logger.outstream)
+            "ERR:",
+            *args,
+            file=Logger.outstream)
       Logger.outstream.flush()
 
 

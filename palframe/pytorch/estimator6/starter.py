@@ -437,7 +437,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
 
     server_gpus = {}
     for ip, designated_gpus in server_ips.items():
-      designated_gpus= set(designated_gpus)
+      designated_gpus = set(designated_gpus)
       if param.use_gpu:
         avail_gpus = set(nlp.get_available_gpus(ip))
         if not nlp.is_none_or_empty(designated_gpus):
@@ -460,7 +460,7 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
       yield nlp.get_server_ip0(), []
 
     else:
-      reg = re.compile(r"(\d+\.\d+\.\d+\.\d+)(:((\d,)*\d))?");
+      reg = re.compile(r"(\d+\.\d+\.\d+\.\d+)(:((\d,)*\d))?")
       for sf in servers_file.split(","):
         content = open(os.path.expanduser(sf)).read()
         for match in reg.findall(content):

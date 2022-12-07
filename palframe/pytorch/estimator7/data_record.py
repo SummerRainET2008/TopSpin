@@ -3,7 +3,7 @@
 # data recorder, used in evaluate stage
 
 import os
-from typing import List,Dict 
+from typing import List, Dict
 
 
 class EvalDataRecorderBase:
@@ -38,7 +38,6 @@ class EvalDataRecorderBase:
     sort_key = self.sort_key
     self._data.sort(key=lambda x: x[sort_key])
 
-
   def add_acc(self, acc: dict):
     """add metric res
 
@@ -48,7 +47,7 @@ class EvalDataRecorderBase:
     self._data.append(acc)
     self.sort_data()
 
-  def restart_recorder(self,data:List[Dict]):
+  def restart_recorder(self, data: List[Dict]):
     self._data = data
     self.sort_data()
 

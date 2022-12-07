@@ -85,7 +85,8 @@ class DownStreamParamBase(ParamBase):
     param_module_in_version = _ParamBaseMixin.load_module_from_model_version(
         pretrained_model_version, py_name='param')
     _PreTrainParam_in_model_version = param_module_in_version.Param
-    _DownStreamParam = getattr(param_module_in_version, 'DownStreamParam', None)
+    _DownStreamParam = getattr(param_module_in_version, 'DownStreamParam',
+                               None)
     _PreTrainParam_in_path_work = None
     if pretrained_path_work is not None:
       # 读取执行时对应的参数
@@ -96,14 +97,17 @@ class DownStreamParamBase(ParamBase):
       _DownStreamParam = getattr(param_module_in_path_work, 'DownStreamParam',
                                  _DownStreamParam)
 
-    pretrained_param_in_model_version = _PreTrainParam_in_model_version.get_instance()
+    pretrained_param_in_model_version = _PreTrainParam_in_model_version.get_instance(
+    )
     if _PreTrainParam_in_path_work is not None:
-      Logger.info(f'load param from pretrained path work: {pretrained_path_work}')
+      Logger.info(
+          f'load param from pretrained path work: {pretrained_path_work}')
       preTrainParam_in_path_work = _PreTrainParam_in_path_work.get_instance()
     else:
-      preTrainParam_in_path_work = None 
-    
-    downstream_param = None if not _DownStreamParam else _DownStreamParam.get_instance()
+      preTrainParam_in_path_work = None
+
+    downstream_param = None if not _DownStreamParam else _DownStreamParam.get_instance(
+    )
 
     obj = super().__new__(cls)
     # 更新预训练参数
@@ -121,11 +125,11 @@ class DownStreamParamBase(ParamBase):
     obj.process_example_worker_num = psutil.cpu_count()
     obj.process_example_batch_size = 100
     obj._stage_name = DOWNSTREAM_STAGE_NAME
-    obj.path_work_restored_training = None  
+    obj.path_work_restored_training = None
     obj.experiment_folder = 'downstream_work'
     obj.train_batch_size = None
-    obj.eval_batch_size = None 
-    obj.pred_batch_size = None  
+    obj.eval_batch_size = None
+    obj.pred_batch_size = None
     return obj
 
   @property
@@ -135,6 +139,7 @@ class DownStreamParamBase(ParamBase):
   @vali_file.setter
   def vali_file(self, v):
     self.dev_files = v
+
 
 class PretrainModelBase(ModelBase):
   """预训练模型的基础类"""

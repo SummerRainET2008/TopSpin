@@ -187,7 +187,6 @@ def start_dist_train(args):
     value = getattr(args, name)
     if value is not None:
       setattr(param_obj, name, value)
-  
 
   # if param_obj.
   #   param_obj.create_restart_work_path_name()

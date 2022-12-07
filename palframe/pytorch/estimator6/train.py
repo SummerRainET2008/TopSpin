@@ -39,7 +39,7 @@ class TrainerBase:
 
       if param.use_gpu:
         param.gpu_num = 1
-        avail_gpus = nlp.get_available_gpus() 
+        avail_gpus = nlp.get_available_gpus()
         if nlp.is_none_or_empty(avail_gpus):
           assert False, f"No available GPUs"
         current_env["avail_gpus"] = str(avail_gpus[0])
@@ -531,8 +531,7 @@ class TrainerBase:
       Logger.info(
           f"Training time: {nlp.to_readable_time(train_duration)}, "
           f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
-          f"to finish on {finished_time}"
-      )
+          f"to finish on {finished_time}")
       Logger.info(f"{self._get_worker_info()}: "
                   f"*Epoch: {epoch_id:.2f}, "
                   f"batch_id: {self._batch_id:_}, "
@@ -570,8 +569,9 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
-      f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error;")
+        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+        f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error;"
+    )
 
     ratio = self._model_seen_sample_num / self._target_seen_sample_num
     if exit_code == 0 or (exit_code == 1 and ratio >= 0.99):
@@ -608,7 +608,7 @@ class TrainerBase:
                   f"{round(used_memory / 1024 ** 3, 2)} GB.")
 
   def early_stop(self, batch_id, epoch_id, loss_history: list,
-                  vali_error_history: list):
+                 vali_error_history: list):
     return False
 
   def _check_sync_stop_condition(self, bool_cond):
@@ -698,8 +698,8 @@ class TrainerBase:
         figure_data[f"{line_id}.{key}"] = self._figure_data[key]
 
       out_file_prefix = os.path.join(
-        self._param.path_work,
-        os.path.split(self._param.path_work)[1] + ".train.loss.png")
+          self._param.path_work,
+          os.path.split(self._param.path_work)[1] + ".train.loss.png")
 
       smooth_widths = self._param.draw_figure_smooth_width
       if not isinstance(smooth_widths, list):
@@ -710,7 +710,7 @@ class TrainerBase:
           out_file = out_file_prefix
         else:
           out_file = out_file_prefix.replace(
-            f".train.loss.png", f".train.loss.smoothed_{smooth}.png")
+              f".train.loss.png", f".train.loss.smoothed_{smooth}.png")
         draw_figure(figure_data, out_file, smooth_width=smooth)
 
   def _save_model(self, tag=""):

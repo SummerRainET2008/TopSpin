@@ -8,7 +8,7 @@ from datetime import datetime
 from xml.sax import default_parser_list
 import numpy as np
 from datetime import date
-import threading,base64
+import threading, base64
 from concurrent.futures import ProcessPoolExecutor as _ProcessPoolExecutor
 from palframe import nlp
 from palframe.nlp import Logger
@@ -56,7 +56,7 @@ class ProcessPoolExecutor(_ProcessPoolExecutor):
         max_workers=max_workers,
         mp_context=mp_context,
         initializer=start_thread_to_terminate_when_parent_process_dies,
-        initargs=(os.getpid(),))
+        initargs=(os.getpid(), ))
 
 
 def _monitor_file_exist_helper(file_path):
@@ -179,7 +179,6 @@ class JsonComplexEncoder(json.JSONEncoder):
   """
     json序列化辅助类
     """
-
   def default(self, obj):
     if isinstance(obj, datetime):
       return obj.strftime('%Y-%m-%d %H:%M:%S')
@@ -327,7 +326,6 @@ class Example(dict):
   """
     实现一个可以使用点访问的字典
     """
-
   def __getattr__(self, item):
     return self[item]
 
@@ -337,7 +335,7 @@ class Example(dict):
     else:
       self[key] = value
 
-  
+
 def get_now_time_str(format='%Y-%m-%d %H:%M:%S'):
   """get now time 
   Args:
@@ -346,9 +344,8 @@ def get_now_time_str(format='%Y-%m-%d %H:%M:%S'):
   Returns:
       _type_: _description_
   """
-  return datetime.now().strftime(
-      format
-      )
+  return datetime.now().strftime(format)
+
 
 def img_to_base64(img_path):
   """img to base64
@@ -359,7 +356,6 @@ def img_to_base64(img_path):
   Returns:
       _type_: _description_
   """
-  with open(img_path,"rb") as f:
+  with open(img_path, "rb") as f:
     encoded_string = base64.b64encode(f.read()).decode('utf-8')
   return encoded_string
-

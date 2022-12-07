@@ -74,7 +74,8 @@ class TrainEvalBase:
           "please set param.eval_value_is_large_better that is type of bool,"\
           f" current is {self.param.eval_value_is_large_better}"
 
-    assert param.model_save_stratyge in ('auto','recent','top-k'), param.model_save_stratyge
+    assert param.model_save_stratyge in ('auto', 'recent',
+                                         'top-k'), param.model_save_stratyge
 
   # def parse_data_folder(self,
   #                       feat_path: typing.Union[list, str, None],
@@ -277,18 +278,18 @@ class TrainEvalBase:
     global_batch_size = batch_size_one_gpu * iter_num_update_optimizer * world_size
     return global_batch_size
 
-  def parse_max_train_step(self, global_batch_size,train_sample_num):
+  def parse_max_train_step(self, global_batch_size, train_sample_num):
     """find the max_train_step
     """
     max_train_step = self.param.max_train_step
     epoch_num = self.param.epoch_num
     if max_train_step is not None:
       return max_train_step
-     
-    # param.train_sample_num may be find in dataloader 
+
+    # param.train_sample_num may be find in dataloader
     if train_sample_num is None:
       return None
-    
+
     # train_sample_num /= self.param.train_sample_num
     total_sample_num = train_sample_num * epoch_num
     return math.ceil(total_sample_num / global_batch_size)
