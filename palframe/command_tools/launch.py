@@ -120,6 +120,85 @@ def parser_args():
 
   create_folder_meta_parser.set_defaults(func=create_folder_meta)
 
+  start_server_parser = subparser.add_parser(
+      'start_server', help='start a flask server to predict')
+  start_server_parser.add_argument(
+      '--worker_dist',
+      type=str,
+      default='{-1:1}',
+      help='worker distribution dict, a json file path or json str,'
+      'for example: `{0:1,1:1}` mean cuda:0 has one worker, cuda:1 has one worker'
+  )
+  start_server_parser.add_argument(
+      '--lazy_start',
+      action='store_true',
+      default=False,
+      help=
+      'decide if use lazy start, if so, model will not start when service is started'
+  )
+
+  start_server_parser.add_argument('--param_script_name',
+                                   default='param.py',
+                                   help='name of param.py')
+  start_server_parser.add_argument('--param_cls_name',
+                                   default='Param',
+                                   help='class name of Param class')
+
+  start_server_parser.add_argument('--model_script_name',
+                                   default='model.py',
+                                   help='name of model.py')
+  start_server_parser.add_argument('--model_cls_name',
+                                   default='Model',
+                                   help='class name of Model class')
+
+  start_server_parser.add_argument('--predictor_script_name',
+                                   default='predict.py',
+                                   help='name of model.py')
+  start_server_parser.add_argument('--predictor_cls_name',
+                                   default='Predictor',
+                                   help='class name of Prodictor class')
+
+  start_server_parser.add_argument(
+      '--model_checkpoint',
+      default=None,
+      help='model checkpoint path sent to predictor')
+
+  start_server_parser.add_argument(
+      '--restart_with_cpu',
+      action='store_true',
+      default=False,
+      help='by default, model will restart refer to worker_dist argument,'
+      ' this argument forces restart with cpu')
+  start_server_parser.add_argument('--debug',
+                                   default=False,
+                                   action='store_true',
+                                   help='debug mode')
+  start_server_parser.add_argument('--port',
+                                   type=int,
+                                   default=5018,
+                                   help='specify port')
+  start_server_parser.add_argument('--auto_exit_time',
+                                   type=int,
+                                   default=1800,
+                                   help='auto exit time')
+  start_server_parser.add_argument(
+      '--submit_desc',
+      type=str,
+      default=None,
+      help='a json file path, which describe the data example format to submit')
+
+  start_server_parser.add_argument('--save_request_data',
+                                   default=False,
+                                   action='store_true',
+                                   help='whether save requests data')
+  start_server_parser.add_argument(
+      '--max_keep',
+      default=5,
+      type=int,
+      help='max data to keep with error or normal data')
+
+  start_server_parser.set_defaults(func=start_server)
+
   return parser.parse_args()
 
 
@@ -136,6 +215,7 @@ def param_init_fn_decorator(run_tag):
   """
     modify init funciton's run_tag keyword
     """
+
   def wrapper1(fn):
     def wrapper2(*args, **kwargs):
       kwargs['run_tag'] = run_tag
@@ -187,7 +267,6 @@ def start_dist_train(args):
     value = getattr(args, name)
     if value is not None:
       setattr(param_obj, name, value)
-  
 
   # if param_obj.
   #   param_obj.create_restart_work_path_name()
@@ -249,6 +328,7 @@ def distribute_from_templates(args):
     :param args: 
     :return:
     """
+
   def _render_one_file(path_sorce, path_target, args):
     try:
       with open(path_sorce, 'r', encoding='utf-8') as f:
@@ -279,6 +359,12 @@ def distribute_from_templates(args):
   for path in paths_total:
     _render_one_file(path, os.path.join(path_project, os.path.basename(path)),
                      args)
+
+
+def start_server(args):
+  # 启动预测服务
+  from palframe.pytorch.estimator7.deploy.flask_server.start_server import start_server
+  start_server(args)
 
 
 def main():

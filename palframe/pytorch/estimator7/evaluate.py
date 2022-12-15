@@ -44,8 +44,8 @@ class EvaluatorBase(TrainEvalBase, metaclass=EvaluatorBaseMeta):
 
     self._has_call_base_init = True
 
-  def _try_to_get_device_from_model(self):
-    return next(self.model.parameters()).device
+  # def _try_to_get_device_from_model(self):
+  #   return next(self.model.parameters()).device
 
   def evaluate_one_batch(self, *args, **kwargs) -> Dict:
     """evaluate one batch data
