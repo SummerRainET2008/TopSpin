@@ -15,7 +15,8 @@ DEFAULT_PARAMS = dict(
     # whether save first step
     is_save_model_at_first_step=True,
     model_saved_num=3,  # model save param
-    model_save_stratyge='auto', #  `recent`: save recent, `top-k`: save best top-k, `auto` 
+    model_save_stratyge=
+    'auto',  #  `recent`: save recent, `top-k`: save best top-k, `auto` 
     # worker num in dataloader
     train_num_workers_loading_data=2,
     # worker num in processing example, i.e. create feat stage
@@ -46,7 +47,7 @@ DEFAULT_PARAMS = dict(
     weight_decay=0.01,
     # "linear" or "cosine" or "cosine_with_restarts"  or "polynomial"
     # or "constant" or "constant_with_warmup"
-    lr_scheduler_type='linear',  
+    lr_scheduler_type='linear',
     num_warmup_steps=None,
     num_warmup_ratio=None,
     param_clip_norm=1,
@@ -74,7 +75,7 @@ DEFAULT_PARAMS = dict(
     dev_file=None,
     test_files=None,
     eval_valid_file_extension=["pkl", "pydict", "json"],
-    eval_batch_size=None, # defualt is train batch size
+    eval_batch_size=None,  # defualt is train batch size
     eval_num_workers_loading_data=2,
     eval_process_example_num_worker=1,
     eval_path_initial_model=None,
@@ -109,7 +110,7 @@ DEFAULT_PARAMS = dict(
     cudnn_benchmark=False,
     experiment_folder="work",
     # file name to save current best score
-    best_eval_score_file_name = 'current_best_score.txt',
+    best_eval_score_file_name='current_best_score.txt',
     run_tag=None,
     use_utc_time=True,
     folder_cache_meta_name=".meta.palframe.pkl")

@@ -14,8 +14,8 @@ def main():
   Logger.set_level(options.debug_level)
 
   starter.start_distributed_train(
-    Param.get_instance(),
-    "example/nlp/intent_detection/estimator6/train.py",
+      Param.get_instance(),
+      "example/nlp/intent_detection/estimator6/train.py",
   )
 
 

@@ -433,8 +433,7 @@ class TrainerBase:
       Logger.info(
           f"Training time: {nlp.to_readable_time(train_duration)}, "
           f"and remaining time: {nlp.to_readable_time(remaining_time)}, "
-          f"to finish on {finished_time}"
-      )
+          f"to finish on {finished_time}")
       Logger.info(f"{self._get_worker_info()}: "
                   f"*Epoch: {epoch_id:.2f}, "
                   f"batch_id: {self._batch_id:_}, "
@@ -468,8 +467,9 @@ class TrainerBase:
       self._evaluate()
 
     nlp.execute_cmd(
-      f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
-      f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error")
+        f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
+        f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error"
+    )
 
     ratio = self._model_seen_sample_num / self._target_seen_sample_num
     if exit_code == 0 or (exit_code == 1 and ratio >= 0.99):
@@ -601,9 +601,10 @@ class TrainerBase:
         figure_data[f"{line_id}.{key}"] = self._figure_data[key]
 
       out_file = os.path.join(
-        self._param.path_work,
-        os.path.split(self._param.path_work)[1] + ".train.loss.png")
+          self._param.path_work,
+          os.path.split(self._param.path_work)[1] + ".train.loss.png")
       draw_figure(figure_data, out_file)
 
-      out_file = out_file.replace(".train.loss.png", ".train.loss.smoothed.png")
+      out_file = out_file.replace(".train.loss.png",
+                                  ".train.loss.smoothed.png")
       draw_figure(figure_data, out_file, smooth_width=256)

@@ -2,7 +2,7 @@
 #author: zhouxuan553
 
 from functools import partial
-import os, pickle, copy, itertools, math, psutil, random,sys
+import os, pickle, copy, itertools, math, psutil, random, sys
 import threading
 import copy
 from palframe import nlp
@@ -47,13 +47,13 @@ class ParamBaseMeta(type):
       else:
         assert not nlp.is_none_or_empty(param.run_tag)
         param.parse_path_work_name()
-      
+
       param._instance_cache = None
-      _param = param  
-      param =  next(param.generate_all_variants())
+      _param = param
+      param = next(param.generate_all_variants())
       param._instance_cache = _param
       param.param_normalize()
-      
+
     else:
       # dist run, using cache from env
       Logger.info(f"loading param from '{file_name}'")
@@ -74,25 +74,25 @@ class ParamBase(metaclass=ParamBaseMeta):
     self.__dict__.update(**copy.deepcopy(DEFAULT_PARAMS))
     return self
 
-
   @property
   def path_work_restored_training(self):
     return self._path_work_restored_training
-  
+
   @path_work_restored_training.setter
-  def path_work_restored_training(self,v):
+  def path_work_restored_training(self, v):
     if v is None:
       self._path_work_restored_training = None
-      return 
+      return
     self._path_work_restored_training = v
-    i=1
+    i = 1
     while True:
       candiate_path_work = v + f'.continue.{i}'
       if not os.path.exists(candiate_path_work):
         self.path_work = candiate_path_work
-        return 
+        return
       if i > 100:
-        raise RuntimeError(f'too many continue times for path work {v}, it is limited to 100')
+        raise RuntimeError(
+            f'too many continue times for path work {v}, it is limited to 100')
       i += 1
 
   # def create_restart_work_path_name(self):
@@ -229,7 +229,7 @@ class ParamBase(metaclass=ParamBaseMeta):
         param = copy.deepcopy(self)
         for k, v in attr_set:
           param.__dict__[k] = v
-          
+
         param.path_work = f"{param.path_work}.automl_{idx}"
         param.param_normalize()
         _current_grid_search_params = copy.deepcopy(dict(attr_set))
@@ -263,26 +263,30 @@ class ParamBase(metaclass=ParamBaseMeta):
           param1 = copy.deepcopy(param)
           for k, v in attr_set:
             param1.__dict__[k] = v
-        
+
           param1.path_work = f"{param1.path_work}.automl_{idx}"
           param.param_normalize()
-          _current_grid_search_params = copy.deepcopy(dict(param_value+cand_key_values_grouped))
+          _current_grid_search_params = copy.deepcopy(
+              dict(param_value + cand_key_values_grouped))
           param._current_grid_search_params = _current_grid_search_params
           # Logger.info(f"current search param_value: {str(param_value)}, cand_key_values_grouped:  {str(cand_key_values_grouped)}, path_work: {param.path_work}")
           yield param1
           idx += 1
 
-  
   def param_normalize(self):
     """
     对于某些参数做一些默认处理
     """
     param = self
     if param.eval_batch_size is None:
-      Logger.debug(f"cls: {param.__class__} set eval_batch_size to {param.train_batch_size}")
+      Logger.debug(
+          f"cls: {param.__class__} set eval_batch_size to {param.train_batch_size}"
+      )
       param.eval_batch_size = param.train_batch_size
     if param.pred_batch_size is None:
-      Logger.debug(f"cls: {param.__class__}, set pred_batch_size to {param.train_batch_size}")
+      Logger.debug(
+          f"cls: {param.__class__}, set pred_batch_size to {param.train_batch_size}"
+      )
       param.pred_batch_size = param.train_batch_size
 
   def clone(self, buff={}):
@@ -384,20 +388,18 @@ def distributed_init(param: ParamBase):
   else:
     assert False, f"wrong backhand: {param.backhand}"
   os.environ[socket_ifname] = param._try_get_net_name(param)
-  
+
   # set env CUDA_VISIBLE_DEVICES
   local_rank = int(os.getenv("LOCAL_RANK"))
   gpu_id = param.gpus[local_rank]
   os.environ['CUDA_VISIBLE_DEVICES'] = str(gpu_id)
-  
+
   import torch.distributed as dist
   dist.init_process_group(backend=param.backhand)
   HAS_RUN_DISTRIBUTED_INIT = True
   if not quickrun_mode:
-    Logger.reset_outstream(
-      f"{param.path_log}/log.rank_{get_rank()}",
-      append=True
-      )
+    Logger.reset_outstream(f"{param.path_log}/log.rank_{get_rank()}",
+                           append=True)
 
   if quickrun_mode:
     param._check_folder_meta(auto_create=True)
@@ -406,8 +408,8 @@ def distributed_init(param: ParamBase):
 from palframe.nlp import get_log_time as _get_log_time
 
 
-def get_log_time(utc_time: bool = False,country_city: str=None):
-  return _get_log_time(utc_time,country_city=country_city)
+def get_log_time(utc_time: bool = False, country_city: str = None):
+  return _get_log_time(utc_time, country_city=country_city)
 
 
 def modify_time_display(param):

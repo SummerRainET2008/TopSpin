@@ -16,7 +16,6 @@ class ModelBaseMeta(type):
   """
     控制实例化过程
     """
-
   @starter.exception_stop
   def __call__(cls, param):
     self = cls.__new__(cls, param)
@@ -50,13 +49,10 @@ class ModelBase(nn.Module, metaclass=ModelBaseMeta):
     self._param = param
     self._has_call_base_init = True
 
-  
-  def load_model_from_file(
-    self,
-    checkpoint_path, 
-    device=torch.device('cpu'),
-    strict: bool = False
-    ):
+  def load_model_from_file(self,
+                           checkpoint_path,
+                           device=torch.device('cpu'),
+                           strict: bool = False):
     """load checkpoint from local file 
     Args:
         checkpoint_path (_type_): _description_
@@ -81,7 +77,7 @@ class ModelBase(nn.Module, metaclass=ModelBaseMeta):
       return info
     except Exception as error:
       Logger.error(f"Model load: {error}")
-      raise 
+      raise
 
   def save_model(self, info: dict, path_model, tag=""):
     model_seen_sample_num = info["model_seen_sample_num"]

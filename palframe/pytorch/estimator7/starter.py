@@ -44,7 +44,6 @@ def _check_server_gpus(server_gpu_info: list):
   return True
 
 
-
 def ____get_vali_error(log_file):
   '''
   You can check path_meta/dev.eval.pkl, which includes all dev evaluation
@@ -78,7 +77,6 @@ def _get_vali_error(best_eval_score_file_path):
     # Logger.error(error)
     Logger.warn(f"No evaluation found in '{best_eval_score_file_path}'")
   return 0
-
 
 
 def _get_netport(buffer=set()):
@@ -230,7 +228,8 @@ class _RunTaskThread(threading.Thread):
       remaining_time = duration / shared["finished_task"] * remaining_task
 
       if code == 0:
-        vali_error = _get_vali_error(f"{param.path_meta}/{param.best_eval_score_file_name}")
+        vali_error = _get_vali_error(
+            f"{param.path_meta}/{param.best_eval_score_file_name}")
         Logger.info(f"Task[{self._thread_id}] '{param.path_work}' succeeds, "
                     f"best vali_error: {-vali_error}, "
                     f"taking {nlp.to_readable_time(duration)} seconds, "
@@ -255,7 +254,7 @@ def close_processes():
 
 
 class RunManager:
-  avail_opts = ["no_GPU_check", "run_tag","experiment_folder"]
+  avail_opts = ["no_GPU_check", "run_tag", "experiment_folder"]
 
   def __init__(self, tasks, servers, **kwargs):
     Logger.info("-" * 80)
@@ -269,20 +268,21 @@ class RunManager:
 
     self._check_tasks_condition(tasks)
     self._check_servers(servers, tasks)
-    
 
-    experiment_folder = kwargs.get('experiment_folder','work')
+    experiment_folder = kwargs.get('experiment_folder', 'work')
 
     num_gpu = sum([len(s._avail_gpus) for s in servers])
     Logger.info(f"#task: {len(tasks)}, #gpu: {num_gpu}")
 
     nlp.set_random_seeds(0)
     self._run_id = random.randint(0, 1024 * 1024)
-    run_root_path = [f"{experiment_folder}/batch_task", f"run_id_{self._run_id}"]
+    run_root_path = [
+        f"{experiment_folder}/batch_task", f"run_id_{self._run_id}"
+    ]
     run_tag = kwargs.get("run_tag", "")
     if not nlp.is_none_or_empty(run_tag):
       run_root_path.append(run_tag)
-      
+
     run_root_path = ".".join(run_root_path)
     nlp.mkdir(run_root_path)
     self._run_lock_file = f"{run_root_path}/.run.lock"
@@ -365,7 +365,7 @@ class RunManager:
     def stop_thread_function():
       for thread in self._all_threads:
         thread.clear_threads()
-    
+
     start_time = time.time()
     nlp.execute_cmd(f"touch {self._run_lock_file}")
 
@@ -390,7 +390,7 @@ class RunManager:
           # os.system(f"kill -9 -{os.getpid()}")
           # os.system(f"kill -9 {os.getpid()}")
           # os._exit(0)
-          # return 
+          # return
 
         sleep_time = 3
         Logger.debug(f"waiting for {sleep_time} seconds.")
@@ -410,8 +410,8 @@ class RunManager:
 
     nlp.execute_cmd(f"rm {self._run_lock_file}")
     Logger.info(
-      f"RunManager.run() is done, total time: {nlp.to_readable_time(time.time()-start_time)}"
-      )
+        f"RunManager.run() is done, total time: {nlp.to_readable_time(time.time()-start_time)}"
+    )
 
 
 def start_train(param: ParamBase, source_script_and_params: str,
@@ -505,7 +505,8 @@ def start_distributed_train(param: ParamBase, source_script_and_params):
     stop_distributed_train(param.path_work)
 
   else:
-    vali_error = _get_vali_error(f"{param.path_meta}/{param.best_eval_score_file_name}")
+    vali_error = _get_vali_error(
+        f"{param.path_meta}/{param.best_eval_score_file_name}")
     duration = time.time() - whole_run_starting_time
     Logger.info(f"best vali_error: {-vali_error}, "
                 f"taking {nlp.to_readable_time(duration)}.")
@@ -528,16 +529,18 @@ def clear_server(ip):
       nlp.command(f"kill -9 {pid}", server=ip)
 
 
-def parse_servers_from_files(server_files:str):
+def parse_servers_from_files(server_files: str):
   from palframe.pytorch.estimator7.utils import _parse_server_infos_from_server_files
   server_infos = list(_parse_server_infos_from_server_files(server_files))
   assert server_infos, server_infos
-  server_infos = [(server_IP,gpus) for server_IP, gpu_num, gpus in server_infos]
-  # check gpu 
+  server_infos = [(server_IP, gpus)
+                  for server_IP, gpu_num, gpus in server_infos]
+  # check gpu
   _check_server_gpus(server_infos)
 
   for server_IP, gpus in server_infos:
-    yield Server(server_IP,gpus)
+    yield Server(server_IP, gpus)
+
 
 def exception_stop(class_func):
   @wraps(class_func)
@@ -546,7 +549,9 @@ def exception_stop(class_func):
       ret = class_func(*args, **kwargs)
       return ret
     except Exception as error:
-      Logger.error(f"function {class_func} execute error:\n {traceback.format_exc()}")
+      Logger.error(
+          f"function {class_func} execute error:\n {traceback.format_exc()}")
       stop_distributed_train(args[0]._param.path_work)
       close_processes()
+
   return f
