@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>{{title}}</title>
+    <!--引入jquery和echart-->
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-3.6.0.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='echarts.js') }}"></script>
+
+</head>
+<body>
+<!--Step:1 为ECharts准备一个具备大小（宽高）的Dom-->
+<h2> {{flowchart|safe}}</h2>
+<button></button>
+<div id="main" style="height:1000px;border:1px solid #ccc;padding:10px;"></div>
+
+<!--Step:2 引入echarts.js-->
+
+<script type="text/javascript">
+    var myChart = echarts.init(document.getElementById('main'))
+    var options = {{echart_options| safe}};
+//     console.log(options)
+    // 时间戳转换
+    function getLocalTime(nS) {  
+ return new Date(parseInt(nS) * 1000).toLocaleString();  
+};
+    
+    
+    // 节点显示回调函数
+    function node_formatter(params){
+    let data = params.data;
+    /*console.log('data.host',data.host,'data.parallel_num',data.parallel_num); */
+    if(params.dataType == 'node'){
+    let s = 'host: ' + data.host+ '<br>' + 'parallel_num: ' + data.parallel_num + '<br>' + 'model_path: ' + data.model_path + '<br>';
+    return s
+    }else{
+    let s = '队列名称: '+ data.source + '->' + data.target + '<br>';
+    return s
+    }
+    };
+    
+    //边显示回调函数
+    
+    // options["series"][0]['edgeLabel']['formatter'] = label_show_fomatter;
+    options["series"][0]['edgeLabel']['show'] = false
+    options['tooltip']['formatter'] = node_formatter;
+    myChart.setOption(options);
+    
+    // 每个10秒刷新
+    // window.setInterval(update_options, 10000); 
+
+</script>
+</body>
+</html>
