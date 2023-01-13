@@ -231,7 +231,7 @@ class TrainerBase:
       if not nlp.is_none_or_empty(param.vali_file) or \
         not nlp.is_none_or_empty(param.test_files):
         if param.use_gpu:
-          param.gpu_inference = self._avail_gpus[0]
+          param.gpu_inference = 0
         param.path_inference_model = ""
         predictor = self._user_predictor_cls(param)
         predictor._model.load_state_dict(self._user_model.state_dict(),
