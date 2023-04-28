@@ -1,7 +1,5 @@
 #coding: utf8
 #author: Tian Xia
-import datetime
-import pytz
 
 from palframe import *
 
@@ -192,13 +190,13 @@ def uniq(data: list) -> typing.Iterator:
 
 
 def norm1(vec):
-  vec = array(vec)
+  vec = np.array(vec)
   nm = float(sum(abs(vec)))
   return vec if eq(nm, 0) else vec / nm
 
 
 def norm2(vec):
-  vec = array(vec)
+  vec = np.array(vec)
   nm = math.sqrt(sum(vec * vec))
   return vec if eq(nm, EPSILON) else vec / nm
 
@@ -251,6 +249,29 @@ def norm_regex(regexExpr) -> str:
     .replace("{", "\{").replace("}", "\}")\
     .replace(".", "\.")
 
+def csv_file_read(file_name, max_num: int=-1)-> typing.Iterator:
+  assert file_name.endswith(".csv")
+  data_num = 0
+  with open(file_name, newline='') as csvfile:
+    reader = csv.DictReader(csvfile)
+    for idx, row in enumerate(reader):
+      if max_num >= 0 and idx + 1 > max_num:
+        break
+
+      if idx > 0 and idx % 10_000 == 0:
+        Logger.info(f"{file_name}: {idx} lines have been loaded.")
+
+      yield row
+
+  Logger.info(f"{file_name}: #data={data_num:,}")
+
+def csv_file_write(data: typing.Iterator, field_names: list,
+                   file_name, **kwargs):
+  with open(file_name, 'w') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=field_names)
+    writer.writeheader()
+    for d in data:
+      writer.writerow(d)
 
 def pydict_file_read(file_name, max_num: int = -1) -> typing.Iterator:
   assert file_name.endswith(".pydict")
@@ -508,7 +529,7 @@ def eq(v1, v2, prec=EPSILON):
 
 def discrete_sample(dists) -> int:
   '''each probability must be greater than 0'''
-  dists = array(dists)
+  dists = np.array(dists)
   assert all(dists >= 0)
   accsum = scipy.cumsum(dists)
   expNum = accsum[-1] * random.random()
@@ -616,6 +637,7 @@ def get_available_gpus(server_ip=None, account=None):
 
 
 def get_GPU_num():
+  import torch
   return torch.cuda.device_count()
 
 
