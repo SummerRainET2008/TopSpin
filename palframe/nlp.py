@@ -254,12 +254,13 @@ def csv_file_read(file_name, max_num: int=-1)-> typing.Iterator:
   data_num = 0
   with open(file_name, newline='') as csvfile:
     reader = csv.DictReader(csvfile)
-    for idx, row in enumerate(reader):
-      if max_num >= 0 and idx + 1 > max_num:
+    for row in reader:
+      data_num += 1
+      if max_num >= 0 and data_num > max_num:
         break
 
-      if idx > 0 and idx % 10_000 == 0:
-        Logger.info(f"{file_name}: {idx} lines have been loaded.")
+      if data_num > 0 and data_num % 10_000 == 0:
+        Logger.info(f"{file_name}: {data_num} lines have been loaded.")
 
       yield row
 
@@ -267,6 +268,7 @@ def csv_file_read(file_name, max_num: int=-1)-> typing.Iterator:
 
 def csv_file_write(data: typing.Iterator, field_names: list,
                    file_name, **kwargs):
+  assert file_name.endswith(".csv")
   with open(file_name, 'w') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=field_names)
     writer.writeheader()
