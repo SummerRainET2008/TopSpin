@@ -1,6 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
+import typing
 from palframe import *
 
 INF = float("inf")
@@ -548,7 +549,9 @@ def log_sum(ds):
 
 
 def group_by_key_fun(data, key_fun=None):
-  '''Note, the spark.group_by_key requires the data is sorted by keys.
+  '''
+  data: list or dict
+  Note, the spark.group_by_key requires the data is sorted by keys.
   @:return a dict
   '''
   result = collections.defaultdict(list)
