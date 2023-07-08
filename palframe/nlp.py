@@ -268,12 +268,17 @@ def csv_file_read(file_name, max_num: int=-1)-> typing.Iterator:
   Logger.info(f"{file_name}: #data={data_num:,}")
 
 def csv_file_write(data: typing.Iterator, field_names: list,
-                   file_name, **kwargs):
+                   file_name, remove_extra_keys=True, **kwargs):
   assert file_name.endswith(".csv")
   with open(file_name, 'w') as csvfile:
     writer = csv.DictWriter(csvfile, fieldnames=field_names)
     writer.writeheader()
     for d in data:
+      if remove_extra_keys:
+        for k in list(d.keys()):
+          if k not in field_names:
+            del d[k]
+
       writer.writerow(d)
 
 def pydict_file_read(file_name, max_num: int = -1) -> typing.Iterator:
