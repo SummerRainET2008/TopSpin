@@ -5,6 +5,7 @@ from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter
 from optparse import OptionParser
 from scipy import array
+from enum import Enum
 
 import abc
 import bisect
