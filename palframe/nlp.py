@@ -1,8 +1,6 @@
 #coding: utf8
 #author: Tian Xia
 from palframe import *
-import threading
-import typing
 
 INF = float("inf")
 EPSILON = 1e-6
@@ -951,10 +949,10 @@ class DisjointSet:
 
 class MultiProcessPool:
   @staticmethod
-  def _feed_data(task_in_queue, prompt_list: list, work_num):
+  def _feed_data(task_in_queue, prompt_list: list, worker_num):
     for query in prompt_list:
       task_in_queue.put(query)
-    for _ in range(work_num):
+    for _ in range(worker_num):
       task_in_queue.put(None)
 
   @staticmethod
@@ -966,53 +964,48 @@ class MultiProcessPool:
       out = target_func(query)
       task_out_queue.put(out)
 
-  def __call__(self, prompt_list: list,
-               target_func,
-               service_num: int=4, *args, **kwargs):
-    task_in_queue = mp.Queue(service_num)
+  def __call__(self, prompt_list: list, target_func, worker_num: int=4,
+               *args, **kwargs):
+    task_in_queue = mp.Queue(worker_num)
     task_out_queue = mp.Queue()
 
-    for _ in range(service_num):
+    for _ in range(worker_num):
       p = mp.Process(target=MultiProcessPool._process,
                      args=(target_func, task_in_queue, task_out_queue))
       p.start()
 
     mp.Process(target=MultiProcessPool._feed_data,
-               args=(task_in_queue, prompt_list, service_num)).start()
+               args=(task_in_queue, prompt_list, worker_num)).start()
     for _ in prompt_list:
       out = task_out_queue.get()
       yield out
 
 class MultiThreadPool:
-  @staticmethod
-  def _feed_data(task_in_queue, prompt_list: list, work_num):
+  def _feed_data(self, prompt_list: list, worker_num):
     for query in prompt_list:
-      task_in_queue.put(query)
-    for _ in range(work_num):
-      task_in_queue.put(None)
+      self._task_in_queue.put(query)
+    for _ in range(worker_num):
+      self._task_in_queue.put(None)
 
-  @staticmethod
-  def _process(target_func, task_in_queue, task_out_queue):
+  def _process(self, target_func):
     while True:
-      query = task_in_queue.get()
+      query = self._task_in_queue.get()
       if query is None:
         break
       out = target_func(query)
-      task_out_queue.put(out)
+      self._task_out_queue.put(out)
 
-  def __call__(self, prompt_list: list,
-               target_func,
-               service_num: int=4, *args, **kwargs):
-    task_in_queue = mp.Queue(service_num)
-    task_out_queue = mp.Queue()
+  def __call__(self, prompt_list: list, target_func, worker_num: int=4,
+               *args, **kwargs):
+    self._task_in_queue = mp.Queue(worker_num)
+    self._task_out_queue = mp.Queue()
 
-    for _ in range(service_num):
-      p = threading.Thread(target=MultiProcessPool._process,
-                     args=(target_func, task_in_queue, task_out_queue))
+    for _ in range(worker_num):
+      p = threading.Thread(target=self._process, args=(target_func,))
       p.start()
 
-    threading.Thread(target=MultiProcessPool._feed_data,
-                     args=(task_in_queue, prompt_list, service_num)).start()
+    threading.Thread(target=self._feed_data,
+                     args=(prompt_list, worker_num)).start()
     for _ in prompt_list:
-      out = task_out_queue.get()
+      out = self._task_out_queue.get()
       yield out
