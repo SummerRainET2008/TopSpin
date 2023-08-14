@@ -273,6 +273,7 @@ def csv_file_write(data: typing.Iterator, field_names: list,
     writer.writeheader()
     for d in data:
       if remove_extra_keys:
+        d = d.copy()
         for k in list(d.keys()):
           if k not in field_names:
             del d[k]
@@ -314,6 +315,9 @@ def pydict_file_write(data: typing.Iterator, file_name: str, **kwargs) -> None:
       print(obj, file=fou)
       if kwargs.get("print_log", True) and num % 10_000 == 0:
         Logger.info(f"{file_name} has been written {num} lines")
+      if kwargs.get("flush_freq", None) is not None and \
+        num % kwargs["flush_freq"] == 0:
+        fou.flush()
 
   if kwargs.get("print_log", True):
     Logger.info(f"{file_name} has been written {num} lines totally")
