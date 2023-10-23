@@ -5,6 +5,11 @@ from palframe import *
 INF = float("inf")
 EPSILON = 1e-6
 
+def cond_if(cond, value1, value2):
+  if isinstance(cond, bool):
+    return value1 if cond else value2
+  else:
+    return value1 if not is_none_or_empty(cond) else value2
 
 def load_module_from_full_path(path):
   import importlib.util
