@@ -918,38 +918,6 @@ def top_k_max_or_min(data: list,
     key_func = lambda item: -data_key_func(item)
     return top_k_largest(key_func)
 
-
-class DisjointSet:
-  def __init__(self, n):
-    self._fathers = {}
-    self._sizes = {}
-    self._clusters_num = n
-
-  def combine(self, a, b):
-    c1 = self.get_cluster_id(a)
-    c2 = self.get_cluster_id(b)
-    if c1 == c2:
-      return
-
-    if self._sizes.get(c1, 1) > self._sizes.get(c2, 1):
-      self.combine(b, a)
-      return
-
-    self._fathers[c1] = c2
-    self._sizes[c2] = self._sizes.get(c2, 1) + self._sizes.get(c1, 1)
-    self._clusters_num -= 1
-
-  def get_cluster_id(self, a):
-    father = self._fathers.get(a, -1)
-    if father == -1:
-      return a
-    cluster_id = self.get_cluster_id(father)
-    self._fathers[a] = cluster_id
-    return cluster_id
-
-  def get_cluster_num(self):
-    return self._clusters_num
-
 class MultiProcessPool:
   @staticmethod
   def _feed_data(task_in_queue, prompt_list: list, worker_num):
