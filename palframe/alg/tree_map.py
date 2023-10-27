@@ -2,6 +2,7 @@
 #coding: utf8
 
 import collections
+from palframe.alg.linked_list import LinkedList, ListNode
 
 class _AVLTreeNode:
   def __init__(self, key: int):
@@ -9,8 +10,7 @@ class _AVLTreeNode:
     self._left = None
     self._right = None
     self._depth = 1
-    self._prev = None
-    self._next = None
+    self._next_value = None
 
   def _get_next(self):
     if self._left is not None:
@@ -41,20 +41,32 @@ class _AVLTreeNode:
       assert abs(ld - rd) < 2
       return max(ld, rd) + 1
 
-  def _insert(self, key):
+  def _find_lower_bound(self, key, bound: list):
+    if key == self._key:
+      bound[0] = key
+    elif key < self._key:
+      bound[0] = self._key
+      if self._left is not None:
+        self._left._find_lower_bound(key, bound)
+    else:
+      if self._right is not None:
+        self._right._find_lower_bound(key, bound)
+
+  def _insert(self, key, next_key: list):
     assert key != self._key
 
     if key < self._key:
+      next_key[0] = self._key
       if self._left is None:
         self._left = _AVLTreeNode(key)
       else:
-        self._left = self._left._insert(key)
+        self._left = self._left._insert(key, next_key)
 
     else:
       if self._right is None:
         self._right = _AVLTreeNode(key)
       else:
-        self._right = self._right._insert(key)
+        self._right = self._right._insert(key, next_key)
 
     new_root = self
     while True:
@@ -115,70 +127,73 @@ class _AVLTreeNode:
 class TreeMap:
   def __init__(self):
     self._root = None
-    self._data = {}
+    self._key_list = LinkedList()
+    self._key2info = {} # {"key": ["value", "key_list_node"]}
 
   def size(self):
-    return len(self._data)
+    return len(self._key2info)
 
   def items(self):
-    if self._root is not None:
-      for key in self._root._get_next():
-        yield key, self._data[key]
+    node = self._key_list.begin()
+    while node is not self._key_list.end():
+      key = node()
+      value = self._key2info[key]["value"]
+      yield key, value
+      node = node.next()
 
-  def _hash(self, key: [int, float, str]):
-    if isinstance(key, str):
-      return hash(key)
-    return key
+  def reversed_items(self):
+    node = self._key_list.rbegin()
+    while node is not self._key_list.rend():
+      key = node()["key"]
+      value = self._key2info[key]["value"]
+      yield key, value
+      node = node.prev()
 
-  def lower_bound(self, key):
+  def key_list_end(self):
+    return self._key_list.end()
+
+  def lower_bound(self, key):   # return key_list node
     if self._root is None:
       return None
 
-    smallest_large = None
-    key = self._hash(key)
-    node = self._root
-    while True:
-      if key == node._key:
-        return key
-      elif key < node._key:
-        smallest_large = node._key
-        if node._left is None:
-          return node._key
-        node = node._left
-      else:
-        if node._right is None:
-          return smallest_large
-        node = node._right
+    bound = [None]
+    self._root._find_lower_bound(key, bound)
+    if bound[0] is None:
+      return self._key_list.end()
+
+    return self._key2info[bound[0]]["key_list_node"]
 
   def get(self, key, default_value=None):
-    return self._data.get(self._hash(key), default_value)
+    # return self._key2info.get(self._hash(key), default_value)
+    info = self._key2info.get(key, None)
+    return default_value if info is None else info["value"]
 
   def set(self, key, value):
-    hash_code = self._hash(key)
-    if hash_code in self._data:
-      self._data[hash_code] = value
+    rd = self._key2info.get(key, None)
+    if rd is not None:
+      rd["value"] = value
       return
 
     if self._root is None:
-      self._root = _AVLTreeNode(hash_code)
+      self._root = _AVLTreeNode(key)
+      self._key_list.push_back(key)
+      self._key2info[key] = {
+        "key": key, "value": value, "key_list_node": self._key_list.rbegin()
+      }
+
     else:
-      self._root = self._root._insert(hash_code)
+      next_keyhash = [None]
+      self._root = self._root._insert(key, next_keyhash)
 
-    self._data[hash_code] = value
+      if next_keyhash[0] is None:
+        next_node = self._key_list.end()
+      else:
+        next_node = self._key2info[next_keyhash[0]]["key_list_node"]
+      self._key_list.insert(next_node, ListNode(key))
 
-  # def _find(self, key):
-  #   node = self._fake_root
-  #   while True:
-  #     if key == node.key:
-  #       return node
-  #     elif key < node.key:
-  #       if node.left is None:
-  #         return node
-  #       node = node.left
-  #     else:
-  #       if node.rigth is None:
-  #         return node
-  #       node = node.right
+      self._key2info[key] = {
+        "key": key, "value": value, "key_list_node": next_node.prev()
+      }
 
 def main():
   tree_map = TreeMap()
@@ -218,33 +233,29 @@ def main():
 
   tree_map.set(8, 1)
   tree_map.set(9, 1)
+
   print(str(tree_map._root))
   print(f"num={tree_map.size()}")
 
-  print(tree_map._root._debug_checked_depth())
+  print("max_depth:", tree_map._root._debug_checked_depth())
 
-  print(tree_map.lower_bound(2.5))
-  print(tree_map.lower_bound(2.6))
-  print(tree_map.lower_bound(3.25))
-  print(tree_map.lower_bound(4.15))
-  print(tree_map.lower_bound(5.1))
-  print(tree_map.lower_bound(6.1))
-  print(tree_map.lower_bound(7.1))
-  print(tree_map.lower_bound(8.1))
-  print(tree_map.lower_bound(9.1))
-  print(tree_map.lower_bound(0.1))
-  print(tree_map.lower_bound(2.1))
-  print(tree_map.lower_bound(2.3))
+  print(tree_map.lower_bound(2.5)())
+  print(tree_map.lower_bound(2.6)())
+  print(tree_map.lower_bound(3.25)())
+  print(tree_map.lower_bound(4.15)())
+  print(tree_map.lower_bound(5.1)())
+  print(tree_map.lower_bound(6.1)())
+  print(tree_map.lower_bound(7.1)())
+  print(tree_map.lower_bound(8.1)())
+  print(tree_map.lower_bound(9.1)())
+  print(tree_map.lower_bound(0.1)())
+  print(tree_map.lower_bound(2.1)())
+  print(tree_map.lower_bound(2.3)())
 
   print("traverse")
   for key, value in tree_map.items():
-    print(key, value)
+    print(f"key= {key:<10} value= {value:<10}")
 
-
-if __name__ == "__main__":
-  main()
-
-  pass
 
 if __name__ == "__main__":
   main()
