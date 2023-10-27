@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 #coding: utf8
 
+# It is buggy.
+
 import collections
 from palframe.alg.linked_list import LinkedList, ListNode
 
