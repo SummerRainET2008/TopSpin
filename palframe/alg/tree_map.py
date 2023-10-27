@@ -108,14 +108,38 @@ class TreeMap:
   def __init__(self):
     self._root = None
     self._data = {}
+    self._end_node = _AVLTreeNode(None)
 
-  def num(self):
+  def size(self):
     return len(self._data)
 
   def _hash(self, key: [int, float, str]):
     if isinstance(key, str):
       return hash(key)
     return key
+
+  def end(self):
+    return self._end_node
+
+  def lower_bound(self, key):
+    if self._root is None:
+      return self._end_node
+
+    smallest_large = self._end_node
+    key = self._hash(key)
+    node = self._root
+    while True:
+      if key == node.key:
+        return key
+      elif key < node.key:
+        smallest_large = node.key
+        if node.left is None:
+          return node.key
+        node = node.left
+      else:
+        if node.right is None:
+          return smallest_large
+        node = node.right
 
   def get(self, key, default_value=None):
     return self._data.get(self._hash(key), default_value)
@@ -186,8 +210,22 @@ def main():
   tree_map.set(8, 1)
   tree_map.set(9, 1)
   print(str(tree_map._root))
+  print(f"num={tree_map.size()}")
 
   print(tree_map._root._debug_checked_depth())
+
+  print(tree_map.lower_bound(2.5))
+  print(tree_map.lower_bound(2.6))
+  print(tree_map.lower_bound(3.25))
+  print(tree_map.lower_bound(4.15))
+  print(tree_map.lower_bound(5.1))
+  print(tree_map.lower_bound(6.1))
+  print(tree_map.lower_bound(7.1))
+  print(tree_map.lower_bound(8.1))
+  print(tree_map.lower_bound(9.1))
+  print(tree_map.lower_bound(0.1))
+  print(tree_map.lower_bound(2.1))
+  print(tree_map.lower_bound(2.3))
 
 
 if __name__ == "__main__":
