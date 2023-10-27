@@ -108,7 +108,6 @@ class TreeMap:
   def __init__(self):
     self._root = None
     self._data = {}
-    self._end_node = _AVLTreeNode(None)
 
   def size(self):
     return len(self._data)
@@ -118,14 +117,11 @@ class TreeMap:
       return hash(key)
     return key
 
-  def end(self):
-    return self._end_node
-
   def lower_bound(self, key):
     if self._root is None:
-      return self._end_node
+      return None
 
-    smallest_large = self._end_node
+    smallest_large = None
     key = self._hash(key)
     node = self._root
     while True:
