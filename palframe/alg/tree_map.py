@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 #coding: utf8
 
-# It is buggy.
-
 import collections
 from palframe.alg.linked_list import LinkedList, ListNode
 
@@ -14,21 +12,17 @@ class _AVLTreeNode:
     self._depth = 1
     self._next_value = None
 
-  def _get_next(self):
-    if self._left is not None:
-      yield from self._left._get_next()
-    yield self._key
-    if self._right is not None:
-      yield from self._right._get_next()
-
   def __str__(self):
-    ans = [f"{self._key}"]
-    for son in [self._left, self._right]:
-      if son is not None:
-        ans.append(f"( {str(son)} )")
-      else:
-        ans.append(f"()")
-    return " ".join(ans)
+    if self._left is not None:
+      left = str(self._left)
+    else:
+      left = "(null)"
+    if self._right is not None:
+      right = str(self._right)
+    else:
+      right = "(null)"
+
+    return f"({self._key} {left} {right})"
 
   def _debug_checked_depth(self):
     if self._left is None and self._right is None:
@@ -37,6 +31,10 @@ class _AVLTreeNode:
       rd = self._right._debug_checked_depth()
       assert rd < 2
       return rd + 1
+    elif self._right is None:
+      ld = self._left._debug_checked_depth()
+      assert ld < 2
+      return ld + 1
     else:
       ld = self._left._debug_checked_depth()
       rd = self._right._debug_checked_depth()
@@ -54,7 +52,7 @@ class _AVLTreeNode:
       if self._right is not None:
         self._right._find_lower_bound(key, bound)
 
-  def _insert(self, key, next_key: list):
+  def _insert(self, key, next_key: list, from_left: bool):
     assert key != self._key
 
     if key < self._key:
@@ -62,46 +60,66 @@ class _AVLTreeNode:
       if self._left is None:
         self._left = _AVLTreeNode(key)
       else:
-        self._left = self._left._insert(key, next_key)
+        self._left = self._left._insert(key, next_key, True)
 
     else:
       if self._right is None:
         self._right = _AVLTreeNode(key)
       else:
-        self._right = self._right._insert(key, next_key)
+        self._right = self._right._insert(key, next_key, False)
 
-    new_root = self
-    while True:
-      new_root = new_root._reset_balance()
-      if new_root._is_balanced():
-        return new_root
+    return _AVLTreeNode._reset_balance(self, from_left)
 
-  def _is_balanced(self):
-    return abs(self._get_balance_factor()) < 2
+  def _is_balanced(self, from_left: bool):
+    bf = self._get_balance_factor()
+    return bf == 0 or (from_left and bf == 1) or (not from_left and bf == -1)
 
   def _get_balance_factor(self):
     return self._get_depth(self._left) - self._get_depth(self._right)
 
-  def _reset_balance(self):
-    self._reset_depth()
-    bf = self._get_balance_factor()
-    if abs(bf) < 2:
-      return self
+  @staticmethod
+  def _reset_node(node, from_left: bool):
+    node._reset_depth()
+    bf = node._get_balance_factor()
 
-    if bf == 2:
-      return self._right_rotate()
-    elif bf == -2:
-      return self._left_rotate()
+    if bf == -2:
+      return node._left_rotate()
+
+    elif bf == -1:
+      return node if not from_left else node._left_rotate()
+
+    elif bf == 0:
+      return node
+
+    elif bf == 1:
+      return node if from_left else node._right_rotate()
+
+    elif bf == 2:
+      return node._right_rotate()
+
+    else:
+      assert False
+
+  @staticmethod
+  def _reset_balance(node, from_left: bool):
+    if node is None:
+      return node
+
+    new_root = node
+    while True:
+      new_root = _AVLTreeNode._reset_node(new_root, from_left)
+      if new_root._is_balanced(from_left):
+        return new_root
 
   def _right_rotate(self):
     bf = self._get_balance_factor()
-    assert bf >= 2
+    # assert bf >= 2
 
     left = self._left
-    self._left = left._right
+    self._left = _AVLTreeNode._reset_balance(left._right, True)
     self._reset_depth()
 
-    left._right = self
+    left._right = _AVLTreeNode._reset_balance(self, False)
     left._reset_depth()
 
     return left
@@ -115,13 +133,13 @@ class _AVLTreeNode:
 
   def _left_rotate(self):
     bf = self._get_balance_factor()
-    assert bf <= -2
+    # assert bf <= -2
 
     right = self._right
-    self._right = right._left
+    self._right = _AVLTreeNode._reset_balance(right._left, False)
     self._reset_depth()
 
-    right._left = self
+    right._left = _AVLTreeNode._reset_balance(self, True)
     right._reset_depth()
 
     return right
@@ -132,8 +150,11 @@ class TreeMap:
     self._key_list = LinkedList()
     self._key2info = {} # {"key": ["value", "key_list_node"]}
 
-  def size(self):
-    return len(self._key2info)
+  def _debug(self):
+    if self._root is None:
+      print("null-tree")
+    else:
+      print(str(self._root))
 
   def items(self):
     node = self._key_list.begin()
@@ -185,7 +206,7 @@ class TreeMap:
 
     else:
       next_keyhash = [None]
-      self._root = self._root._insert(key, next_keyhash)
+      self._root = self._root._insert(key, next_keyhash, True)
 
       if next_keyhash[0] is None:
         next_node = self._key_list.end()
@@ -199,57 +220,16 @@ class TreeMap:
 
 def main():
   tree_map = TreeMap()
-  tree_map.set(1, 1)
-  print(str(tree_map._root))
-  tree_map.set(2, 1)
-  print(str(tree_map._root))
-  tree_map.set(3, 1)
-  print(str(tree_map._root))
+  # data = [32, 294, 280, 603, 927]
+  # data = [130, 819, 180, 252, 831, 100, 9, 0, 102, 10, 34, 76, 12, 98, 12]
+  data = [127, 645, 356, 789, 119, 718, 162, 667, 1012, 861, 511, 120, 130, 801, 689, 657, 21, 224, 1014, 157, 228, 1022, 259, 415, 943, 827, 819, 103, 279, 529]
 
-  tree_map.set(4, 1)
-  print(str(tree_map._root))
+  for d in data:
+    tree_map.set(d, d)
+    print(f"\nafter adding: {d}")
+    tree_map._debug()
 
-  tree_map.set(5, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(6, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(2.5, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(2.2, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(3.1, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(3.2, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(4.1, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(7, 1)
-  print(str(tree_map._root))
-
-  tree_map.set(8, 1)
-  tree_map.set(9, 1)
-
-  print(str(tree_map._root))
-  print(f"\nnum={tree_map.size()}")
-  print("max_depth:", tree_map._root._debug_checked_depth())
-
-  print()
-  values = [2.5, 2.6, 3.25, 4.15, 5.1, 6.1, 7.1, 8.1, 9.1, 0.1, 2.1, 2.3]
-  for v in values:
-    key_node = tree_map.lower_bound(v)
-    print(f"{v=}'s lower bound is {key_node()}")
-
-  print("\ntraverse")
-  for key, value in tree_map.items():
-    print(f"key= {key:<10} value= {value:<10}")
-
+  print(f"depth: ", tree_map._root._debug_checked_depth())
 
 if __name__ == "__main__":
   main()
