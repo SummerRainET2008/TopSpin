@@ -12,6 +12,13 @@ class _AVLTreeNode:
     self._prev = None
     self._next = None
 
+  def _get_next(self):
+    if self._left is not None:
+      yield from self._left._get_next()
+    yield self._key
+    if self._right is not None:
+      yield from self._right._get_next()
+
   def __str__(self):
     ans = [f"{self._key}"]
     for son in [self._left, self._right]:
@@ -35,8 +42,7 @@ class _AVLTreeNode:
       return max(ld, rd) + 1
 
   def _insert(self, key):
-    if key == self._key:
-      return
+    assert key != self._key
 
     if key < self._key:
       if self._left is None:
@@ -113,6 +119,11 @@ class TreeMap:
 
   def size(self):
     return len(self._data)
+
+  def items(self):
+    if self._root is not None:
+      for key in self._root._get_next():
+        yield key, self._data[key]
 
   def _hash(self, key: [int, float, str]):
     if isinstance(key, str):
@@ -224,6 +235,10 @@ def main():
   print(tree_map.lower_bound(0.1))
   print(tree_map.lower_bound(2.1))
   print(tree_map.lower_bound(2.3))
+
+  print("traverse")
+  for key, value in tree_map.items():
+    print(key, value)
 
 
 if __name__ == "__main__":
