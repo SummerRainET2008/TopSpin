@@ -235,24 +235,16 @@ def main():
   tree_map.set(9, 1)
 
   print(str(tree_map._root))
-  print(f"num={tree_map.size()}")
-
+  print(f"\nnum={tree_map.size()}")
   print("max_depth:", tree_map._root._debug_checked_depth())
 
-  print(tree_map.lower_bound(2.5)())
-  print(tree_map.lower_bound(2.6)())
-  print(tree_map.lower_bound(3.25)())
-  print(tree_map.lower_bound(4.15)())
-  print(tree_map.lower_bound(5.1)())
-  print(tree_map.lower_bound(6.1)())
-  print(tree_map.lower_bound(7.1)())
-  print(tree_map.lower_bound(8.1)())
-  print(tree_map.lower_bound(9.1)())
-  print(tree_map.lower_bound(0.1)())
-  print(tree_map.lower_bound(2.1)())
-  print(tree_map.lower_bound(2.3)())
+  print()
+  values = [2.5, 2.6, 3.25, 4.15, 5.1, 6.1, 7.1, 8.1, 9.1, 0.1, 2.1, 2.3]
+  for v in values:
+    key_node = tree_map.lower_bound(v)
+    print(f"{v=}'s lower bound is {key_node()}")
 
-  print("traverse")
+  print("\ntraverse")
   for key, value in tree_map.items():
     print(f"key= {key:<10} value= {value:<10}")
 
