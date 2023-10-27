@@ -5,14 +5,16 @@ import collections
 
 class _AVLTreeNode:
   def __init__(self, key: int):
-    self.key = key
-    self.left = None
-    self.right = None
-    self.depth = 1
+    self._key = key
+    self._left = None
+    self._right = None
+    self._depth = 1
+    self._prev = None
+    self._next = None
 
   def __str__(self):
-    ans = [f"{self.key}"]
-    for son in [self.left, self.right]:
+    ans = [f"{self._key}"]
+    for son in [self._left, self._right]:
       if son is not None:
         ans.append(f"( {str(son)} )")
       else:
@@ -20,33 +22,33 @@ class _AVLTreeNode:
     return " ".join(ans)
 
   def _debug_checked_depth(self):
-    if self.left is None and self.right is None:
+    if self._left is None and self._right is None:
       return 1
-    elif self.left is None:
-      rd = self.right._debug_checked_depth()
+    elif self._left is None:
+      rd = self._right._debug_checked_depth()
       assert rd < 2
       return rd + 1
     else:
-      ld = self.left._debug_checked_depth()
-      rd = self.right._debug_checked_depth()
+      ld = self._left._debug_checked_depth()
+      rd = self._right._debug_checked_depth()
       assert abs(ld - rd) < 2
       return max(ld, rd) + 1
 
   def _insert(self, key):
-    if key == self.key:
+    if key == self._key:
       return
 
-    if key < self.key:
-      if self.left is None:
-        self.left = _AVLTreeNode(key)
+    if key < self._key:
+      if self._left is None:
+        self._left = _AVLTreeNode(key)
       else:
-        self.left = self.left._insert(key)
+        self._left = self._left._insert(key)
 
     else:
-      if self.right is None:
-        self.right = _AVLTreeNode(key)
+      if self._right is None:
+        self._right = _AVLTreeNode(key)
       else:
-        self.right = self.right._insert(key)
+        self._right = self._right._insert(key)
 
     new_root = self
     while True:
@@ -58,7 +60,7 @@ class _AVLTreeNode:
     return abs(self._get_balance_factor()) < 2
 
   def _get_balance_factor(self):
-    return self._get_depth(self.left) - self._get_depth(self.right)
+    return self._get_depth(self._left) - self._get_depth(self._right)
 
   def _reset_balance(self):
     self._reset_depth()
@@ -75,31 +77,31 @@ class _AVLTreeNode:
     bf = self._get_balance_factor()
     assert bf >= 2
 
-    left = self.left
-    self.left = left.right
+    left = self._left
+    self._left = left._right
     self._reset_depth()
 
-    left.right = self
+    left._right = self
     left._reset_depth()
 
     return left
 
   def _get_depth(self, node):
-    return 0 if node is None else node.depth
+    return 0 if node is None else node._depth
 
   def _reset_depth(self):
-    self.depth = max(self._get_depth(self.left),
-                     self._get_depth(self.right)) + 1
+    self._depth = max(self._get_depth(self._left),
+                      self._get_depth(self._right)) + 1
 
   def _left_rotate(self):
     bf = self._get_balance_factor()
     assert bf <= -2
 
-    right = self.right
-    self.right = right.left
+    right = self._right
+    self._right = right._left
     self._reset_depth()
 
-    right.left = self
+    right._left = self
     right._reset_depth()
 
     return right
@@ -125,17 +127,17 @@ class TreeMap:
     key = self._hash(key)
     node = self._root
     while True:
-      if key == node.key:
+      if key == node._key:
         return key
-      elif key < node.key:
-        smallest_large = node.key
-        if node.left is None:
-          return node.key
-        node = node.left
+      elif key < node._key:
+        smallest_large = node._key
+        if node._left is None:
+          return node._key
+        node = node._left
       else:
-        if node.right is None:
+        if node._right is None:
           return smallest_large
-        node = node.right
+        node = node._right
 
   def get(self, key, default_value=None):
     return self._data.get(self._hash(key), default_value)
