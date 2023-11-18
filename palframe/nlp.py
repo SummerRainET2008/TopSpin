@@ -5,6 +5,16 @@ from palframe import *
 INF = float("inf")
 EPSILON = 1e-6
 
+def load_py_data(py_file):
+  user_data = {}
+  with open(py_file) as fin:
+    try:
+      exec(compile(fin.read(), "py_data", "exec"), user_data)
+      return user_data
+    except Exception as error:
+      Logger.error(error)
+      return {}
+
 def load_module_from_full_path(path):
   import importlib.util
   path = os.path.abspath(path)
@@ -185,18 +195,6 @@ def uniq(data: list) -> typing.Iterator:
     if prev is None or d != prev:
       yield d
       prev = d
-
-
-def norm1(vec):
-  vec = np.array(vec)
-  nm = float(sum(abs(vec)))
-  return vec if eq(nm, 0) else vec / nm
-
-
-def norm2(vec):
-  vec = np.array(vec)
-  nm = math.sqrt(sum(vec * vec))
-  return vec if eq(nm, EPSILON) else vec / nm
 
 
 def cmp(a, b) -> int:
@@ -406,6 +404,7 @@ def __strdate(timezone: str, now):
 
 
 def get_log_time(utc_time: bool = True, country_city: str = None):
+  import pytz
   '''
   utc_time: if False, return local time(server);
             if True, return local time(city).
@@ -432,6 +431,7 @@ def get_future_time(days=0,
                     minutes=0,
                     seconds=0,
                     country_city: str = None):
+  import pytz
   delta = datetime.timedelta(days=days,
                              hours=hours,
                              minutes=minutes,
@@ -485,6 +485,7 @@ def command(cmd: str,
             server=None,
             account=None,
             buff={}):
+  import psutil
   '''return (status_code, stdout, stderror)'''
   current_IPs = buff.setdefault(
       "current_IP",
@@ -534,15 +535,6 @@ def print_flush(cont, stream=None) -> None:
 
 def eq(v1, v2, prec=EPSILON):
   return abs(v1 - v2) < prec
-
-
-def discrete_sample(dists) -> int:
-  '''each probability must be greater than 0'''
-  dists = np.array(dists)
-  assert all(dists >= 0)
-  accsum = scipy.cumsum(dists)
-  expNum = accsum[-1] * random.random()
-  return bisect.bisect(accsum, expNum)
 
 
 def log_sum(ds):
@@ -653,6 +645,7 @@ def get_GPU_num():
 
 
 def get_GPU_info(gpu_id):
+  import nvidia_smi
   with Timer(f"get_GPU_info({gpu_id})"):
     nvidia_smi.nvmlInit()
     handle = nvidia_smi.nvmlDeviceGetHandleByIndex(gpu_id)

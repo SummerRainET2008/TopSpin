@@ -4,7 +4,6 @@
 from collections import defaultdict, namedtuple, Counter
 from operator import methodcaller, attrgetter, itemgetter
 from optparse import OptionParser
-from scipy import array
 from enum import Enum
 
 import abc
@@ -21,14 +20,11 @@ import logging
 import math
 import multiprocessing as mp
 import numpy as np
-import nvidia_smi
 import operator
 import optparse
 import os
 import pickle
 import pprint
-import psutil
-import pytz
 import queue
 import random
 import re
