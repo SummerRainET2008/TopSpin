@@ -40,7 +40,6 @@ import traceback
 import typing
 import unicodedata
 
-import palframe.__version__ as about
-from palframe.__version__ import __version__
-
-version = __version__
+__version__ = '1.0.0'
+__author__ = 'TIAN XIA'
+__email__ = 'XIATIAN443@paii-labs.com'
