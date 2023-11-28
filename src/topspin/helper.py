@@ -2,8 +2,12 @@
 #author: Tian Xia
 from src.topspin import *
 
-INF = float("inf")
-EPSILON = 1e-6
+import sys
+from pyal import INF, EPSILON, is_none_or_empty
+import typing
+import functools
+import os
+import time
 
 def load_py_data(py_file):
   user_data = {}
@@ -16,6 +20,7 @@ def load_py_data(py_file):
       return {}
 
 def load_module_from_full_path(path):
+  import os
   import importlib.util
   path = os.path.abspath(path)
   spec = importlib.util.spec_from_file_location("module.name", location=path)
@@ -24,32 +29,8 @@ def load_module_from_full_path(path):
   return foo
 
 
-class TerminalColors:
-  HEADER = '\033[95m'
-  OKBLUE = '\033[94m'
-  OKCYAN = '\033[96m'
-  OKGREEN = '\033[92m'
-  WARNING = '\033[93m'
-  FAIL = '\033[91m'
-  BOLD = '\033[1m'
-  UNDERLINE = '\033[4m'
-
-  ENDC = '\033[0m'
-
-  @staticmethod
-  def display_all_colors():
-    TC = TerminalColors
-    print(f"{TC.HEADER}This color is 'HEADER'{TC.ENDC}")
-    print(f"{TC.OKCYAN}This color is 'OKCYAN'{TC.ENDC}")
-    print(f"{TC.OKBLUE}This color is 'OKBLUE'{TC.ENDC}")
-    print(f"{TC.OKGREEN}This color is 'OKGREEN'{TC.ENDC}")
-    print(f"{TC.WARNING}This color is 'WARNING'{TC.ENDC}")
-    print(f"{TC.FAIL}This color is 'FAIL'{TC.ENDC}")
-    print(f"{TC.BOLD}This color is 'BOLD'{TC.ENDC}")
-    print(f"{TC.UNDERLINE}This color is 'UNDERLINE'{TC.ENDC}")
-
-
 def async_function(f):
+  import threading
   '''
   Decorator
   :param f: a function with no return value.
@@ -65,10 +46,6 @@ def async_function(f):
   return wrapper
 
 
-def coloring(s, value=TerminalColors.HEADER):
-  return f"{value}{s}{TerminalColors.ENDC}"
-
-
 def is_sys_mac():
   return sys.platform == "darwin"
 
@@ -77,35 +54,11 @@ def is_os_linux():
   return "linux" in sys.platform
 
 
-def histogram_ascii(points, out_file=sys.stdout) -> None:
-  counted = Counter(points)
-  sumv = sum(counted.values())
-  max_ratio = max([v / sumv for v in counted.values()] + [0])
-  accum_sum = 0
-  print(file=out_file)
-  print(f"{'INDEX':>7} {'VALUE':>10} {'PERCENT':>7} {'ACCUM':>7}  {'FREQ'}",
-        file=out_file)
-
-  for index, [k, v] in enumerate(sorted(counted.items())):
-    ratio = v / sumv
-    tag = "*" if eq(max_ratio, ratio) else ""
-    accum_sum += v
-    bar_len = math.ceil(ratio / max_ratio * 120)
-    key = f"{tag}{k}"
-    percent1 = f"{ratio * 100:>5.2f}%"
-    percent2 = f"{100 * accum_sum / sumv:>5.2f}%"
-    print(
-        f"{index:7d} {key:>10} {percent1:>7} {percent2:>7}  "
-        f"{'+' * bar_len} {counted[k]}",
-        file=out_file)
-
-  print(file=out_file)
-
-
 def set_random_seeds(seed=0):
   '''
   :param seed: 0 means taking current time, or taking the seed value.
   '''
+  import os, random
   if seed == 0:
     seed = os.getpid()
     Logger.info(f"current seed: {seed}")
@@ -113,12 +66,13 @@ def set_random_seeds(seed=0):
   try:
     import torch
     torch.manual_seed(seed)
+    random.seed(seed)
+    import numpy
+    numpy.random.seed(seed)
+  except ImportError:
+    pass
   except:
     Logger.error("failed to set random seeds")
-
-  np.random.seed(seed)
-  random.seed(seed)
-
 
 def is_debugging():
   gettrace = getattr(sys, 'gettrace', None)
@@ -129,6 +83,7 @@ def is_debugging():
 
 
 def next_batch(data: typing.Iterator, batch_size: int):
+  from operator import itemgetter
   _ = range(batch_size)
   data_iter = iter(data)
   while True:
@@ -139,13 +94,10 @@ def next_batch(data: typing.Iterator, batch_size: int):
     yield batch_data
 
 
-def ensure_random_seed_for_one_time(buff={}):
-  key = "randomized"
-  status = buff.get(key, False)
-  if not status:
-    random.seed()
-    buff[key] = True
-
+@functools.cache
+def ensure_random_seed_for_one_time():
+  import random
+  random.seed()
 
 def get_file_line_count(file_name: str):
   return int(os.popen(f"wc -l {file_name}").read().split()[0])
@@ -156,6 +108,7 @@ def get_files_line_count(file_names: list):
 
 
 def get_new_temporay_file():
+  import tempfile
   return tempfile.NamedTemporaryFile(delete=False).name
 
 
@@ -185,22 +138,6 @@ def segment_intersec(seg1: list, seg2: list):
 def segment_no_touch(seg1: list, seg2: list):
   return seg1[1] <= seg2[0] or seg2[1] <= seg1[0]
 
-
-def uniq(data: list) -> typing.Iterator:
-  '''
-  :param data: must be sorted.
-  '''
-  prev = None
-  for d in data:
-    if prev is None or d != prev:
-      yield d
-      prev = d
-
-
-def cmp(a, b) -> int:
-  return (a > b) - (a < b)
-
-
 def get_home_dir():
   return os.environ["HOME"]
 
@@ -208,13 +145,13 @@ def get_home_dir():
 def mkdir(folder: str, delete_first: bool = False) -> None:
   # create folder recursively.
   if delete_first:
-    execute_cmd(f"rm -r {folder}")
+    command(f"rm -r {folder}")
 
   path = "/" if folder.startswith("/") else ""
   for subfolder in folder.split("/"):
     path = os.path.join(path, subfolder)
     if not os.path.exists(path):
-      execute_cmd(f"mkdir {path}")
+      command(f"mkdir {path}")
 
 
 def get_module_path(module_name) -> typing.Union[str, None]:
@@ -234,48 +171,6 @@ def get_module_path(module_name) -> typing.Union[str, None]:
 
   return None
 
-
-def norm_regex(regexExpr) -> str:
-  return regexExpr\
-    .replace("*", "\*")\
-    .replace("+", "\+")\
-    .replace("?", "\?")\
-    .replace("[", "\[").replace("]", "\]")\
-    .replace("(", "\(").replace(")", "\)")\
-    .replace("{", "\{").replace("}", "\}")\
-    .replace(".", "\.")
-
-def csv_file_read(file_name, max_num: int=-1)-> typing.Iterator:
-  assert file_name.endswith(".csv")
-  data_num = 0
-  with open(file_name, newline='') as csvfile:
-    reader = csv.DictReader(csvfile)
-    for row in reader:
-      data_num += 1
-      if max_num >= 0 and data_num > max_num:
-        break
-
-      if data_num > 0 and data_num % 10_000 == 0:
-        Logger.info(f"{file_name}: {data_num} lines have been loaded.")
-
-      yield row
-
-  Logger.info(f"{file_name}: #data={data_num:,}")
-
-def csv_file_write(data: typing.Iterator, field_names: list,
-                   file_name, remove_extra_keys=True, **kwargs):
-  assert file_name.endswith(".csv")
-  with open(file_name, 'w') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=field_names)
-    writer.writeheader()
-    for d in data:
-      if remove_extra_keys:
-        d = d.copy()
-        for k in list(d.keys()):
-          if k not in field_names:
-            del d[k]
-
-      writer.writerow(d)
 
 def pydict_file_read(file_name, max_num: int = -1) -> typing.Iterator:
   assert file_name.endswith(".pydict")
@@ -352,27 +247,6 @@ def get_files_in_folder(data_path,
         yield os.path.realpath(os.path.join(path, short_name))
 
 
-def split_data_by_func(data, func):
-  data1, data2 = [], []
-  for d in data:
-    if func(d):
-      data1.append(d)
-    else:
-      data2.append(d)
-  return data1, data2
-
-
-def is_none_or_empty(data) -> bool:
-  '''This applies to any data type which has a __len__ method'''
-  if data is None:
-    return True
-
-  try:
-    return len(data) == 0
-  except:
-    return False
-
-
 def to_readable_time(seconds: float):
   if seconds < 0:
     return f"negative time: {seconds} seconds."
@@ -413,6 +287,7 @@ def get_log_time(utc_time: bool = True, country_city: str = None):
 
   e.g., SF time is UTC+8, then get_log_time(True) - 8 = get_log_time(False)
   '''
+  import datetime
   if utc_time:
     if is_none_or_empty(country_city):
       now = datetime.datetime.utcnow()
@@ -431,7 +306,7 @@ def get_future_time(days=0,
                     minutes=0,
                     seconds=0,
                     country_city: str = None):
-  import pytz
+  import pytz, datetime
   delta = datetime.timedelta(days=days,
                              hours=hours,
                              minutes=minutes,
@@ -443,41 +318,35 @@ def get_future_time(days=0,
     finished_time = datetime.datetime.now(pytz.timezone(country_city)) + delta
     return __strdate(country_city, finished_time)
 
+@functools.cache
+def get_IPs():
+  import psutil
+  return set([attr[0].address
+              for net_name, attr in psutil.net_if_addrs().items()])
 
-#deprecated
-def execute_cmd(*cmds) -> int:
-  cmd = " ".join(cmds)
-  start = time.time()
-  Logger.debug(f"[start] executing '{cmd}'")
+@functools.cache
+def get_server_ip():
+  """
+  modify by xuan, 2022-11-3
+  """
+  import socket
+  hostname = socket.gethostname()
+  local_ip = socket.gethostbyname(hostname)
+  return local_ip
 
-  ret = os.system(cmd)
-  status = "OK" if ret == 0 else "fail"
-  duration = time.time() - start
-  readable_time = to_readable_time(duration)
-  Logger.debug(f"[{status}] {readable_time}, executing '{cmd}'")
-  return ret
+@functools.cache
+def get_server_ip0():
+  import socket
+  st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  try:
+    st.connect(('10.255.255.255', 1))
+    ip = st.getsockname()[0]
+  except Exception:
+    ip = '127.0.0.1'
+  finally:
+    st.close()
 
-
-#deprecated
-def execute_remote_cmd(account, server, cmd, buff={}):
-  current_IP = buff.setdefault("current_IP", get_server_ip())
-  if server == current_IP or server == "127.0.0.1":
-    return execute_cmd(cmd)
-  else:
-    assert "'" not in cmd
-    return execute_cmd(f"ssh {account}@{server} '{cmd}'")
-
-
-#deprecated
-def execute_popen(cmd, server=None, account=None):
-  current_ip = get_server_ip()
-  if not (server is None or server == current_ip):
-    if account is None:
-      account = os.getlogin()
-    cmd = f"ssh {account}@{server} '{cmd}'"
-  Logger.debug(cmd)
-
-  return list(os.popen(cmd))
+  return ip
 
 
 def command(cmd: str,
@@ -485,13 +354,10 @@ def command(cmd: str,
             server=None,
             account=None,
             buff={}):
-  import psutil
   '''return (status_code, stdout, stderror)'''
-  current_IPs = buff.setdefault(
-      "current_IP",
-      set([
-          attr[0].address for net_name, attr in psutil.net_if_addrs().items()
-      ]))
+  import subprocess
+
+  current_IPs = get_IPs()
   if server == "127.0.0.1" or server is None or server in current_IPs:
     full_cmd = cmd
   else:
@@ -533,73 +399,16 @@ def print_flush(cont, stream=None) -> None:
   stream.flush()
 
 
-def eq(v1, v2, prec=EPSILON):
-  return abs(v1 - v2) < prec
-
-
-def log_sum(ds):
-  '''input: [d1, d2, d3..] = [log(p1), log(p2), log(p3)..]
-      output: log(p1 + p2 + p3..)
-  '''
-  dv = max(ds)
-  e = math.log(sum([math.exp(d - dv) for d in ds]))
-  return dv + e
-
-
-def group_by_key_fun(data, key_fun=None):
-  '''
-  data: list or dict
-  Note, the spark.group_by_key requires the data is sorted by keys.
-  @:return a dict
-  '''
-  result = collections.defaultdict(list)
-  for d in data:
-    key = d[0] if key_fun is None else key_fun(d)
-    result[key].append(d)
-
-  return result
-
-
-def get_server_ip(buffer={}):
-  """
-  modify by xuan, 2022-11-3
-  """
-  if "ip" in buffer:
-    return buffer["ip"]
-  hostname = socket.gethostname()
-  local_ip = socket.gethostbyname(hostname)
-  buffer["ip"] = local_ip
-  return local_ip
-
-
-def get_server_ip0(buffer={}):
-  if "ip" in buffer:
-    return buffer["ip"]
-
-  st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  try:
-    st.connect(('10.255.255.255', 1))
-    ip = st.getsockname()[0]
-  except Exception:
-    ip = '127.0.0.1'
-  finally:
-    st.close()
-
-  buffer["ip"] = ip
-  return ip
-
 
 def display_server_info():
+  import socket
   host_name = socket.gethostname()
   ip = get_server_ip()
   Logger.info(f"server information: {host_name}({ip}), process: {os.getpid()}")
 
 
-def get_pretrained_model(model_name="roberta/roberta.large"):
-  return os.path.expanduser(f"~/pretrained_models/{model_name}")
-
-
 def get_available_gpus(server_ip=None, account=None):
+  import re
   def find():
     memory_regex = r'([0-9]+)MiB / .* Default'
 
@@ -702,6 +511,7 @@ def get_gpu_user(gpu_id,
 
 
 def timeout(func, args: list, max_time_seconds):
+  import threading
   class _MonitorThread(threading.Thread):
     def __init__(self, ret: list):
       threading.Thread.__init__(self, daemon=True)
@@ -725,74 +535,6 @@ def timeout(func, args: list, max_time_seconds):
       return status[0]
 
   raise TimeoutError()
-
-
-def is_wide_char(ch):
-  return unicodedata.east_asian_width(ch) in ['W', "F"]
-
-
-def get_console_text_length(text):
-  ext_len = sum([is_wide_char(e) for e in text])
-  return len(text) + ext_len
-
-
-def full_justify_zh_en(article: str, max_width) -> list:
-  def split(text):
-    text = text.strip()
-    console_len_sum = 0
-    for p, e in enumerate(text):
-      console_len_sum += 1
-      if is_wide_char(e):
-        console_len_sum += 1
-
-      # print(f"{console_len_sum}, {p}, '{e}', {char_type}, {text[: p + 1]}")
-
-      if console_len_sum == max_width:
-        return text[:p + 1], text[p + 1:]
-      elif console_len_sum == max_width + 1:
-        return text[:p], text[p:]
-
-    return text, ""
-
-  article = " ".join(article.split())
-  ret = []
-  remaining = article
-  while remaining != "":
-    text, remaining = split(remaining)
-    ret.append(text)
-
-  return ret
-
-
-def full_justify_en(article: str, max_width) -> list:
-  words = article.split()
-  buff, words_length = [], 0
-  ret, p = [], 0
-  while p < len(words):
-    w = words[p]
-    if words_length + len(w) + len(buff) <= max_width:
-      buff.append(w)
-      if p == len(words) - 1:
-        ret.append(" ".join(buff))
-      else:
-        words_length += len(w)
-      p += 1
-    elif buff == []:
-      assert words_length == 0
-      ret.append(w)
-      p += 1
-    else:
-      if len(buff) == 1:
-        ret.append(buff[0].rjust(max_width))
-      else:
-        blank = (max_width - words_length) // (len(buff) - 1)
-        mod = max_width - words_length - blank * (len(buff) - 1)
-        ret.append((" " * (blank + 1)).join(buff[:mod + 1]) + " " * blank +
-                   (" " * blank).join(buff[mod + 1:]))
-      buff = []
-      words_length = 0
-
-  return ret
 
 
 class Timer(object):
@@ -881,95 +623,3 @@ class Logger:
             file=Logger.outstream)
       Logger.outstream.flush()
 
-
-def top_k_max_or_min(data: list,
-                     k,
-                     type="max",
-                     to_sort=False,
-                     data_key_func=lambda d: d):
-  def top_k_largest(key_func):
-    if len(data) <= k:
-      return data
-
-    min_heap = []
-    for d in data:
-      key = key_func(d)
-      if len(min_heap) < k:
-        heapq.heappush(min_heap, (key, d))
-      elif key > min_heap[0][0]:
-        heapq.heappop(min_heap)
-        heapq.heappush(min_heap, (key, d))
-
-    if to_sort:
-      min_heap.sort(reverse=True)
-
-    return [d for _, d in min_heap]
-
-  if type == "max":
-    return top_k_largest(data_key_func)
-  elif type == "min":
-    key_func = lambda item: -data_key_func(item)
-    return top_k_largest(key_func)
-
-class MultiProcessPool:
-  @staticmethod
-  def _feed_data(task_in_queue, prompt_list: list, worker_num):
-    for query in prompt_list:
-      task_in_queue.put(query)
-    for _ in range(worker_num):
-      task_in_queue.put(None)
-
-  @staticmethod
-  def _process(target_func, task_in_queue, task_out_queue):
-    while True:
-      query = task_in_queue.get()
-      if query is None:
-        break
-      out = target_func(query)
-      task_out_queue.put(out)
-
-  def __call__(self, prompt_list: list, target_func, worker_num: int=4,
-               *args, **kwargs):
-    task_in_queue = mp.Queue(worker_num)
-    task_out_queue = mp.Queue()
-
-    for _ in range(worker_num):
-      p = mp.Process(target=MultiProcessPool._process,
-                     args=(target_func, task_in_queue, task_out_queue))
-      p.start()
-
-    mp.Process(target=MultiProcessPool._feed_data,
-               args=(task_in_queue, prompt_list, worker_num)).start()
-    for _ in prompt_list:
-      out = task_out_queue.get()
-      yield out
-
-class MultiThreadPool:
-  def _feed_data(self, prompt_list: list, worker_num):
-    for query in prompt_list:
-      self._task_in_queue.put(query)
-    for _ in range(worker_num):
-      self._task_in_queue.put(None)
-
-  def _process(self, target_func):
-    while True:
-      query = self._task_in_queue.get()
-      if query is None:
-        break
-      out = target_func(query)
-      self._task_out_queue.put(out)
-
-  def __call__(self, prompt_list: list, target_func, worker_num: int=4,
-               *args, **kwargs):
-    self._task_in_queue = mp.Queue(worker_num)
-    self._task_out_queue = mp.Queue()
-
-    for _ in range(worker_num):
-      p = threading.Thread(target=self._process, args=(target_func,))
-      p.start()
-
-    threading.Thread(target=self._feed_data,
-                     args=(prompt_list, worker_num)).start()
-    for _ in prompt_list:
-      out = self._task_out_queue.get()
-      yield out
