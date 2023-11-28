@@ -2,15 +2,12 @@
 #author: Tian Xia
 
 import typing
+import torch
+import math
 from torch import nn
 from torch.nn import functional as func
-from src.topspin.nlp import Logger
-from src.topspin.nlp import *
-from src.topspin import nlp
-import torch
-
-
-# From HuggingFace
+from pyal import is_none_or_empty
+from .helper import Logger
 
 
 def nan_tensor():
@@ -23,7 +20,7 @@ def uniform_sample(probs: torch.Tensor):
 
 
 def isabnormal(x: torch.Tensor):
-  return not nlp.is_none_or_empty(x) and \
+  return not is_none_or_empty(x) and \
          torch.any(torch.logical_or(torch.isinf(x), torch.isnan(x))).item()
 
 
@@ -503,184 +500,6 @@ class TextCNN(nn.Module):
     out = self._out_dropout(out)
 
     return out
-
-
-#todo: not finished. Do NOT use it.
-class SLSTM(nn.Module):
-  def __init__(self,
-               dim_input,
-               dim_hidden,
-               window_size,
-               num_sent_nodes=1,
-               bias=True,
-               init_method='normal'):
-    super(SLSTM, self).__init__()
-    self._dim_input = dim_input
-    self._dim_hidden = dim_hidden
-    self._window_size = window_size
-    self._num_sent_nodes = num_sent_nodes
-    self._init_name = init_method
-    self._add_bias = bias
-    self._ptanh = PenalizedTanh()
-    self._all_gate_weights = []
-
-    # define parameters for word nodes
-    word_gate_dict = dict([('input_gate', 'i'), ('left_forget_gate', 'l'),
-                           ('right_forget_gate', 'r'), ('forget_gate', 'f'),
-                           ('sentence_forget_gate', 's'), ('output_gate', 'o'),
-                           ('recurrent_input', 'u')])
-
-    for (gate_name, gate_tag) in word_gate_dict.items():
-      # weight: (out_features, in_features)
-      w_w = nn.Parameter(
-          torch.Tensor(dim_hidden, (window_size * 2 + 1) * dim_hidden))
-      w_u = nn.Parameter(torch.Tensor(dim_hidden, dim_input))
-      w_v = nn.Parameter(torch.Tensor(dim_hidden, dim_hidden))
-      w_b = nn.Parameter(torch.Tensor(dim_hidden))
-
-      gate_params = (w_w, w_u, w_v, w_b)
-      param_names = ['w_w{}', 'w_u{}', 'w_v{}', 'w_b{}']
-      param_names = [x.format(gate_tag) for x in param_names]
-      for name, param in zip(param_names, gate_params):
-        setattr(self, name, param)  # self.w_w{i} = w_w
-      self._all_gate_weights.append(param_names)
-
-    # define parameters for sentence node
-    sentence_gate_dict = dict([('sentence_forget_gate', 'g'),
-                               ('word_forget_gate', 'f'),
-                               ('output_gate', 'o')])
-    for (gate_name, gate_tag) in sentence_gate_dict.items():
-      # weight: (out_features, in_features)
-      s_w = nn.Parameter(torch.Tensor(dim_hidden, dim_hidden))
-      s_u = nn.Parameter(torch.Tensor(dim_hidden, dim_hidden))
-      s_b = nn.Parameter(torch.Tensor(dim_hidden))
-      gate_params = (s_w, s_u, s_b)
-      param_names = ['s_w{}', 's_u{}', 's_b{}']
-      param_names = [x.format(gate_tag) for x in param_names]
-      for name, param in zip(param_names, gate_params):
-        setattr(self, name, param)  # self.s_w{i} = s_w
-      self._all_gate_weights.append(param_names)
-
-    self._init_params(self._init_name)
-
-  def _init_params(self, init_method):
-    if init_method == 'normal':
-      std = 0.1
-      for weight in self.parameters():
-        weight.data.normal_(mean=0.0, std=std)
-
-    else:  # uniform: make std of weights as 0
-      stdv = 1.0 / math.sqrt(self._dim_hidden)
-      for weight in self.parameters():
-        weight.data.uniform_(-stdv, stdv)
-
-  def _in_window_context(self, hx, window_size=1):
-    '''
-    Args: hx: (l,b,d)
-    Returns: (l,b,hidden*(window*2+1)
-    '''
-    slices = torch.unbind(hx, dim=0)
-    zeros = torch.unbind(torch.zeros_like(hx), dim=0)
-
-    context_left = [
-        torch.stack(zeros[:i] + slices[:-i], dim=0)
-        for i in range(window_size, 0, -1)
-    ]
-    context_left.append(hx)
-    context_right = [
-        torch.stack(slices[i + 1:] + zeros[:i + 1], dim=0)
-        for i in range(0, window_size)
-    ]
-
-    context = context_left + context_right
-    # context is a list of length window size*2+1,
-    # every element covering different part of original sent,
-    # every element in context is of same length
-    return torch.cat(context, dim=2)
-
-  def forward(self, src_seq, src_len, state=None):
-    '''
-    src_seq: (b, len, d)
-    src_len: (b)
-    state = (h_0, c_0)
-    h_0: (seq_len+sentence_nodes, batch, hidden_size)
-    c_0: (seq_len+sentence_nodes, batch, hidden_size)
-
-    Returns: (h_1, c_1)
-    h_1: (seq_len+sentence_nodes, batch, hidden_size)
-    c_1: (seq_len+sentence_nodes, batch, hidden_size)
-    '''
-    #todo: should set initial state here.
-    seq_mask = nlp_torch.sequence_mask(src_len, src_seq.size(1))
-    seq_mask = seq_mask.transpose(0, 1).unsqueeze(2).logical_not()
-    # sent node is in the end
-    prev_h_gt = state[0][-self._num_sent_nodes:]
-    #（l,b,d)
-    prev_h_wt = state[0][:-self._num_sent_nodes].masked_fill(seq_mask, 0)
-    prev_c_gt = state[1][-self._num_sent_nodes:]
-    prev_c_wt = state[1][:-self._num_sent_nodes].masked_fill(seq_mask, 0)
-
-    # update sentence node
-    h_hat = prev_h_wt.mean(dim=0)
-    fg = func.sigmoid(
-        func.linear(prev_h_gt, self.s_wg) + func.linear(h_hat, self.s_ug) +
-        self.s_bg)
-    output_gate = func.sigmoid(
-        func.linear(prev_h_gt, self.s_wo) + func.linear(h_hat, self.s_uo) +
-        self.s_bo)
-    fi = func.sigmoid(
-        func.linear(prev_h_gt, self.s_wf) + func.linear(prev_h_wt, self.s_uf) +
-        self.s_bf).masked_fill(seq_mask, -1e25)
-    fi_normalized = func.softmax(fi, dim=0)
-    c_gt = fg.mul(prev_c_gt).add(fi_normalized.mul(prev_c_wt).sum(dim=0))
-    h_gt = output_gate.mul(func.tanh(c_gt))
-
-    # update word nodes
-    epsilon = self._in_window_context(prev_h_wt, window_size=self._window_size)
-    # epsilon: (l, b, d_word or emb_size * (2 * window_size + 1)
-    input_gate = func.sigmoid(
-        func.linear(epsilon, self.w_wi) + func.linear(src_seq, self.w_ui) +
-        func.linear(prev_h_gt, self.w_vi) + self.w_bi)
-    left_gate = func.sigmoid(
-        func.linear(epsilon, self.w_wl) + func.linear(src_seq, self.w_ul) +
-        func.linear(prev_h_gt, self.w_vl) + self.w_bl)
-    right_gate = func.sigmoid(
-        func.linear(epsilon, self.w_wr) + func.linear(src_seq, self.w_ur) +
-        func.linear(prev_h_gt, self.w_vr) + self.w_br)
-    forget_gate = func.sigmoid(
-        func.linear(epsilon, self.w_wf) + func.linear(src_seq, self.w_uf) +
-        func.linear(prev_h_gt, self.w_vf) + self.w_bf)
-    sent_gate = func.sigmoid(
-        func.linear(epsilon, self.w_ws) + func.linear(src_seq, self.w_us) +
-        func.linear(prev_h_gt, self.w_vs) + self.w_bs)
-    output_gate = func.sigmoid(
-        func.linear(epsilon, self.w_wo) + func.linear(src_seq, self.w_uo) +
-        func.linear(prev_h_gt, self.w_vo) + self.w_bo)
-    current_update = func.tanh(
-        func.linear(epsilon, self.w_wu) + func.linear(src_seq, self.w_uu) +
-        func.linear(prev_h_gt, self.w_vu) + self.w_bu)
-
-    gates = torch.stack(
-        (left_gate, forget_gate, right_gate, sent_gate, input_gate), dim=0)
-    # gates: (5*l,b,d)
-    gates_normalized = func.softmax(gates.masked_fill(seq_mask, -1e25), dim=0)
-
-    c_wt_l, prev_c_wt, c_wt_r = \
-      self._in_window_context(prev_c_wt).chunk(3, dim=2) # split by dim 2
-    # c_wt_: (l, b, d_word)
-    c_mergered = torch.stack(
-        (c_wt_l, prev_c_wt, c_wt_r, prev_c_gt.expand_as(
-            prev_c_wt.data), current_update),
-        dim=0)
-
-    c_wt = gates_normalized.mul(c_mergered).sum(dim=0)
-    c_wt = c_wt.masked_fill(seq_mask, 0)
-    h_wt = output_gate.mul(func.tanh(c_wt))
-
-    h_t = torch.cat((h_wt, h_gt), dim=0)
-    c_t = torch.cat((c_wt, c_gt), dim=0)
-
-    return h_t, c_t
 
 
 class TranformerEncoder(nn.Module):
