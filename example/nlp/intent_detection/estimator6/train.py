@@ -6,8 +6,8 @@ from example.nlp.intent_detection.estimator6.model import Model
 from example.nlp.intent_detection.estimator6.predict import Predictor
 from example.nlp.intent_detection.estimator6.dataset import \
   get_batch_data, _pad_batch_data
-from src.palframe import Logger
-from src.palframe.pytorch.estimator6.train import TrainerBase
+from src.topspin import Logger
+from src.topspin.pytorch.estimator6.train import TrainerBase
 
 
 class Trainer(TrainerBase):

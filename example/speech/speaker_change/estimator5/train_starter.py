@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from src.palframe.pytorch import starter
+from src.topspin.pytorch import starter
 from example.speech.speaker_change.estimator5.param import Param
 
 

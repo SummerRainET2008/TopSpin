@@ -2,8 +2,8 @@
 #author: Tian Xia
 
 import torch.utils.data
-from src.palframe import *
-from src.palframe.pytorch.dataset.offline_smalldataset import Dataset
+from src.topspin import *
+from src.topspin.pytorch.dataset.offline_smalldataset import Dataset
 
 
 class MyBatchSampler:

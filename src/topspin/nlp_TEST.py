@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe.nlp import *
+from src.topspin.nlp import *
 
 if __name__ == "__main__":
   data = load_py_data("/tmp/1.data")

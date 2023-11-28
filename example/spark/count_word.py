@@ -4,8 +4,8 @@
 # running commands:
 # >> spark-submit example/spark/count_word.py --save_to_file
 
-from src.palframe import spark_helper
-from src.palframe import \
+from src.topspin import spark_helper
+from src.topspin import \
   nlp
 import optparse
 

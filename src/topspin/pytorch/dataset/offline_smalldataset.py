@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe import *
-from src.palframe.pytorch.dataset.offline_bigdataset import Dataset as _DataSet
+from src.topspin import *
+from src.topspin.pytorch.dataset.offline_bigdataset import Dataset as _DataSet
 
 
 class Dataset(_DataSet):

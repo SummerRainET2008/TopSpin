@@ -1,8 +1,8 @@
 import torch.utils.data
-from src.palframe import *
-from src.palframe import \
+from src.topspin import *
+from src.topspin import \
   nlp
-from src.palframe.nlp import Logger
+from src.topspin.nlp import Logger
 
 
 def parse_feat_folder(feat_path: typing.Union[list, str, None],

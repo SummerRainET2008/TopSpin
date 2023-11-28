@@ -1,6 +1,6 @@
 #coding: utf8
 #author: Tian Xia
-from src.palframe import *
+from src.topspin import *
 
 INF = float("inf")
 EPSILON = 1e-6

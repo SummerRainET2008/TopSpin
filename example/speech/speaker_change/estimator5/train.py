@@ -5,7 +5,7 @@ from example.speech.speaker_change.estimator5.param import Param
 from example.speech.speaker_change.estimator5.model_wrapper import ModelWrapper
 from example.speech.speaker_change.estimator5.model import SCDetConv as Model
 from example.speech.speaker_change.estimator5.dataset import get_batch_data
-from src.palframe.pytorch import TrainerBase
+from src.topspin.pytorch import TrainerBase
 
 
 class Trainer(TrainerBase):

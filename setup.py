@@ -3,7 +3,7 @@
 
 import os
 from setuptools import setup, find_packages
-from src.palframe import about
+from src.topspin import about
 
 
 def read(fname):
@@ -13,7 +13,7 @@ def read(fname):
 
 py_modules = [
     f'palframe.{name.replace(".py","")}' for name in os.listdir(
-    'src/palframe')
+    'src/topspin')
     if name.endswith('.py') and name not in ['__init__.py']
 ]
 

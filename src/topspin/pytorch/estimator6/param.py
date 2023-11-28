@@ -1,12 +1,12 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe import *
-from src.palframe import \
+from src.topspin import *
+from src.topspin import \
   nlp
-from src.palframe.nlp import Logger
+from src.topspin.nlp import Logger
 import torch.distributed as dist
-from src.palframe.pytorch.dataset.helper import parse_feat_folder
+from src.topspin.pytorch.dataset.helper import parse_feat_folder
 
 
 class ParameterRange:

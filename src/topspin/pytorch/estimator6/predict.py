@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe.pytorch.estimator6.model import ModelBase
+from src.topspin.pytorch.estimator6.model import ModelBase
 
 
 class PredictorBase:

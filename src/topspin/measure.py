@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe import *
-from src.palframe import \
+from src.topspin import *
+from src.topspin import \
   nlp
 
 

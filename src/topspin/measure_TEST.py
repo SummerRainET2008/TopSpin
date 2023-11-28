@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe.measure import *
-from src.palframe import \
+from src.topspin.measure import *
+from src.topspin import \
   nlp
 
 if __name__ == "__main__":

@@ -6,9 +6,9 @@ palframe command tools, including start_dist_train ...
 
 import importlib
 import sys, os, time, traceback
-from src.palframe import \
+from src.topspin import \
   nlp
-from src.palframe.nlp import Logger
+from src.topspin.nlp import Logger
 from functools import partial
 from argparse import ArgumentParser
 
@@ -205,7 +205,7 @@ def create_folder_meta(args):
   feat_path = args.feat_path
   valid_file_extension = args.valid_file_extension
   meta_file_name = args.meta_file_name
-  from src.palframe.pytorch import FolderMetaCache
+  from src.topspin.pytorch import FolderMetaCache
   FolderMetaCache.create_meta_file(feat_path, valid_file_extension,
                                    meta_file_name)
 
@@ -269,7 +269,7 @@ def start_dist_train(args):
 
   # if param_obj.
   #   param_obj.create_restart_work_path_name()
-  from src.palframe.pytorch import starter
+  from src.topspin.pytorch import starter
   starter.start_distributed_train(param_obj, train_script_path)
 
 
@@ -277,7 +277,7 @@ def stop_dist_train(args):
   """
     stop dist train, code copy from stopper.py
     """
-  from src.palframe.pytorch.estimator6 import \
+  from src.topspin.pytorch.estimator6 import \
     starter
   import re
   if not nlp.is_none_or_empty(args.path_work):
@@ -363,7 +363,7 @@ def distribute_from_templates(args):
 
 def start_server(args):
   # 启动预测服务
-  from src.palframe.pytorch import start_server
+  from src.topspin.pytorch import start_server
   start_server(args)
 
 

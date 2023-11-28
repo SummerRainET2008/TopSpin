@@ -2,8 +2,8 @@
 #author: Xinyi Wu
 
 from example.speech.speaker_change.estimator5.dataset import get_batch_data
-from src.palframe import Measure
-from src.palframe.pytorch import ModelWrapperBase
+from src.topspin import Measure
+from src.topspin.pytorch import ModelWrapperBase
 
 
 class ModelWrapper(ModelWrapperBase):

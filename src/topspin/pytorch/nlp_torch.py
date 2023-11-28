@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe import *
-from src.palframe.nlp import Logger
-from src.palframe import \
+from src.topspin import *
+from src.topspin.nlp import Logger
+from src.topspin import \
   nlp
 from torch.nn import functional as func
 import torch

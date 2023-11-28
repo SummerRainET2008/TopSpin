@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from src.palframe.pytorch import ParamBase
+from src.topspin.pytorch import ParamBase
 
 
 class Param(ParamBase):

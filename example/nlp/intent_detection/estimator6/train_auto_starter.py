@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.palframe.pytorch.estimator6 import \
+from src.topspin.pytorch.estimator6 import \
   starter
 from example.nlp.intent_detection.estimator6.param import Param
 

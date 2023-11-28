@@ -1,11 +1,11 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from src.palframe import *
+from src.topspin import *
 from example.cv.edsr.estimator5.param import Param
 from example.cv.edsr.estimator5.model import Net
 from example.cv.edsr.estimator5.dataset import get_batch_data
-from src.palframe.pytorch import ModelWrapperBase
+from src.topspin.pytorch import ModelWrapperBase
 
 
 class ModelWrapper(ModelWrapperBase):

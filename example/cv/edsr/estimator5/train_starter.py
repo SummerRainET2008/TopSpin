@@ -3,8 +3,8 @@
 
 from example.cv.edsr.estimator5.param import Param
 import optparse
-from src.palframe import Logger
-from src.palframe.pytorch import starter
+from src.topspin import Logger
+from src.topspin.pytorch import starter
 
 
 def main():

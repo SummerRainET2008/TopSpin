@@ -6,8 +6,8 @@ from torch import nn
 from param import Param
 from example.cv.edsr.estimator5.dataset import get_batch_data
 from model_wrapper import ModelWrapper
-from src.palframe import Logger
-from src.palframe.pytorch import TrainerBase
+from src.topspin import Logger
+from src.topspin.pytorch import TrainerBase
 
 
 class Trainer(TrainerBase):

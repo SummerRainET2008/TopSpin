@@ -2,8 +2,8 @@
 #author: Tian Xia
 
 from example.nlp.intent_detection.estimator6.param import Param
-from src.palframe.pytorch.pretrained.tokenizer import Tokenizer
-from src.palframe import \
+from src.topspin.pytorch.pretrained.tokenizer import Tokenizer
+from src.topspin import \
   nlp
 
 

@@ -2,13 +2,13 @@
 #author: Tian Xia
 
 import torch.utils.data
-from src.palframe import \
+from src.topspin import \
   nlp
-from src.palframe import *
-from src.palframe.nlp import Logger
+from src.topspin import *
+from src.topspin.nlp import Logger
 import pickle
 import numpy
-from src.palframe.pytorch.dataset.online_dataset import get_batch_data
+from src.topspin.pytorch.dataset.online_dataset import get_batch_data
 
 worker_num = 5
 batch_size = 3

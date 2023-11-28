@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from src.palframe.pytorch import ParamBase, ParameterRange
+from src.topspin.pytorch import ParamBase, ParameterRange
 
 
 class Param(ParamBase):

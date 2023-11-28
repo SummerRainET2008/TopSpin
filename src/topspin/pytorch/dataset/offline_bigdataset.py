@@ -2,7 +2,7 @@
 #author: Tian Xia
 
 import torch.utils.data
-from src.palframe import *
+from src.topspin import *
 
 
 class Dataset(torch.utils.data.Dataset):
