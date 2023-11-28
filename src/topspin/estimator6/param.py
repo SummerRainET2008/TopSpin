@@ -6,7 +6,7 @@ from src.topspin import \
   nlp
 from src.topspin.nlp import Logger
 import torch.distributed as dist
-from src.topspin.pytorch.dataset.helper import parse_feat_folder
+from src.topspin.dataset.helper import parse_feat_folder
 
 
 class ParameterRange:

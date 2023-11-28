@@ -2,7 +2,7 @@
 #author: Xinyi Wu
 
 import torch.utils.data
-from src.topspin.pytorch.dataset.offline_smalldataset import get_batch_data as \
+from src.topspin.dataset import get_batch_data as \
   _get_batch_data
 
 # class SCDCNN1dTrainDataset_NoWin(torch.utils.data.Dataset):

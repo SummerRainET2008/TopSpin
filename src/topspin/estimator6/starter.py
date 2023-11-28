@@ -3,7 +3,7 @@
 
 #todo: check all ERR, WARN infor
 
-from src.topspin.pytorch.estimator6.param import ParamBase
+from src.topspin.estimator6.param import ParamBase
 import threading
 
 

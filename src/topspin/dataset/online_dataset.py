@@ -2,14 +2,12 @@
 #author: Tian Xia
 
 import torch.utils.data
-from src.topspin import \
-  nlp
 from src.topspin import *
 from src.topspin.nlp import Logger
 import pickle
 import random
-from src.topspin.pytorch.dataset.offline_bigdataset import parse_feat_folder
-from src.topspin.pytorch.dataset.helper import get_batch_data_helper
+from src.topspin.dataset.offline_bigdataset import parse_feat_folder
+from src.topspin.dataset.helper import get_batch_data_helper
 
 
 class Dataset(torch.utils.data.IterableDataset):

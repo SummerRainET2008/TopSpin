@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin.pytorch.estimator6.param import ParamBase
+from src.topspin.estimator6 import ParamBase
 
 
 class Param(ParamBase):

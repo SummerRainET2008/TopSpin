@@ -1,11 +1,12 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin import *
-from src.topspin.nlp import Logger
-from src.topspin import \
-  nlp
+import typing
+from torch import nn
 from torch.nn import functional as func
+from src.topspin.nlp import Logger
+from src.topspin.nlp import *
+from src.topspin import nlp
 import torch
 
 
@@ -88,6 +89,8 @@ def sequence_mask(real_len: torch.Tensor,
 
 
 def display_model_parameters(model: nn.Module) -> int:
+  import functools, operator
+
   Logger.info("-" * 64)
   Logger.info(f"module parameters:")
   total_num = 0

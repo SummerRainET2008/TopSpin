@@ -1,13 +1,13 @@
 #coding: utf8
 #author: Tian Xia
 import torch
-from src.topspin.pytorch.estimator6.model import ModelBase
-from src.topspin.pytorch.estimator6.param import ParamBase
-from src.topspin.pytorch.estimator6.draw_figure import draw_figure
+from src.topspin.estimator6.model import ModelBase
+from src.topspin.estimator6.param import ParamBase
+from src.topspin.estimator6.draw_figure import draw_figure
 from torch.optim import Optimizer
 from torch.cuda import amp
-from src.topspin.pytorch.dataset.offline_bigdataset import parse_feat_folder
-from src.topspin.pytorch.estimator6 import \
+from src.topspin.dataset.offline_bigdataset import parse_feat_folder
+from src.topspin.estimator6 import \
   starter
 from torch import autograd
 from filelock import FileLock

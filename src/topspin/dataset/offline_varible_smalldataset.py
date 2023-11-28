@@ -3,7 +3,7 @@
 
 import torch.utils.data
 from src.topspin import *
-from src.topspin.pytorch.dataset.offline_smalldataset import Dataset
+from src.topspin.dataset.offline_smalldataset import Dataset
 
 
 class MyBatchSampler:

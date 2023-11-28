@@ -277,7 +277,7 @@ def stop_dist_train(args):
   """
     stop dist train, code copy from stopper.py
     """
-  from src.topspin.pytorch.estimator6 import \
+  from src.topspin.estimator6 import \
     starter
   import re
   if not nlp.is_none_or_empty(args.path_work):
