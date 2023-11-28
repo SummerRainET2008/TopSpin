@@ -1,9 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from example.nlp.intent_detection.estimator6 import *
-from example.nlp.intent_detection.estimator6.param import Param
-from palframe.pytorch.estimator6.model import ModelBase
+from src.palframe.pytorch.estimator6.model import ModelBase
 
 
 class Model(ModelBase):

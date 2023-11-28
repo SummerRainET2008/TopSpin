@@ -1,8 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from palframe.pytorch.estimator5.predict import PredictorBase
-from example.speech.speaker_change.estimator5 import *
+from src.palframe.pytorch import PredictorBase
 from example.speech.speaker_change.estimator5.param import Param
 from example.speech.speaker_change.estimator5.model_wrapper import ModelWrapper
 from example.speech.speaker_change.estimator5.model import SCDetConv as Model

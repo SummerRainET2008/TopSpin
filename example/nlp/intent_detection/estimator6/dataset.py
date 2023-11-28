@@ -1,10 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from example.nlp.intent_detection.estimator6 import *
-from example.nlp.intent_detection.estimator6.param import Param
 import torch.utils.data
-from palframe.pytorch.dataset.offline_smalldataset import get_batch_data
 
 
 def _pad_batch_data(batch):

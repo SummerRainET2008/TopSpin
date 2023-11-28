@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from palframe.pytorch.estimator6 import starter
-from example.nlp.intent_detection.estimator6 import *
+from src.palframe.pytorch.estimator6 import \
+  starter
 from example.nlp.intent_detection.estimator6.param import Param
 
 

@@ -1,14 +1,11 @@
 #coding: utf8
 #author: Tian Xia
 
-from palframe.pytorch.estimator6.predict import PredictorBase
-from example.nlp.intent_detection.estimator6 import *
-from example.nlp.intent_detection.estimator6.param import Param
+from src.palframe.pytorch.estimator6.predict import PredictorBase
 from example.nlp.intent_detection.estimator6.model import Model
 from example.nlp.intent_detection.estimator6.dataset import \
   get_batch_data, _pad_batch_data
-from palframe.measure import Measure
-from palframe.pytorch.estimator6.model import ModelBase
+from src.palframe import Measure
 
 
 class Predictor(PredictorBase):

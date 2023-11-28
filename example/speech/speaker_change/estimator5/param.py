@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from palframe.pytorch.estimator5.param import ParamBase, ParameterRange
+from src.palframe.pytorch import ParamBase, ParameterRange
 
 
 class Param(ParamBase):

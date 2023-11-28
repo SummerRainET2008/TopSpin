@@ -1,8 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from palframe.pytorch import *
-from palframe.pytorch.estimator6.param import ParamBase
+from src.palframe.pytorch.estimator6.param import ParamBase
 
 
 class Param(ParamBase):

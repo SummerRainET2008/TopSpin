@@ -2,15 +2,12 @@
 #author: Hongchen Liu
 
 import optparse
-from example.cv.edsr.estimator5.header import *
-from example.cv.edsr.estimator5 import *
 from torch import nn
 from param import Param
 from example.cv.edsr.estimator5.dataset import get_batch_data
 from model_wrapper import ModelWrapper
-from palframe.nlp import Logger
-from palframe.pytorch.estimator5.train import TrainerBase
-from palframe.pytorch import *
+from src.palframe import Logger
+from src.palframe.pytorch import TrainerBase
 
 
 class Trainer(TrainerBase):

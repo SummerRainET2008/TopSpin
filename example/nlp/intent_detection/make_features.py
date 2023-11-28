@@ -1,10 +1,10 @@
 #coding: utf8
 #author: Tian Xia
 
-from example.nlp.intent_detection.estimator6 import *
 from example.nlp.intent_detection.estimator6.param import Param
-from palframe.pytorch.pretrained.tokenizer import Tokenizer
-from palframe import nlp
+from src.palframe.pytorch.pretrained.tokenizer import Tokenizer
+from src.palframe import \
+  nlp
 
 
 def process(data_files: list, out_file: str, param: Param):

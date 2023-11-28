@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from palframe.pytorch.estimator6 import starter
-from example.nlp.intent_detection.estimator6 import *
+from src.palframe.pytorch.estimator6 import \
+  starter
 from example.nlp.intent_detection.estimator6.param import Param
 
 
@@ -15,7 +15,8 @@ def main():
 
   starter.start_train(Param.get_instance(),
                       "example/nlp/intent_detection/estimator5/train.py",
-                      [starter.Server(None, [0, 1, 2, 3])])
+                      [
+                        starter.Server(None, [0, 1, 2, 3])])
 
 
 if __name__ == '__main__':

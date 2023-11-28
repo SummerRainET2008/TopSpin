@@ -1,8 +1,7 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from os import path
-from palframe.pytorch.estimator5.param import ParamBase
+from src.palframe.pytorch import ParamBase
 
 
 class Param(ParamBase):

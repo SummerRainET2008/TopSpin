@@ -1,12 +1,11 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from example.speech.speaker_change.estimator5 import *
 from example.speech.speaker_change.estimator5.param import Param
 from example.speech.speaker_change.estimator5.model_wrapper import ModelWrapper
 from example.speech.speaker_change.estimator5.model import SCDetConv as Model
 from example.speech.speaker_change.estimator5.dataset import get_batch_data
-from palframe.pytorch.estimator5.train import TrainerBase
+from src.palframe.pytorch import TrainerBase
 
 
 class Trainer(TrainerBase):

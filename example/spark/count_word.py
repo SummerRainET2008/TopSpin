@@ -4,13 +4,10 @@
 # running commands:
 # >> spark-submit example/spark/count_word.py --save_to_file
 
-import sys
-from random import random
-from operator import add
-from palframe import spark_helper
-from palframe import nlp
+from src.palframe import spark_helper
+from src.palframe import \
+  nlp
 import optparse
-import os
 
 
 def main():

@@ -2,10 +2,9 @@
 #author: Hongchen Liu
 #author: Tian Xia
 
-from example.cv.edsr.estimator5.header import *
 import torch
 from param import Param
-from palframe.pytorch.dataset.offline_smalldataset import Dataset as _Dataset,\
+from src.palframe.pytorch.dataset.offline_smalldataset import Dataset as _Dataset,\
   get_batch_data_helper
 import h5py
 import numpy as np
