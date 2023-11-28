@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin import *
-from src.topspin import \
-  nlp
+import numpy as np
+from collections import Counter, defaultdict
+from .helper import EPSILON
 
 
 class Measure:
@@ -41,6 +41,7 @@ class Measure:
     '''
     In the parallel mode, the multiprocess.Pool() would leads memory leak.
     '''
+    import multiprocessing as mp
     assert type(ref_list) is list and type(ref_list[0]) is str
     if not case_sensitive:
       ref_list = [ref.lower() for ref in ref_list]
@@ -106,9 +107,9 @@ class Measure:
     label_stat = Counter(true_labels)
     for label in label_stat.keys():
       correct = correct_labels.get(label, 0)
-      recall = correct / (true_label_num.get(label, 0) + nlp.EPSILON)
-      prec = correct / (pred_label_num.get(label, 0) + nlp.EPSILON)
-      f_value = 2 * (recall * prec) / (recall + prec + nlp.EPSILON)
+      recall = correct / (true_label_num.get(label, 0) + EPSILON)
+      prec = correct / (pred_label_num.get(label, 0) + EPSILON)
+      f_value = 2 * (recall * prec) / (recall + prec + EPSILON)
       result[label] = {
           "recall": round(recall, 4),
           "precision": round(prec, 4),
@@ -146,118 +147,6 @@ class Measure:
       pe += c1 * c2
     pe /= (size * size)
 
-    value = (p0 - pe) / (1 - pe + nlp.EPSILON)
+    value = (p0 - pe) / (1 - pe + EPSILON)
 
     return value
-
-  @staticmethod
-  def calc_intervals_accurarcy(true_labels_list: list,
-                               pred_labels_list: list,
-                               over_lapping: float = 0.75):
-    '''
-    :param true_labels_list: [[(0., 2.0), (3.4, 4.5)], [(2. 0, 4.0)]]
-    :param pred_labels_list:  [[(0., 2.0), (3.4, 4.5)], [(2. 0, 4.0)]]
-    :return: accuracy, recall, f-value, more information.
-    '''
-    assert type(true_labels_list) == type(true_labels_list[0]) == list
-    assert type(pred_labels_list) == type(pred_labels_list[0]) == list
-
-    results = [
-        Measure._intervals_accurarcy_single(true_labels, pred_labels,
-                                            over_lapping)
-        for true_labels, pred_labels in zip(true_labels_list, pred_labels_list)
-    ]
-    correct = sum([r["correct"] for r in results])
-    true_label_num = sum([r["true_label_num"] for r in results])
-    pred_label_num = sum([r["pred_label_num"] for r in results])
-
-    recall = correct / true_label_num
-    accuracy = correct / pred_label_num
-    f = 2 * recall * accuracy / (recall + accuracy + nlp.EPSILON)
-
-    return {
-        "recall": round(recall, 4),
-        "accuracy": round(accuracy, 4),
-        "f": round(f, 4),
-        "details:": results
-    }
-
-  @staticmethod
-  def _intervals_accurarcy_single(true_labels: list, pred_labels: list,
-                                  over_lapping: float):
-    def seg_len(seg):
-      return seg[1] - seg[0]
-
-    def matched(pred_label, true_label):
-      if not nlp.segment_intersec(pred_label, true_label):
-        return False
-
-      area = (max(pred_label[0],
-                  true_label[0]), min(pred_label[1], true_label[1]))
-      return seg_len(area) / seg_len(true_label) >= over_lapping
-
-    matched_label_num = np.zeros([len(pred_labels)], np.int)
-    missing_labels = []
-    correct_num = 0
-    for label in true_labels:
-      for idx, pred_label in enumerate(pred_labels):
-        if matched(pred_label, label):
-          matched_label_num[idx] += 1
-          correct_num += 1
-          break
-      else:
-        missing_labels.append(label)
-
-    wrong_indices = np.where(matched_label_num == 0)[0]
-    wrong_labels = []
-    for index in wrong_indices:
-      wrong_labels.append(pred_labels[index])
-
-    total_pred_num = len(wrong_labels) + sum(matched_label_num)
-
-    return {
-        "correct": correct_num,
-        "true_label_num": len(true_labels),
-        "pred_label_num": total_pred_num,
-        "missing": missing_labels,
-        "wrong": wrong_labels,
-    }
-
-  @staticmethod
-  def calc_ndcg(data: list, buff={}):
-    '''
-    :param data: [{"qid": 1234, "ranks": [0, 4, 2, 1]}...]
-    :return: [NDCG@1, NDCG@2, ..., NDCG@10]
-    '''
-    def calc_ndcg(pdata: dict):
-      qid = pdata["qid"]
-      if qid in buff:
-        ideal_dcg = buff[qid]
-
-      else:
-        sorted_ranks = sorted(pdata["ranks"], reverse=True)
-        ideal_dcg = calc_dcg(sorted_ranks)
-        buff[qid] = ideal_dcg
-
-      dcg = calc_dcg(pdata["ranks"])
-      ndcg = dcg / ideal_dcg
-
-      return ndcg
-
-    def calc_dcg(ranks: dict):
-      norm = lambda pos: math.log(pos + 2)
-      dcg = [(2**u - 1) / norm(i) for i, u in enumerate(ranks[:10])]
-      dcg = [0.0] + dcg + [0.0] * (10 - len(dcg))
-      for p in range(1, 11):
-        dcg[p] += dcg[p - 1]
-
-      return array(dcg) + nlp.EPSILON
-
-    avg_ndcg = array([0.0] * 11)
-    for pdata in data:
-      ndcg = calc_ndcg(pdata)
-      avg_ndcg += ndcg
-
-    avg_ndcg /= len(data)
-
-    return list(avg_ndcg)[1:]
