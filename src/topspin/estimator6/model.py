@@ -1,7 +1,11 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin.estimator6.param import ParamBase
+from .param import ParamBase
+from ..helper import Logger, is_none_or_empty
+import torch.nn as nn
+import torch
+import os
 
 
 class ModelBase(nn.Module):
@@ -45,7 +49,7 @@ class ModelBase(nn.Module):
     else:
       model_name = ""
 
-    if nlp.is_none_or_empty(model_name):
+    if is_none_or_empty(model_name):
       Logger.info("No model to load")
       return None
 

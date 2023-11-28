@@ -1,7 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin.estimator6.model import ModelBase
+from .model import ModelBase
+import torch
+from ..helper import Logger
 
 
 class PredictorBase:

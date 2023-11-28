@@ -6,8 +6,7 @@ import torch
 import math
 from torch import nn
 from torch.nn import functional as func
-from pyal import is_none_or_empty
-from .helper import Logger
+from .helper import Logger, is_none_or_empty
 
 
 def nan_tensor():

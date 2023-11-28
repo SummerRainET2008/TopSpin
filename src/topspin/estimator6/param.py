@@ -1,13 +1,15 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin import *
-from src.topspin import \
-  nlp
-from src.topspin.nlp import Logger
+from ..dataset import helper
+from ..helper import Logger, is_none_or_empty
 import torch.distributed as dist
-from src.topspin.dataset.helper import parse_feat_folder
-
+import pickle
+import os
+import abc
+import math
+import copy
+import itertools
 
 class ParameterRange:
   def __init__(self, values, grouped_attribute=False):
@@ -39,15 +41,15 @@ class ParamBase(abc.ABC):
     self.country_city = country_city
     Logger.country_city = country_city
 
-    if not nlp.is_none_or_empty(path_work_restored_training):
+    if not is_none_or_empty(path_work_restored_training):
       self.path_work = path_work_restored_training
       assert os.path.isdir(self.path_work), self.path_work
       self.restore_from_last_train = True
     else:
-      assert not nlp.is_none_or_empty(run_tag)
+      assert not is_none_or_empty(run_tag)
       self.restore_from_last_train = False
 
-      date_str = nlp.get_log_time(True, country_city=country_city)
+      date_str = helper.get_log_time(True, country_city=country_city)
       date_str = date_str.replace(" ", "_").replace(":", "-")
       self.run_tag = f"{run_tag}.{date_str}"
       self.path_work = f"{experiment_folder}/run.{self.run_tag}"
@@ -219,7 +221,7 @@ class ParamBase(abc.ABC):
     cls_str = str(cls)
     if cls_str not in ParamBase.instances:
       file_name = os.getenv("param_file")
-      if nlp.is_none_or_empty(file_name):
+      if is_none_or_empty(file_name):
         ParamBase.cls_locks[cls_str] = True
         param = cls()
       else:
@@ -304,19 +306,19 @@ class ParamBase(abc.ABC):
 
     self.check_param_validity()
     self.__workspace_created = True
-    nlp.mkdir("work")
-    nlp.mkdir(self.path_work)
-    nlp.mkdir(self.path_model)
-    nlp.mkdir(self.path_log)
-    nlp.mkdir(self.path_meta, True)
-    nlp.mkdir(self.path_bug)
+    helper.mkdir("work")
+    helper.mkdir(self.path_work)
+    helper.mkdir(self.path_model)
+    helper.mkdir(self.path_log)
+    helper.mkdir(self.path_meta, True)
+    helper.mkdir(self.path_bug)
 
   def size_divided_by_16(self, size, unit=16):
     return math.ceil(size / unit) * unit
 
   def display(self):
     Logger.info("\n", "-" * 64)
-    nlp.display_server_info()
+    helper.display_server_info()
     for key in sorted(self.__dict__):
       Logger.info(f"{key:20}: {self.__dict__[key]}")
     try:
@@ -326,17 +328,17 @@ class ParamBase(abc.ABC):
     Logger.info("-" * 64, "\n")
 
   def check_param_validity(self):
-    files = parse_feat_folder(self.train_files)
+    files = helper.parse_feat_folder(self.train_files)
     if len(files) == 0:
       Logger.warn(f"Empty {self.train_files}")
 
-    if not nlp.is_none_or_empty(self.vali_file):
-      files = parse_feat_folder(self.vali_file)
+    if not is_none_or_empty(self.vali_file):
+      files = helper.parse_feat_folder(self.vali_file)
       if len(files) == 0:
         Logger.warn(f"Empty {self.vali_file}")
 
-    if not nlp.is_none_or_empty(self.test_files):
-      files = parse_feat_folder(self.test_files)
+    if not is_none_or_empty(self.test_files):
+      files = helper.parse_feat_folder(self.test_files)
       if len(files) == 0:
         Logger.warn(f"Empty {self.test_files}")
 

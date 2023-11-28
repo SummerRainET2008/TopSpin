@@ -1,6 +1,13 @@
 #coding: utf8
 #author: Tian Xia
 
+from ..helper import Logger
+import optparse
+import traceback
+import os
+import pickle
+import pyal
+
 
 def draw_figure(figure_data, out_file, smooth_width=1):
   def shorten_label_name(name, max_prefix_len=12, max_len=30):
@@ -91,7 +98,7 @@ def main():
   if options.show:
     return
 
-  assert not nlp.is_none_or_empty(options.out_file)
+  assert not pyal.is_none_or_empty(options.out_file)
 
   if options.line_IDs != "":
     user_line_IDs = set([int(e) for e in options.line_IDs.split(",")])

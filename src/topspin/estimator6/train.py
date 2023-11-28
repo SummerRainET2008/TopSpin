@@ -1,16 +1,31 @@
 #coding: utf8
 #author: Tian Xia
-import torch
-from src.topspin.estimator6.model import ModelBase
-from src.topspin.estimator6.param import ParamBase
-from src.topspin.estimator6.draw_figure import draw_figure
-from torch.optim import Optimizer
-from torch.cuda import amp
-from src.topspin.dataset.offline_bigdataset import parse_feat_folder
-from src.topspin.estimator6 import \
-  starter
-from torch import autograd
+
+from . import starter
+from .. import helper
+from .. import nn_helper
+from ..dataset.helper import parse_feat_folder
+from ..helper import Logger, Timer
+from ..tools.draw_figure import draw_figure
+from .model import ModelBase
+from .param import ParamBase
+from collections import defaultdict
 from filelock import FileLock
+from torch import autograd
+from torch.cuda import amp
+from torch.optim import Optimizer
+from torch.utils.tensorboard import SummaryWriter
+import math
+import os
+import pickle
+import psutil
+import random
+import sys
+import time
+import torch
+import torch.distributed as dist
+import traceback
+import typing
 
 
 class TrainerBase:
@@ -21,7 +36,7 @@ class TrainerBase:
     Logger.country_city = param.country_city
     self._param = param
 
-    nlp.set_random_seeds(param.seed)
+    helper.set_random_seeds(param.seed)
     torch.backends.cudnn.deterministic = param.cudnn_deterministic
     torch.backends.cudnn.benchmark = param.cudnn_benchmark
     torch.set_num_threads(param.num_threads_cpu)
@@ -38,8 +53,8 @@ class TrainerBase:
 
       if param.use_gpu:
         param.gpu_num = 1
-        avail_gpus = nlp.get_available_gpus()
-        if nlp.is_none_or_empty(avail_gpus):
+        avail_gpus = helper.get_available_gpus()
+        if helper.is_none_or_empty(avail_gpus):
           assert False, f"No available GPUs"
         current_env["avail_gpus"] = str(avail_gpus[0])
       else:
@@ -49,7 +64,7 @@ class TrainerBase:
       param.create_workspace()
 
     avail_gpus = os.getenv("avail_gpus").strip()
-    if nlp.is_none_or_empty(avail_gpus):
+    if helper.is_none_or_empty(avail_gpus):
       self._avail_gpus = []
     else:
       self._avail_gpus = [int(g) for g in avail_gpus.split(",")]
@@ -59,16 +74,16 @@ class TrainerBase:
     Logger.info(f"Currently used GPU: {gpu_id}")
     os.environ["CUDA_VISIBLE_DEVICES"] = f"{gpu_id}"
 
-    nlp.timeout(self._init_distributed_training, [param], 30)
+    helper.timeout(self._init_distributed_training, [param], 30)
 
     self._rank = dist.get_rank()
     self._world_size = dist.get_world_size()
     self._to_stop = False
-    nlp.command(f"touch {param.run_lock_file}")
+    helper.command(f"touch {param.run_lock_file}")
     starter._MonitorStopThread(param.run_lock_file, self).start()
 
     param_file = param.__module__.replace(".", "/") + ".py"
-    nlp.command(f"cp {param_file} {param.path_work}")
+    helper.command(f"cp {param_file} {param.path_work}")
 
     if not debug_mode:
       Logger.reset_outstream(f"{param.path_log}/log.rank_{dist.get_rank()}",
@@ -102,7 +117,7 @@ class TrainerBase:
       )
 
     self._user_model.set_device(self._device)
-    self._model_size = nlp_torch.display_model_parameters(self._user_model)
+    self._model_size = nn_helper.display_model_parameters(self._user_model)
 
     if optimizer is not None:
       self._optimizer = optimizer
@@ -110,7 +125,7 @@ class TrainerBase:
       self._optimizer = getattr(torch.optim, param.optimizer_name)(
           model.parameters(), lr=param.lr, weight_decay=param.weight_decay)
 
-    if not nlp.is_none_or_empty(param.path_initial_model):
+    if not helper.is_none_or_empty(param.path_initial_model):
       '''
       If we loads a model as its initizaliazation, we ignore 
       self._model_seen_sample_num and others, as these are recording their
@@ -172,13 +187,13 @@ class TrainerBase:
           self._optimizer.load_state_dict(info["optimizer_state"])
 
     elif self._rank == 0:
-      nlp.execute_cmd(f"echo > {param.path_model}/checkpoint")
+      helper.execute_cmd(f"echo > {param.path_model}/checkpoint")
 
     self._use_amp = param.use_amp and param.use_gpu
 
     if self._rank == 0:
       tb_dir = f"{param.path_work}/tensorboard"
-      nlp.mkdir(tb_dir, False)
+      helper.mkdir(tb_dir, False)
       self._writer = SummaryWriter(tb_dir)
 
     if self._use_amp:
@@ -198,7 +213,7 @@ class TrainerBase:
 
   def _try_to_save_best_model(self, predictor):
     param = self._param
-    if nlp.is_none_or_empty(param.vali_file):
+    if helper.is_none_or_empty(param.vali_file):
       self._save_model()
 
     else:
@@ -227,8 +242,8 @@ class TrainerBase:
 
       param = self._param
 
-      if not nlp.is_none_or_empty(param.vali_file) or \
-        not nlp.is_none_or_empty(param.test_files):
+      if not helper.is_none_or_empty(param.vali_file) or \
+        not helper.is_none_or_empty(param.test_files):
         if param.use_gpu:
           param.gpu_inference = 0
         param.path_inference_model = ""
@@ -286,7 +301,7 @@ class TrainerBase:
 
       if self._param.true_gradient:
         ret["loss"] *= ret["batch_num"]
-      if nlp_torch.isabnormal(ret["loss"]):
+      if nn_helper.isabnormal(ret["loss"]):
         raise ValueError("loss is NaN")
 
       return ret
@@ -325,9 +340,9 @@ class TrainerBase:
         self._save_model(tag=f"rank_{self._rank}")
 
         for name, var in self._user_model.named_parameters():
-          if nlp_torch.isabnormal(var):
+          if nn_helper.isabnormal(var):
             Logger.error(f"parameter '{name}' has inf or nan.")
-          if var.requires_grad and nlp_torch.isabnormal(var.grad):
+          if var.requires_grad and nn_helper.isabnormal(var.grad):
             Logger.error(f"parameter.grad '{name}' has inf or nan.")
 
         starter.stop_distributed_train(self._param.path_work)
@@ -343,13 +358,13 @@ class TrainerBase:
       )
       for epoch_id, batch in train_data_iter:
         batch = batch if isinstance(batch, (list, tuple)) else [batch]
-        batch = nlp_torch.to_device(batch, self._device)
+        batch = nn_helper.to_device(batch, self._device)
         if not isinstance(batch[-1], dict):
           yield {"args": batch, "kwargs": {}}
         else:
           yield {"args": batch[:-1], "kwargs": batch[-1]}
 
-    yield from nlp.next_batch(get_one_batch(),
+    yield from helper.next_batch(get_one_batch(),
                               self._param.iter_num_update_optimizer)
 
   def get_training_data(self, rank: int, world_size: int):
@@ -437,7 +452,7 @@ class TrainerBase:
         train_start_time = time.time()
         batch_start_time = time.time()
 
-      with nlp.Timer("data fetching syn"):
+      with helper.Timer("data fetching syn"):
         if self._check_sync_stop_condition(batches == []):
           Logger.info(f"Exit training. Batch is empty.")
           exit_code = 1
@@ -492,7 +507,7 @@ class TrainerBase:
 
       total_norm = torch.nn.utils.clip_grad_norm_(self._model.parameters(),
                                                   param.param_norm)
-      if nlp.eq(total_norm, 0):
+      if helper.eq(total_norm, 0):
         Logger.warn(f"total_norm(parameters.grad)={total_norm}")
 
       self._update_lr()
@@ -525,11 +540,11 @@ class TrainerBase:
 
       self._memory_information()
 
-      finished_time = nlp.get_future_time(seconds=remaining_time,
+      finished_time = helper.get_future_time(seconds=remaining_time,
                                           country_city=Logger.country_city)
       Logger.info(
-          f"Training time: {nlp.to_readable_time(train_duration)}, "
-          f"and estimated remaining time: {nlp.to_readable_time(remaining_time)} "
+          f"Training time: {helper.to_readable_time(train_duration)}, "
+          f"and estimated remaining time: {helper.to_readable_time(remaining_time)} "
           f"to finish on {finished_time}")
       Logger.info(f"{self._get_worker_info()}: "
                   f"*Epoch: {epoch_id:.2f}, "
@@ -567,7 +582,7 @@ class TrainerBase:
     if self._when_evaluate(True):
       self._evaluate()
 
-    nlp.execute_cmd(
+    helper.execute_cmd(
         f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
         f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error;"
     )
@@ -575,10 +590,10 @@ class TrainerBase:
     ratio = self._model_seen_sample_num / self._target_seen_sample_num
     if exit_code == 0 or (exit_code == 1 and ratio >= 0.99):
       Logger.info(f"Training is Done.")
-      nlp.command(f"touch {param.path_meta}/TRAIN.DONE")
+      helper.command(f"touch {param.path_meta}/TRAIN.DONE")
     else:
       Logger.info(f"Training is Done with an exception")
-      nlp.command(f"touch {param.path_meta}/TRAIN.FAILED")
+      helper.command(f"touch {param.path_meta}/TRAIN.FAILED")
 
     os._exit(0)
 
@@ -597,7 +612,7 @@ class TrainerBase:
       depletion_time = m.free / (speed + 1e-6)
       Logger.warn(
           f"free memory: {m.free:_} B, {round(m.free / 1024 ** 3, 2)} GB, "
-          f"depletion time: {nlp.to_readable_time(depletion_time)}.")
+          f"depletion time: {helper.to_readable_time(depletion_time)}.")
       buff["memory"] = m
       buff["time"] = time.time()
 
@@ -689,7 +704,7 @@ class TrainerBase:
     if self._rank != 0:
       return
 
-    with nlp.Timer("Draw training loss"):
+    with helper.Timer("Draw training loss"):
       pickle.dump(self._figure_data,
                   open(f"{self._param.path_meta}/figure.data", "wb"))
       figure_data = {}
@@ -732,7 +747,7 @@ class TrainerBase:
       name = f'model_{model_seen_sample_num:015}.{tag}.pt'
     else:
       name = f'model_{model_seen_sample_num:015}.pt'
-    nlp.execute_cmd(f"echo {name} >> {param.path_model}/checkpoint")
+    helper.command(f"echo {name} >> {param.path_model}/checkpoint")
 
     torch.save(info, os.path.join(param.path_model, name))
 
@@ -740,7 +755,7 @@ class TrainerBase:
     for name in model_names[:-param.model_saved_num]:
       model_file = f"{param.path_model}/{name}"
       if os.path.isfile(model_file):
-        nlp.execute_cmd(f"rm {model_file}")
+        helper.command(f"rm {model_file}")
 
   def _init_distributed_training(self, param: ParamBase):
     if param.backhand == "gloo" or not param.use_gpu:
@@ -755,10 +770,10 @@ class TrainerBase:
     dist.init_process_group(backend=param.backhand)
 
   def _try_get_net_name(self, param):
-    if not nlp.is_none_or_empty(param.net_name):
+    if not helper.is_none_or_empty(param.net_name):
       return param.net_name
 
-    if nlp.is_none_or_empty(param.servers_file):
+    if helper.is_none_or_empty(param.servers_file):
       server_ips = set(["127.0.0.1"])
     else:
       server_ips = set(
