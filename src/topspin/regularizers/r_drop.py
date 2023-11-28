@@ -5,7 +5,7 @@
 """
 实现 rdrop 正则化
 """
-from src.topspin.estimator6.regularizers.vat import kl_divergence_with_logit
+from src.topspin.regularizers.vat import kl_divergence_with_logit
 import torch
 
 

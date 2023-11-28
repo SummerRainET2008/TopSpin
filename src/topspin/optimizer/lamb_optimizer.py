@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# coding: utf8
-# author: Zongcheng Ji
-# date: 2020/10/27
-
 import torch
 from torch.optim.optimizer import Optimizer
 from typing import Callable, Iterable, Tuple
