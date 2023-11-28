@@ -1,4 +1,51 @@
-===============================================================================
+# TopSpin - Deep Learning Training Framework
+
+**TopSpin**, is a PyTorch based high-level *Deep Learning training framework*.
+User defined model can be launched in either ***single-GPU***, ***multi-GPU***, or ***multi-server***, without changing one line of codes.
+
+**TopSpin** supports many useful techiniques in Deep Learning Training, such as ***gradient accumulation***, ***learning rate warmup and decay***, ***early stop***, ***mixed precision*** training, ***automatic validation*** data evaluation in training, ***TensorBoard***, ***True gradient*** for variable batch size in some NLP applications, and provide rich statistics in training log, like ***network time statistics***, ***traininig time prediction***.
+
+**TopSpin**, besides, provides inheirit ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
+
+# 1. Install
+```bash
+python3 -m pip install TopSpin
+```
+
+# 2. Example
+ >* NLP
+ >   * Intent detection Task
+ > * ASR
+ >   * EDSR
+ > * CV
+ >   * Speaker Change detection Task
+ 
+
+# 3. Core components
+
+# 4. Training Run Modes
+> ### mode 1: Debug Run 
+> ### mode 2: Auto ML 
+> ### mode 3: Distributed 
+
+ # 5. Stop and Restore training
+
+ # 6. Miscellanious functions
+ > 1. Learning rate warmup and decay
+ > 2. Early stop
+ > 3. Mixed precision training
+ > 4. Gradient accumulation
+ > 5. Automatic validation data evaluation in training
+ > 6. TensorBoard
+ > 7. `True gradient` in training
+ > 8. Rich statistics in training log
+ 
+
+ # 7. Config your servers
+
+ # 8. Common Questions and Issues
+
+
 # Version 5 What's New?
 
 ### 1. More safe
