@@ -2,10 +2,9 @@
 #author: Tian Xia
 
 from pytorch_transformers import AutoTokenizer
-# from palframe.pytorch import *
-import typing
-import optparse
 from topspin import Logger
+import optparse
+import typing
 
 class Tokenizer:
   _inst = None

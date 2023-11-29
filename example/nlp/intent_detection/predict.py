@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from .dataset import _pad_batch_data , get_batch_data
-from .model import Model
+from example.nlp.intent_detection.dataset import _pad_batch_data , get_batch_data
+from example.nlp.intent_detection.model import Model
 import topspin
 
 

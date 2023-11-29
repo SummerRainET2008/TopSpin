@@ -16,8 +16,7 @@ def main():
 
   topspin.start_train(Param.get_instance(),
                       "example/nlp/intent_detection/estimator5/train.py",
-                      [
-                        topspin.Server(None, [0, 1, 2, 3])])
+                      [topspin.Server(None, [0, 1, 2, 3])])
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from ..dataset import helper
+from topspin.tools import helper
 from topspin.tools.helper import Logger, is_none_or_empty
 import torch.distributed as dist
 import pickle

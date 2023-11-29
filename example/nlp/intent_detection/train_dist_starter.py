@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-from src.topspin.estimator6 import \
-  starter
+from topspin import start_distributed_train, Logger
 from example.nlp.intent_detection.param import Param
+import optparse
 
 
 def main():
@@ -13,7 +13,7 @@ def main():
 
   Logger.set_level(options.debug_level)
 
-  starter.start_distributed_train(
+  start_distributed_train(
       Param.get_instance(),
       "example/nlp/intent_detection/estimator6/train.py",
   )

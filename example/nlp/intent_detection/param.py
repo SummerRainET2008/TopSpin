@@ -15,7 +15,7 @@ class Param(topspin.ParamBase):
     self.vali_file = f"{self.path_feat}/test.pydict"
     self.test_files = []
 
-    self.tokenizer_data = "example/nlp/tokenizer_data/roberta"
+    self.tokenizer_data = "example/nlp/tokenizer/tokenizer_data/roberta"
 
     self.optimizer_name = "Adam"
     self.lr = 5e-4

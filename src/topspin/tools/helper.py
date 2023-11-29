@@ -1,6 +1,5 @@
 #coding: utf8
 #author: Tian Xia
-from src.topspin import *
 
 from pyal import INF, EPSILON, is_none_or_empty
 import functools

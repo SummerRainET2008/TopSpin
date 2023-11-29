@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-from .dataset import get_batch_data, _pad_batch_data
-from .model import Model
-from .predict import Predictor
+from example.nlp.intent_detection.dataset import get_batch_data, _pad_batch_data
+from example.nlp.intent_detection.model import Model
+from example.nlp.intent_detection.predict import Predictor
 from topspin import Logger
 import optparse
 import topspin

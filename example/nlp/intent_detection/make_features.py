@@ -1,14 +1,14 @@
 #coding: utf8
 #author: Tian Xia
 
-from .param import Param
-from ..tokenizer.tokenizer import Tokenizer
+from example.nlp.intent_detection.param import Param
+from example.nlp.tokenizer.tokenizer import Tokenizer
 import topspin
 import pickle
 import os
 
 
-def process(data_files: list, out_file: str, param: topspin.Param):
+def process(data_files: list, out_file: str, param: Param):
   def get_point():
     for ln in topspin.next_line_from_files(data_files):
       tokens = eval(ln.strip())
