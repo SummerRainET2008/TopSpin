@@ -3,7 +3,9 @@
 
 from example.nlp.intent_detection.dataset import _pad_batch_data , get_batch_data
 from example.nlp.intent_detection.model import Model
+from topspin import Measure, Logger
 import topspin
+import time
 
 
 class Predictor(topspin.PredictorBase):
@@ -26,7 +28,7 @@ class Predictor(topspin.PredictorBase):
         rank=0,
         world_size=1,
         pad_batch_data_func=_pad_batch_data):
-      batch = nlp_torch.to_device(batch, self._device)
+      batch = topspin.to_device(batch, self._device)
 
       b_word_ids, b_labels, _ = batch
       logits, pred_labels = self.predict(b_word_ids)

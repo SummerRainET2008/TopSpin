@@ -3,6 +3,7 @@
 
 from topspin.tools import helper
 from topspin.tools.helper import Logger, is_none_or_empty
+from topspin.dataset.helper import parse_feat_folder
 import torch.distributed as dist
 import pickle
 import os
@@ -328,17 +329,17 @@ class ParamBase(abc.ABC):
     Logger.info("-" * 64, "\n")
 
   def check_param_validity(self):
-    files = helper.parse_feat_folder(self.train_files)
+    files = parse_feat_folder(self.train_files)
     if len(files) == 0:
       Logger.warn(f"Empty {self.train_files}")
 
     if not is_none_or_empty(self.vali_file):
-      files = helper.parse_feat_folder(self.vali_file)
+      files = parse_feat_folder(self.vali_file)
       if len(files) == 0:
         Logger.warn(f"Empty {self.vali_file}")
 
     if not is_none_or_empty(self.test_files):
-      files = helper.parse_feat_folder(self.test_files)
+      files = parse_feat_folder(self.test_files)
       if len(files) == 0:
         Logger.warn(f"Empty {self.test_files}")
 

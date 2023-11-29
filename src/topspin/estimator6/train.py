@@ -25,6 +25,7 @@ import torch
 import torch.distributed as dist
 import traceback
 import typing
+import pyal
 
 
 class TrainerBase:
@@ -186,7 +187,7 @@ class TrainerBase:
           self._optimizer.load_state_dict(info["optimizer_state"])
 
     elif self._rank == 0:
-      helper.execute_cmd(f"echo > {param.path_model}/checkpoint")
+      helper.command(f"echo > {param.path_model}/checkpoint")
 
     self._use_amp = param.use_amp and param.use_gpu
 
@@ -506,7 +507,7 @@ class TrainerBase:
 
       total_norm = torch.nn.utils.clip_grad_norm_(self._model.parameters(),
                                                   param.param_norm)
-      if helper.eq(total_norm, 0):
+      if pyal.eq(total_norm, 0):
         Logger.warn(f"total_norm(parameters.grad)={total_norm}")
 
       self._update_lr()
@@ -581,7 +582,7 @@ class TrainerBase:
     if self._when_evaluate(True):
       self._evaluate()
 
-    helper.execute_cmd(
+    helper.command(
         f"grep ERR {param.path_log}/log.rank_* > {param.path_work}/log.error;"
         f"grep Errno {param.path_log}/log.node_* >> {param.path_work}/log.error;"
     )

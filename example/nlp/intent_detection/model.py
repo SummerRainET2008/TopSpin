@@ -4,10 +4,12 @@
 import topspin
 import torch.nn as nn
 import torch
+import typing
+from example.nlp.intent_detection.param import Param
 
 
 class Model(topspin.ModelBase):
-  def __init__(self, param):
+  def __init__(self, param: Param):
     super(Model, self).__init__(param)
 
     self._embedding = nn.Embedding(param.vocab_size, param.embedding_size)

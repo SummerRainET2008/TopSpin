@@ -10,6 +10,7 @@ from topspin.estimator6.starter import (
 
 from topspin.tools.helper import *
 from topspin.tools.nn_helper import *
+from topspin.tools.measure import Measure
 
 
 __version__ = '1.0.0'
