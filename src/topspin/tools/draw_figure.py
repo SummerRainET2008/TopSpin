@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from ..helper import Logger
+from topspin.tools.helper import Logger
 import optparse
 import traceback
 import os

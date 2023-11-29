@@ -1,11 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-#todo: check all ERR, WARN infor
-
-from .. import helper
-from ..helper import Logger
-from src.topspin.estimator6.param import ParamBase
+from topspin.tools import helper
+from topspin.tools.helper import Logger
+from topspin.estimator6.param import ParamBase
 import os
 import pickle
 import random
@@ -19,8 +17,8 @@ import typing
 def _check_server_disk_path(server_ips, current_path):
   for ip in server_ips:
     result = helper.command(f"cd {current_path}; pwd",
-                         capture_output=True,
-                         server=ip)[1]
+                            capture_output=True,
+                            server=ip)[1]
     if current_path not in result:
       Logger.error(f"'{current_path}' is unaccessible in '{ip}'")
       return False

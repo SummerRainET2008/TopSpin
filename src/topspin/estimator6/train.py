@@ -1,16 +1,15 @@
 #coding: utf8
 #author: Tian Xia
 
-from . import starter
-from .. import helper
-from .. import nn_helper
-from ..dataset.helper import parse_feat_folder
-from ..helper import Logger, Timer
-from ..tools.draw_figure import draw_figure
-from .model import ModelBase
-from .param import ParamBase
 from collections import defaultdict
 from filelock import FileLock
+from topspin.dataset.helper import parse_feat_folder
+from topspin.estimator6 import starter
+from topspin.estimator6.model import ModelBase
+from topspin.estimator6.param import ParamBase
+from topspin.tools import nn_helper, helper
+from topspin.tools.draw_figure import draw_figure
+from topspin.tools.helper import Logger, Timer
 from torch import autograd
 from torch.cuda import amp
 from torch.optim import Optimizer
@@ -365,7 +364,7 @@ class TrainerBase:
           yield {"args": batch[:-1], "kwargs": batch[-1]}
 
     yield from helper.next_batch(get_one_batch(),
-                              self._param.iter_num_update_optimizer)
+                                 self._param.iter_num_update_optimizer)
 
   def get_training_data(self, rank: int, world_size: int):
     '''
@@ -541,7 +540,7 @@ class TrainerBase:
       self._memory_information()
 
       finished_time = helper.get_future_time(seconds=remaining_time,
-                                          country_city=Logger.country_city)
+                                             country_city=Logger.country_city)
       Logger.info(
           f"Training time: {helper.to_readable_time(train_duration)}, "
           f"and estimated remaining time: {helper.to_readable_time(remaining_time)} "

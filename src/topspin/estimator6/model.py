@@ -2,7 +2,7 @@
 #author: Tian Xia
 
 from .param import ParamBase
-from ..helper import Logger, is_none_or_empty
+from topspin.tools.helper import Logger, is_none_or_empty
 import torch.nn as nn
 import torch
 import os

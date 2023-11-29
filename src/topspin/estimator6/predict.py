@@ -3,7 +3,7 @@
 
 from .model import ModelBase
 import torch
-from ..helper import Logger
+from topspin.tools.helper import Logger
 
 
 class PredictorBase:

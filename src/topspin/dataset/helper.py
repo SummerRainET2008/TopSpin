@@ -1,8 +1,9 @@
+from topspin.tools import helper as nlp
+from topspin.tools.helper import Logger
+import os
+import pickle
 import torch.utils.data
-from src.topspin import *
-from src.topspin import \
-  nlp
-from src.topspin.nlp import Logger
+import typing
 
 
 def parse_feat_folder(feat_path: typing.Union[list, str, None],

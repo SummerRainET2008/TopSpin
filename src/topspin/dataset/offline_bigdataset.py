@@ -2,7 +2,6 @@
 #author: Tian Xia
 
 import torch.utils.data
-from src.topspin import *
 
 
 class Dataset(torch.utils.data.Dataset):

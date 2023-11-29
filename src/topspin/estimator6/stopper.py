@@ -1,8 +1,8 @@
 #coding: utf8
 #author: Tian Xia
 
-from . import starter
-from .. import helper
+from topspin.estimator6 import starter
+from topspin.tools import helper
 import optparse
 import re
 

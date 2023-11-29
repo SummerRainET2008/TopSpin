@@ -2,7 +2,7 @@
 #author: Tian Xia
 
 from ..dataset import helper
-from ..helper import Logger, is_none_or_empty
+from topspin.tools.helper import Logger, is_none_or_empty
 import torch.distributed as dist
 import pickle
 import os

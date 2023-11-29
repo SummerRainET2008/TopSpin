@@ -5,7 +5,7 @@ User defined model can be launched in either ***single-GPU***, ***multi-GPU***, 
 
 **TopSpin** supports many useful techiniques in Deep Learning Training, such as ***gradient accumulation***, ***learning rate warmup and decay***, ***early stop***, ***mixed precision*** training, ***automatic validation*** data evaluation in training, ***TensorBoard***, ***True gradient*** for variable batch size in some NLP applications, and provide rich statistics in training log, like ***network time statistics***, ***traininig time prediction***.
 
-**TopSpin**, besides, provides inheirit ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
+**TopSpin**, besides, provides inherent ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
 
 # 1. Install
 ```bash

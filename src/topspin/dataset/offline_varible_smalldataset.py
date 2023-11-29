@@ -2,8 +2,8 @@
 #author: Tian Xia
 
 import torch.utils.data
-from src.topspin import *
-from src.topspin.dataset.offline_smalldataset import Dataset
+from topspin import *
+from topspin.dataset.offline_smalldataset import Dataset
 
 
 class MyBatchSampler:

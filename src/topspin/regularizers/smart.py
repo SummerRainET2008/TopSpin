@@ -8,11 +8,7 @@
 代码从 https://github.com/namisan/mt-dnn 移植过来
 """
 
-from copy import deepcopy
 import torch
-import random
-from torch.nn import Parameter
-from functools import wraps
 import torch.nn.functional as F
 
 
