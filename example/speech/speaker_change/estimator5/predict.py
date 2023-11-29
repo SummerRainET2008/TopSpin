@@ -2,9 +2,9 @@
 #author: Xinyi Wu
 
 from src.topspin.pytorch import PredictorBase
-from topspin.example.speech.speaker_change.estimator5.param import Param
-from topspin.example.speech.speaker_change.estimator5.model_wrapper import ModelWrapper
-from topspin.example.speech.speaker_change.estimator5.model import SCDetConv as Model
+from example.speech.speaker_change.estimator5.param import Param
+from example.speech.speaker_change.estimator5.model_wrapper import ModelWrapper
+from example.speech.speaker_change.estimator5.model import SCDetConv as Model
 
 
 class Predictor(PredictorBase):

@@ -2,7 +2,7 @@
 #author: Xinyi Wu
 
 from src.topspin.pytorch import starter
-from topspin.example.speech.speaker_change.estimator5.param import Param
+from example.speech.speaker_change.estimator5.param import Param
 
 
 def main():

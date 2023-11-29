@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from topspin.example.nlp.intent_detection.param import Param
+from example.nlp.intent_detection.param import Param
 from topspin import Logger
 import optparse
 import topspin

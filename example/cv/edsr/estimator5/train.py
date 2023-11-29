@@ -4,10 +4,9 @@
 import optparse
 from torch import nn
 from param import Param
-from topspin.example.cv.edsr.estimator5.dataset import get_batch_data
+from example.cv.edsr.estimator5.dataset import get_batch_data
 from model_wrapper import ModelWrapper
-from src.topspin import Logger
-from src.topspin.pytorch import TrainerBase
+from topspin import Logger, TrainerBase
 
 
 class Trainer(TrainerBase):

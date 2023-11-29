@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Xinyi Wu
 
-from topspin.example.speech.speaker_change.estimator5.dataset import get_batch_data
+from example.speech.speaker_change.estimator5.dataset import get_batch_data
 from src.topspin import Measure
 from src.topspin.pytorch import ModelWrapperBase
 

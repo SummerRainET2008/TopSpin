@@ -3,7 +3,7 @@
 
 from src.topspin.estimator6 import \
   starter
-from topspin.example.nlp.intent_detection.param import Param
+from example.nlp.intent_detection.param import Param
 
 
 def main():

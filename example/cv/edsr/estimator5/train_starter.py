@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from topspin.example.cv.edsr.estimator5.param import Param
+from example.cv.edsr.estimator5.param import Param
 import optparse
 from src.topspin import Logger
 from src.topspin.pytorch import starter

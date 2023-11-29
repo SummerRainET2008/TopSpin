@@ -2,9 +2,9 @@
 #author: Hongchen Liu
 
 from src.topspin import *
-from topspin.example.cv.edsr.estimator5.param import Param
-from topspin.example.cv.edsr.estimator5.model import Net
-from topspin.example.cv.edsr.estimator5.dataset import get_batch_data
+from example.cv.edsr.estimator5.param import Param
+from example.cv.edsr.estimator5.model import Net
+from example.cv.edsr.estimator5.dataset import get_batch_data
 from src.topspin.pytorch import ModelWrapperBase
 
 
