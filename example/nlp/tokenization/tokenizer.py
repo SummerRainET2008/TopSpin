@@ -3,7 +3,6 @@
 
 from pytorch_transformers import AutoTokenizer
 from topspin import Logger
-import optparse
 import typing
 
 class Tokenizer:
@@ -64,24 +63,3 @@ class Tokenizer:
   def get_vob_size(self):
     return len(self._tokenizer)
 
-
-def main():
-  parser = optparse.OptionParser(usage="cmd [optons]")
-  # parser.add_option("-q", "--quiet", action="store_true", dest="verbose",
-  parser.add_option("--log_level", type=int, default=1)
-  (options, args) = parser.parse_args()
-
-  Logger.set_level(options.log_level)
-
-  folder = "/Users/summer/pretrained_models/albert.pt/albert.xxlarge.v2"
-  tokenizer = Tokenizer.get_instance(folder)
-  s1 = 'What is the step by step guide to invest in share market in india?'
-  s2 = 'What is the step by step guide to invest in share market?'
-
-  print(tokenizer.get_vob_size())
-  print(tokenizer.tokenize1(s1, 32))
-  print(tokenizer.tokenize1(s2, 32))
-
-
-if __name__ == "__main__":
-  main()

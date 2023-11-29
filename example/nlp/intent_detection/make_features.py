@@ -2,7 +2,7 @@
 #author: Tian Xia
 
 from example.nlp.intent_detection.param import Param
-from example.nlp.tokenizer.tokenizer import Tokenizer
+from example.nlp.tokenization.tokenizer import Tokenizer
 import topspin
 import pickle
 import os

@@ -5,11 +5,11 @@ from pytorch_transformers import AutoTokenizer
 from topspin import Logger
 import optparse
 import typing
-from example.nlp.tokenizer.tokenizer import Tokenizer
+from example.nlp.tokenization.tokenizer import Tokenizer
 
 def test_tokenizer():
   tokenizer = Tokenizer.get_instance(
-    "example/nlp/tokenizer/tokenizer_data/roberta")
+    "example/nlp/tokenization/data/roberta")
   s1 = 'What is the step by step guide to invest in share market in india?'
   s2 = 'What is the step by step guide to invest in share market?'
 
