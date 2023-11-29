@@ -1,3 +1,4 @@
+.DS_Store
 .idea
 bert_biaffine_dependency_parser/data/dev_spo.json
 bert_biaffine_dependency_parser/data/test.json
