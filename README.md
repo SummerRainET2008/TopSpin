@@ -1,9 +1,8 @@
-# TopSpin - Deep Learning Training Framework
+# TopSpin - BERT-style Deep Learning Training Framework
 
-**TopSpin**, is a PyTorch based high-level *Deep Learning training framework*.
-User defined model can be launched in either ***single-GPU***, ***multi-GPU***, or ***multi-server***, without changing one line of codes.
+**TopSpin**, is a PyTorch based high-level *Deep Learning training framework*, designed for BERT-style deep learning models, as opposed to GPT3 based deep learning. User defined model can be launched in either ***single-GPU***, ***multi-GPU***, or ***multi-server***, without changing one line of codes.
 
-**TopSpin** supports many useful techiniques in Deep Learning Training, such as ***gradient accumulation***, ***learning rate warmup and decay***, ***early stop***, ***mixed precision*** training, ***automatic validation*** data evaluation in training, ***TensorBoard***, ***True gradient*** for variable batch size in some NLP applications, and provide rich statistics in training log, like ***network time statistics***, ***traininig time prediction***.
+**TopSpin** supports many useful techiniques in Deep Learning Training, such as ***gradient accumulation***, ***learning rate warmup and decay***, ***early stop***, ***mixed precision*** training, ***parameter regularizers*** like VAT ***automatic validation*** data evaluation in training, ***TensorBoard***, ,***True gradient*** for variable batch size in some NLP applications, and provide rich statistics in training log, like ***network time statistics***, ***traininig time prediction***.
 
 **TopSpin**, besides, provides inherent ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
 
@@ -21,7 +20,7 @@ python3 -m pip install TopSpin
  >   * Speaker Change detection Task
  
 
-# 3. Core components
+# 3. Core Components
 
 # 4. Training Run Modes
 > ### mode 1: Debug Run 
@@ -30,18 +29,19 @@ python3 -m pip install TopSpin
 
  # 5. Stop and Restore training
 
- # 6. Miscellanious functions
- > 1. Learning rate warmup and decay
- > 2. Early stop
- > 3. Mixed precision training
- > 4. Gradient accumulation
- > 5. Automatic validation data evaluation in training
+ # 6. Miscellaneous Functions
+ > 1. Learning Rate Warmup and Decay
+ > 2. Early Stop
+ > 3. Mixed Precision Training
+ > 4. Gradient Accumulation
+ > 5. Parameter Regularization
+ > 5. Automatic Validation Data Evaluation in Training
  > 6. TensorBoard
- > 7. `True gradient` in training
- > 8. Rich statistics in training log
+ > 7. `True gradient` in Training
+ > 8. Rich statistics in Training Log
  
 
- # 7. Config your servers
+ # 7. Config Your Servers
 
  # 8. Common Questions and Issues
 

@@ -1,9 +1,9 @@
 #coding: utf8
 #author: Tian Xia
 
-from .model import ModelBase
-import torch
+from topspin.estimator6.model import ModelBase
 from topspin.tools.helper import Logger
+import torch
 
 
 class PredictorBase:
