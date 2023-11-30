@@ -15,7 +15,7 @@ def main():
   Logger.set_level(options.debug_level)
 
   topspin.start_train(Param.get_instance(),
-                      "example/nlp/intent_detection/estimator5/train.py",
+                      "example/nlp/intent_detection/train.py",
                       [topspin.Server(None, [0, 1, 2, 3])])
 
 
