@@ -157,10 +157,7 @@ class ParamBase(abc.ABC):
   @use_gpu.setter
   def use_gpu(self, value):
     import torch
-    if torch.cuda.is_available():
-      self.__use_gpu = value
-    else:
-      self.__use_gpu = False
+    self.__use_gpu = torch.cuda.is_available() if value else False
 
   def _check_instance_validity(self):
     cls_str = str(type(self))

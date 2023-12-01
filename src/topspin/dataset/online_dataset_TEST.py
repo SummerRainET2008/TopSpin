@@ -14,7 +14,7 @@ batch_size = 3
 
 
 def create_data(folder):
-  nlp.execute_cmd(f"rm -r {folder}; mkdir {folder}")
+  nlp.command(f"rm -r {folder}; mkdir {folder}")
 
   for _ in range(3):
     x = numpy.random.randn(10, 512).tolist()

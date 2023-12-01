@@ -341,7 +341,7 @@ class RunManager:
       for thread in self._all_threads:
         thread.clear_threads()
 
-    helper.execute_cmd(f"touch {self._run_lock_file}")
+    helper.command(f"touch {self._run_lock_file}")
 
     while len(self._tasks) > 0:
       task = self._find_available_run()
@@ -377,7 +377,7 @@ class RunManager:
     for thread in self._all_threads:
       thread.join()
 
-    helper.execute_cmd(f"rm {self._run_lock_file}")
+    helper.command(f"rm {self._run_lock_file}")
 
     Logger.info(f"RunManager.run() is done")
 
@@ -393,7 +393,7 @@ def start_train(param: ParamBase, source_script_and_params: str,
 
 
 def stop_train(run_id):
-  helper.execute_cmd(f"rm work/batch_task.run_id_{run_id}/.run.lock")
+  helper.command(f"rm work/batch_task.run_id_{run_id}/.run.lock")
 
 
 def start_distributed_train(param: ParamBase, source_script_and_params):
