@@ -18,6 +18,7 @@ class Param(topspin.ParamBase):
     self.tokenizer_data = "example/nlp/tokenization/data/roberta"
 
     self.use_gpu = False
+    self.gpu_num = 2
 
     self.optimizer_name = "Adam"
     self.lr = topspin.ParameterRange([5e-4, 1e-3])
