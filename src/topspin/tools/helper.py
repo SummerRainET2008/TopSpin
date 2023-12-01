@@ -93,7 +93,7 @@ def next_batch(data: typing.Iterator, batch_size: int):
     yield batch_data
 
 
-@functools.cache
+@functools.lru_cache
 def ensure_random_seed_for_one_time():
   import random
   random.seed()
@@ -317,13 +317,13 @@ def get_future_time(days=0,
     finished_time = datetime.datetime.now(pytz.timezone(country_city)) + delta
     return __strdate(country_city, finished_time)
 
-@functools.cache
+@functools.lru_cache
 def get_IPs():
   import psutil
   return set([attr[0].address
               for net_name, attr in psutil.net_if_addrs().items()])
 
-@functools.cache
+@functools.lru_cache
 def get_server_ip():
   """
   modify by xuan, 2022-11-3
@@ -333,7 +333,7 @@ def get_server_ip():
   local_ip = socket.gethostbyname(hostname)
   return local_ip
 
-@functools.cache
+@functools.lru_cache
 def get_server_ip0():
   import socket
   st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
