@@ -1,16 +1,30 @@
-[build-system]
-requires = [
-    "tensorboard>=2.3.0",
-    "packaging",
-    "numpy>=1.23.4",
-    "protobuf==3.20.*",
-    "psutil>=5.7.2",
-    "Python-Algorithm-pyal",
+[projects]
+dependencies = [
+   "tensorboard==2.3.0",
+   "packaging",
+   "numpy==1.23.4",
+   "protobuf==3.20.*",
+   "psutil==5.7.2",
+   "pytz",
+   "Python-Algorithm-pyal",
 
 #"matplotlib>=3.4.1",
 #"nvidia-ml-py3>=7.352.0",
 #"scipy>=1.4.1",
-"setuptools>=42",
-"wheel",
+]
+
+[build-system]
+requires = [
+ "setuptools>=42",
+ "wheel",
+   "tensorboard==2.3.0",
+   "packaging",
+   "numpy==1.23.4",
+   "protobuf==3.20.*",
+   "psutil==5.7.2",
+   "Python-Algorithm-pyal",
+
+
+
 ]
 build-backend = "setuptools.build_meta"
