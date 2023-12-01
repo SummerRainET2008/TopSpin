@@ -20,7 +20,7 @@ class Param(topspin.ParamBase):
     self.use_gpu = False
 
     self.optimizer_name = "Adam"
-    self.lr = 5e-4
+    self.lr = topspin.ParameterRange([5e-4, 1e-3])
     # self.epoch_num = 50
     self.max_train_step = 20
     self.batch_size_one_gpu = 3

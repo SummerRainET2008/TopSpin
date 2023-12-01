@@ -1,4 +1,4 @@
-from topspin.estimator6.param import ParamBase
+from topspin.estimator6.param import ParamBase, ParameterRange
 from topspin.estimator6.model import ModelBase
 from topspin.estimator6.train import TrainerBase
 from topspin.estimator6.predict import PredictorBase
