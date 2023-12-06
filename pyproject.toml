@@ -1,5 +1,6 @@
 [projects]
 dependencies = [
+   "filelock==3.7.1",
    "tensorboard==2.3.0",
    "packaging",
    "numpy==1.23.4",
@@ -21,8 +22,5 @@ requires = [
    "protobuf==3.20.*",
    "psutil==5.7.2",
    "Python-Algorithm-pyal",
-
-
-
 ]
 build-backend = "setuptools.build_meta"
