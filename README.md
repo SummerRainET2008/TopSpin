@@ -21,20 +21,22 @@
 >  > ### 3.5 Server
 >  > ### 3.6 TaskManager
 > ## 4. [Run and Stop Training](#item-run-and-stop_training)
->  > ### Run Mode 1: Debug Run
->  > ### Run Mode 2: Auto ML
->  > ### Run Mode 3: Distributed
+>  > ### 4.1 Run mode 1: Debug Run
+>  > ### 4.2 Run mode 2: Auto ML
+>  > ### 4.3 Run mode 3: Distributed
+>  > ### 4.4 Stop Training
 > ## 5. [Miscellaneous Functions](#item-miscellaneous-functions)
->  > ### * Learning Rate Warmup and Decay
->  > ### * Early Stop
->  > ### * Mixed Precision Training
->  > ### * Gradient Accumulation
->  > ### * ___True gradient___ in Training
->  > ### * Automatic Validation Data Evaluation in Training
->  > ### * TensorBoard
->  > ### * Rich statistics in Training Log
+>  > ### 5.1 Learning Rate Warmup and Decay
+>  > ### 5.2 Early Stop
+>  > ### 5.3 Mixed Precision Training
+>  > ### 5.4 Gradient Accumulation
+>  > ### 5.5 ___True gradient___ in Training
+>  > ### 5.6 Automatic Validation Data Evaluation in Training
 > ## 6. [Model Parameters Regularization](#iem-model-parameters-regularization)
 > ## 7. [Interpret the Training Logs](#item-interpret-the-training-logs)
+>  > ### 7.1 TensorBoard
+>  > ### 7.2 Rich statistics in Training Log
+>  > ### 7.3 Traing Figures
 > ## 8. [Config Your Servers](#item-config-your-servers)
 > ## 9. [Popular questions](#item-popular-questions)
 
@@ -49,44 +51,46 @@
 
 <a id="item-examples"></a>
 ## 2. Examples
-> ### NLP
-> * Intent detection Task
-> ### ASR
-> * EDSR
-> ### CV
-> * Speaker Change detection Task
+### 2.1 NLP
+* Intent detection Task
+### 2.2 ASR
+* EDSR
+### 2.3 CV
+* Speaker Change detection Task
 
 
 <a id="item-core-components"></a>
 ## 3. Core Components
-> ### ParamBase Interfaces
-> * [Interface](doc/ParamBase.md)
-> * [code]()
-> ### TrainerBase
-> * [Interface](doc/TrainerBase.md)
-> * [code]()
-> ### ModelBase
-> * [Interface](doc/ModelBase.md)
-> * [code]()
-> ### PredictorBase
-> * [Interface](doc/PredictorBase.md)
-> * [code]()
+### 3.1 ParamBase Interfaces
+* [Interface](doc/ParamBase.md)
+* [code]()
+### 3.2 TrainerBase
+* [Interface](doc/TrainerBase.md)
+* [code]()
+### 3.3 ModelBase
+* [Interface](doc/ModelBase.md)
+* [code]()
+### 3.4 PredictorBase
+* [Interface](doc/PredictorBase.md)
+* [code]()
+### 3.5 Server
+### 3.6 TaskManager
 
 ## 4. Run and Stop Training
-> ### Run Mode 1: Debug Run
-> ### Run Mode 2: Auto ML
-> ### Run Mode 3: Distributed
+### 4.1 Run Mode 1: Debug Run
+### 4.2 Run Mode 2: Auto ML
+### 4.3 Run Mode 3: Distributed
+### 4.4 Stop Training
 
 ## 5. Miscellaneous Functions
-> ### * Learning Rate Warmup and Decay
-> ### * Early Stop
-> ### * Mixed Precision Training
-> ### * Gradient Accumulation
-> ### * Parameter Regularization
-> ### * Automatic Validation Data Evaluation in Training
-> ### * TensorBoard
-> ### * ___True gradient___ in Training
-> ### * Rich statistics in Training Log
+### 5.1 Learning Rate Warmup and Decay
+### 5.2 Early Stop
+### 5.3 Mixed Precision Training
+### 5.4 Gradient Accumulation
+### 5.5 ___True gradient___ in Training
+### 5.6 Automatic Validation Data Evaluation in Training
+### 5.7 TensorBoard
+### 5.8 Rich statistics in Training Log
  
 
 ## 6. Config Your Servers
