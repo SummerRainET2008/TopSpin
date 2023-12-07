@@ -2,9 +2,9 @@
 
 **TopSpin**, is a PyTorch based high-level *Deep Learning training framework*, designed for BERT-style deep learning models, as opposed to GPT3 based deep learning. User defined model can be launched in either ***single-GPU***, ***multi-GPU***, or ***multi-server***, without changing one line of codes.
 
-**TopSpin** supports many useful techiniques in Deep Learning Training, such as ***gradient accumulation***, ***learning rate warmup and decay***, ***early stop***, ***mixed precision*** training, ***parameter regularizers*** like VAT ***automatic validation*** data evaluation in training, ***TensorBoard***, ***True gradient*** for variable batch size in some NLP applications, and provide rich statistics in training log, like ***network time statistics***, ***traininig time prediction***.
+**TopSpin** supports many useful techniques in Deep Learning Training, such as ***gradient accumulation***, ***learning rate warm-up and decay***, ***early stop***, ***mixed precision*** training, ***parameter regularizers*** like VAT ***automatic validation*** data evaluation in training, ***TensorBoard***, ***True gradient*** for variable batch size in some NLP applications, and provide rich statistics in training log, like ***network time statistics***, ***training time prediction***.
 
-**TopSpin**, besides, provides inherent ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
+**TopSpin**, besides, provides inherent ***AutoML*** support that searches possible model parameter combinations in one or multiple servers ***in parallel***.
 
 ---
 > ## 1. [Install](#item-install)
@@ -25,7 +25,7 @@
 >  > ### 4.3 Run mode 3: Distributed
 >  > ### 4.4 Stop Training
 > ## 5. [Miscellaneous Functions](#item-miscellaneous-functions)
->  > ### 5.1 Learning Rate Warmup and Decay
+>  > ### 5.1 Learning Rate Warm-up and Decay
 >  > ### 5.2 Early Stop
 >  > ### 5.3 Mixed Precision Training
 >  > ### 5.4 Gradient Accumulation
@@ -35,8 +35,8 @@
 > ## 7. [Interpret the Training Logs](#item-interpret-the-training-logs)
 >  > ### 7.1 TensorBoard
 >  > ### 7.2 Rich statistics in Training Log
->  > ### 7.3 Traing Figures
-> ## 8. [Config Your Servers](#item-config-your-servers)
+>  > ### 7.3 Training Figures
+> ## 8. [Configure Your Servers](#item-config-your-servers)
 > ## 9. [Popular questions](#item-popular-questions)
 
 ---
@@ -86,7 +86,7 @@ Regarding other packages, higher versions might be working too.
 
 <a id="item-miscellaneous-functions"></a>
 ## 5. Miscellaneous Functions
-### 5.1 Learning Rate Warmup and Decay
+### 5.1 Learning Rate Warm-up and Decay
 ### 5.2 Early Stop
 ### 5.3 Mixed Precision Training
 ### 5.4 Gradient Accumulation
@@ -103,7 +103,7 @@ Regarding other packages, higher versions might be working too.
 ## 7. Interpret the Training Logs
 
 <a id="item-config-your-servers"></a>
-## 8. Config Your Servers
+## 8. Configure Your Servers
 
 ### 8.1 Remove password in login
 ```
@@ -138,12 +138,12 @@ solution is `ls /sys/class/net)` to try those value one by one.
 A typical `net_name` is `en0`, `eth0`.
 
 ### As I do not need distributed training in foreseeable future, do I need TopSpin?
-The distributed training is not our selling points. Ours is a training framework for DL models, which
-integrates many proven effective techiniques in trainig. Meantime, it supports multiple-GPU and distributed training.
+The distributed training is not our selling point. `TopSpin` is a training framework for DL models, which
+integrates many proven effective techniques in training. Meantime, it supports multiple-GPU and distributed training.
 
 ### Is **model debugging** in TopSpin more complicated than in a naive single GPU training script?
 
-No any difference. Acutally, TopSpin, in the debugging mode, provides many convenience behind your
+No any difference. Actually, TopSpin, in the debugging mode, provides many convenience behind your
 back, such as setting all potential multi-thread running as single-thread running, and setting GPU number to ONE, ignoring your preset number.
 
 ### In order to speedup the data loading, could I save a copy of the data in each server, and how to set TopSpin?
