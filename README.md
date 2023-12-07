@@ -7,7 +7,6 @@
 **TopSpin**, besides, provides inherent ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
 
 ---
-# Outline
 > ## 1. [Install](#item-install)
 > ## 2. [Examples](#item-examples)
 >  > ### 2.1 NLP
@@ -32,7 +31,7 @@
 >  > ### 5.4 Gradient Accumulation
 >  > ### 5.5 ___True gradient___ in Training
 >  > ### 5.6 Automatic Validation Data Evaluation in Training
-> ## 6. [Model Parameters Regularization](#iem-model-parameters-regularization)
+> ## 6. [Model Parameters Regularization](#item-model-parameters-regularization)
 > ## 7. [Interpret the Training Logs](#item-interpret-the-training-logs)
 >  > ### 7.1 TensorBoard
 >  > ### 7.2 Rich statistics in Training Log
@@ -48,6 +47,8 @@
 >> python3 -m pip install TopSpin
 >> python3 -m pip install -r requirements.txt
 ```
+Especially we require to install `protobuf==3.20.*` designed in `requirements.txt`. 
+Regarding other packages, higher versions might be working too.
 
 <a id="item-examples"></a>
 ## 2. Examples
@@ -76,12 +77,14 @@
 ### 3.5 Server
 ### 3.6 TaskManager
 
+<a id="item-run-and-stop_training"></a>
 ## 4. Run and Stop Training
 ### 4.1 Run Mode 1: Debug Run
 ### 4.2 Run Mode 2: Auto ML
 ### 4.3 Run Mode 3: Distributed
 ### 4.4 Stop Training
 
+<a id="item-miscellaneous-functions"></a>
 ## 5. Miscellaneous Functions
 ### 5.1 Learning Rate Warmup and Decay
 ### 5.2 Early Stop
@@ -91,11 +94,65 @@
 ### 5.6 Automatic Validation Data Evaluation in Training
 ### 5.7 TensorBoard
 ### 5.8 Rich statistics in Training Log
- 
 
-## 6. Config Your Servers
 
-## 7. Common Questions and Issues
+<a id="item-model-parameters-regularization"></a>
+## 6. Model Parameters Regularization 
+
+<a id="item-interpret-the-training-logs"></a>
+## 7. Interpret the Training Logs
+
+<a id="item-config-your-servers"></a>
+## 8. Config Your Servers
+
+### 8.1 Remove password in login
+```
+1. >> ssh-keygen -t rsa
+2. >> chmod 755 ~/.ssh
+3. copy ~/.ssh/id_rsa.pub to your target server and save as ~/.ssh/authorized_keys
+4. chmod 644 ~/.ssh/authorized_keys
+```
+
+### 8.2 Permit net ports
+
+### 8.3 Share your data disk to other servers
+You could use network shared disk.
+```
+>> sshfs {user}@{ip}:{data-folder} {local-folder} -o idmap=user -o allow_other
+```
+We actually use Network-attached Storage ([NAS](https://en.wikipedia.org/wiki/Network-attached_storage)) system.
+
+<a id="item-popular-questions"></a>
+## 9. Popular questions
+
+### GPU is not available.
+**TopSpin** would detect whether your task has sufficient GPUs to run. If not, it would refuse to run.
+
+### Data path is not available.
+**TopSpin** would detect whether your designated `data path` are available. If not, ti would refuse to run.
+
+### Can not automatically set `ParamBase.net_name`.
+In the most cases, TopSpin would set this for you. Yet in some very
+rare case, TopSpin can not set a correct value. One workable
+solution is `ls /sys/class/net)` to try those value one by one.
+A typical `net_name` is `en0`, `eth0`.
+
+### As I do not need distributed training in foreseeable future, do I need TopSpin?
+The distributed training is not our selling points. Ours is a training framework for DL models, which
+integrates many proven effective techiniques in trainig. Meantime, it supports multiple-GPU and distributed training.
+
+### Is **model debugging** in TopSpin more complicated than in a naive single GPU training script?
+
+No any difference. Acutally, TopSpin, in the debugging mode, provides many convenience behind your
+back, such as setting all potential multi-thread running as single-thread running, and setting GPU number to ONE, ignoring your preset number.
+
+### In order to speedup the data loading, could I save a copy of the data in each server, and how to set TopSpin?
+
+Sure. You can do it, and it indeed speedups the data loading as well as the training. 
+In this way you do not need to change any code. It runs perfectly.
+
+Another way is to copy `1/n` data to `n` servers respectively to save disk space. Then in the user's train.py, you need to update the parameters of get_batch_data(...) in ```Trainer.__init__(...)```. Change ```dist.get_rank()``` and ```dist.get_world_size()``` to ```dist.get_local_rank()``` and ```self._param.gpu_num``` respectively.
+
 
 
 # Version 5 What's New?
@@ -631,84 +688,4 @@ set inference and no gradient.
 Each deployment supports only GPU and is defined as param.gpus[0]. 
 Thus, you should set proper param.gpus values. 
     
-## Section 4. Config your linux server 
-
-#### Remove password in login
-```
-1. >> ssh-keygen -t rsa
-    生成的过程中提示输入，直接回车，接受默认值就行了。
-    其中公共密钥保存在 ~/.ssh/id_rsa.pub， 私有密钥保存在 ~/.ssh/id_rsa
-2. 然后改一下 .ssh 目录的权限，使用命令 "chmod 755 ~/.ssh"
-3. 之后把这个密钥对中的公共密钥复制到你要访问的机器上去，并保存为~/.ssh/authorized_keys.
-4. 设置权限: chmod 644 ~/.ssh/authorized_keys
-```
-
-#### Permit net ports 
-
-#### Share your data disk to other servers
-```
->> sshfs {user}@{ip}:{data-folder} {local-folder} -o idmap=user -o allow_other
-```
-
-#### Install required python packages
-```
->> python3 -m pip install -r requirements.txt  --user `whoami` 
-```
-
-
-## Section 5. Common errors 
-**E1**. Not running in your **working directory**.
-
-The **working directory** is an essential concept in our framework, so is 
-the same in Java. When your project has many self-defined modules, do **NOT**
-run them in the deepest folder, but in this **working directory**. 
-
-![TopSpin logo](../figure/working%20directory.png)
-
-**E2**. GPU is not available.
-TopSpin detects your designated GPUs are unvailable, and refuse to run.
-
-**E3**. Data path is not available. 
-TopSpin detects your designated `data path` are unvailable from servers to
- run, and refuse to run.
-
-**E4**. Can not automatically set `ParamBase.net_name`.
-
-In the most cases, TopSpin would set this for you. Yet in some very 
-rare case, TopSpin can not set a correct value. One workable 
-solution is `ls /sys/class/net)` to try those value one by one.
-A typical `net_name` is `en0`, `eth0`.
-
-## Section 6. Useful functions in TopSpin
-1. from palframe.measure import Measure
-
-## Section 7. Popular Questions 
-
-**Q1.** As I do not need distributed training in foreseeable future, do I need
- TopSpin?
-
-There are looots of functionalities besides the distributed training.
- 
-**Q2.** Is **debugging** in TopSpin different from others?
-
-Nooo any difference. In the debugging mode, TopSpin would set your
-program to using only ONE worker as well as one thread in the background.
-
-**Q3.** Who should I contact when encountering an error?
-
-**Q4.** If, in training, your evaluation on dev and testing datasets takes more than 30 minutes, the training would halt.
-
-This is because the training is distributed while the evaluation is running on GPU (rank_0), and other GPUs are still waiting for the evaluation to be done. If the evaluation takes more than the default maximum 30 minutes, the pytorch distribution system thinks there may have some exception occured and halts.
-
-You may ask why you donot set the evaluation in a distributed style too. I tried and did not find **an elegant design pattern**, though I can **techinically** solve this issue that users would have more burden to use TopSpin.
-
-One short-cut of this issue is, sample a moderate-size data from your true dev data and use as dev in training; after training is finished, test the whole true dev data in one time.
-
-**Q5.** In order to speedup the data loading, could I copy the training data to a local path in each server, and how to set TopSpin?
-
-Sure. You can do it, and it indeed speedups the data loading as well as the training. There are two ways to do it.
-
-First, copy ALL data to each server. Then, you do not need to change any code. It runs perfectly.
-
-Second, copy `1/n` data to `n` servers respectively to save disk space. Then in the user's train.py, you need to update the parameters of get_batch_data(...) in ```Trainer.__init__(...)```. Change ```dist.get_rank()``` and ```dist.get_world_size()``` to ```dist.get_local_rank()``` and ```self._param.gpu_num```.
 
