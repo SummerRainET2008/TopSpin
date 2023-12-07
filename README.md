@@ -6,44 +6,92 @@
 
 **TopSpin**, besides, provides inherent ***AutoML*** support that searches possible model parameter combinations in one or mutliple servers ***in parallel***.
 
-# 1. Install
+---
+# Outline
+> ## 1. [Install](#item-install)
+> ## 2. [Examples](#item-examples)
+>  > ### 2.1 NLP
+>  > ### 2.2 ASR
+>  > ### 2.3 CV 
+> ## 3. [Core Components](#item-core-components)
+>  > ### 3.1 ParamBase 
+>  > ### 3.2 ModelBase
+>  > ### 3.3 TrainerBase
+>  > ### 3.4 PredictorBase
+>  > ### 3.5 Server
+>  > ### 3.6 TaskManager
+> ## 4. [Run and Stop Training](#item-run-and-stop_training)
+>  > ### Run Mode 1: Debug Run
+>  > ### Run Mode 2: Auto ML
+>  > ### Run Mode 3: Distributed
+> ## 5. [Miscellaneous Functions](#item-miscellaneous-functions)
+>  > ### * Learning Rate Warmup and Decay
+>  > ### * Early Stop
+>  > ### * Mixed Precision Training
+>  > ### * Gradient Accumulation
+>  > ### * ___True gradient___ in Training
+>  > ### * Automatic Validation Data Evaluation in Training
+>  > ### * TensorBoard
+>  > ### * Rich statistics in Training Log
+> ## 6. [Model Parameters Regularization](#iem-model-parameters-regularization)
+> ## 7. [Interpret the Training Logs](#item-interpret-the-training-logs)
+> ## 8. [Config Your Servers](#item-config-your-servers)
+> ## 9. [Popular questions](#item-popular-questions)
+
+---
+
+<a id="item-install"></a>
+## 1. Install
 ```bash
-python3 -m pip install TopSpin
+>> python3 -m pip install TopSpin
+>> python3 -m pip install -r requirements.txt
 ```
 
-# 2. Example
- >* NLP
- >   * Intent detection Task
- > * ASR
- >   * EDSR
- > * CV
- >   * Speaker Change detection Task
+<a id="item-examples"></a>
+## 2. Examples
+> ### NLP
+> * Intent detection Task
+> ### ASR
+> * EDSR
+> ### CV
+> * Speaker Change detection Task
+
+
+<a id="item-core-components"></a>
+## 3. Core Components
+> ### ParamBase Interfaces
+> * [Interface](doc/ParamBase.md)
+> * [code]()
+> ### TrainerBase
+> * [Interface](doc/TrainerBase.md)
+> * [code]()
+> ### ModelBase
+> * [Interface](doc/ModelBase.md)
+> * [code]()
+> ### PredictorBase
+> * [Interface](doc/PredictorBase.md)
+> * [code]()
+
+## 4. Run and Stop Training
+> ### Run Mode 1: Debug Run
+> ### Run Mode 2: Auto ML
+> ### Run Mode 3: Distributed
+
+## 5. Miscellaneous Functions
+> ### * Learning Rate Warmup and Decay
+> ### * Early Stop
+> ### * Mixed Precision Training
+> ### * Gradient Accumulation
+> ### * Parameter Regularization
+> ### * Automatic Validation Data Evaluation in Training
+> ### * TensorBoard
+> ### * ___True gradient___ in Training
+> ### * Rich statistics in Training Log
  
 
-# 3. Core Components
+## 6. Config Your Servers
 
-# 4. Training Run Modes
-> ### mode 1: Debug Run 
-> ### mode 2: Auto ML 
-> ### mode 3: Distributed 
-
- # 5. Stop and Restore training
-
- # 6. Miscellaneous Functions
- > 1. Learning Rate Warmup and Decay
- > 2. Early Stop
- > 3. Mixed Precision Training
- > 4. Gradient Accumulation
- > 5. Parameter Regularization
- > 5. Automatic Validation Data Evaluation in Training
- > 6. TensorBoard
- > 7. `True gradient` in Training
- > 8. Rich statistics in Training Log
- 
-
- # 7. Config Your Servers
-
- # 8. Common Questions and Issues
+## 7. Common Questions and Issues
 
 
 # Version 5 What's New?
@@ -111,59 +159,6 @@ We list only interfaces of main modules in estimator4, with their private
 functions omitted.
 
 ##### a) palframe.pytorch.estimator4.param.ParamBase 
-
-```python
-
-class ParamBase(abc.ABC):
-
-  def __init__(self, run_tag: str, restore_training_from_path_work=None): 
-    # Many default parameters are defined
-    ...
-    self.path_initial_model = None
-    self.path_inference_model = None
-
-    self.optimizer_name = "Adam"
-    self.lr = 0.001
-    self.weight_decay = 0
-    self.param_norm = 1
-    self.seed = 0     # 0 means random.
-
-    self.servers_file = None  # for distributed training
-    self.gpu_num = 1          # gpus required by your task
-    self.use_gpu = True
-    self.gpus = [0]           # do NOT set it, unless you use debug mode. 
-    self.use_amp = True       # mixed precision based training
-
-    self.batch_dim = 0
-
-    self.iter_num_update_optimizer = 1  # gradient accumulation
-
-    self.train_files = None     # file num >= 1
-    self.vali_file = None       # file_num <= 1
-    self.test_files = None      # file_num >= 0
-
-    self.train_sample_num = None
-    self.epoch_num = None       
-
-    self.eval_gap_sample_num = None   # frequentcy to evaluate dev set.
-
-    self.warmup_ratio = 0.1           # learning rate warm up.
-    self.ending_lr_ratio = 0.001      # 1 means no lr decay
-
-    self.model_saved_num = 3
-
-    self.num_workers_loading_data = 4
-
-    # None value denotes no limits on the maximum model size, or you should
-    # set a value.
-    self.automl_max_model_size = None
-
-    self.true_gradient = False  # if data in each GPU is unbalenced.
-
-    self.debug_level = 1        # debug=0, info=1, warning=2, error=3
-
-    self.detect_anomaly = False # only for debugging.
-```
 
 ##### b) palframe.pytorch.estimator4.model_wrapper.ModelWrapper
 ```python
