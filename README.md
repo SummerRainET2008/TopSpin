@@ -66,23 +66,87 @@ Regarding other packages, higher versions might be working too.
 ### 3.1 ParamBase Interfaces
 * [Interface](doc/ParamBase.md)
 * [code](src/topspin/estimator6/param.py)
+  
 ### 3.2 TrainerBase
 * [Interface](doc/TrainerBase.md)
 * [code](src/topspin/estimator6/train.py)
+
 ### 3.3 ModelBase
 * [Interface](doc/ModelBase.md)
 * [code](src/topspin/estimator6/model.py)
+
 ### 3.4 PredictorBase
 * [Interface](doc/PredictorBase.md)
 * [code](src/topspin/estimator6/predict.py)
-### 3.5 Server
-### 3.6 TaskManager
+
+### 3.5 Dataset 
+
+### 3.6 Server
+
+### 3.7 TaskManager
 
 <a id="item-run-and-stop_training"></a>
 ## 4. Run and Stop Training
 ### 4.1 Run Mode 1: Debug Run
+```
+>> python3 example/nlp/intent_dection/train.py 
+```
+By design, quck run mode is for debugging, though you could run for simple tasks
+which require only one GPU. TopSpin, in this mode, would find a free GPU on your back and
+assign to your task. You don't need to set GPU id.
+
+This mode is not supportive of GPU allocation, server allocation, task
+parallelization. Strongly encourage you guys to use mode2, auto run.
+
+
 ### 4.2 Run Mode 2: Auto ML
+
+You just use TopSpin.ParameterRange to list candiate values. TopSpin would unfold all combinations
+and sent to GPU queue for paralleled training.
+
+```python
+    # batch size does influence the final performance.
+self.iter_num_update_optimizer = ParameterRange([1, 2, 3])
+
+
+self.embedding_size = ParameterRange([128, 256, 512])
+self.kernel_sizes = ParameterRange([[3, 4, 5], [1, 2, 3, 4, 5], [5, 6, 7]])
+self.kernel_number = ParameterRange([128, 256])
+self.dropout_ratio = ParameterRange([0.1, 0.3])
+```
+ Even you could AutoML training data.
+```python
+self.train_files = ParameterRange(["train.1.pkl", "train.2.pkl"])
+```
+The training entry is often defined in a seperate `train_auto_starter.py`
+```python
+ starter.start_train(
+   Param.get_instance(), 
+   "example/nlp/intent_dection/train.py",
+   [starter.Server(None, [1, 3, 4, 6, 7]),    # None means current log-in server.
+    starter.Server("192.168.1.10", [1, 3, 4, 6, 7])]
+ )
+```
+
+
 ### 4.3 Run Mode 3: Distributed
+
+Here `distributed training` means using more than one server to train ONE model, as opposed to 
+mulitiple models in AutoML. 
+
+The philosophy of distributed training is that the model is large enough that all GPUs from designed servers would be occupied. As a result, AutoML would be too costly to apply here.
+
+The training entry is also defined in a seperate `train_dist_starter.py`.
+Set your `servers_file` in your param.py, and use this starter function
+```
+  starter.start_distributed_train(
+    Param.get_instance(),
+    "example/nlp/intent_dection/train.py",
+  )
+
+```
+
+
 ### 4.4 Stop Training
 
 <a id="item-miscellaneous-functions"></a>
@@ -531,47 +595,12 @@ class Trainer(TrainerBase):
 ```
 >> python3 example/nlp/intent_dection/train.py 
 ```
-By design, quck run mode is for debugging, though you could run for simple tasks
-which require only 1 GPU. If you use GPU in a server, you should make sure
-param.gpus = [0] is available. 
-
-This mode is not supportive of GPU allocation, server allocation, task
- parallelization. Strongly encourage you guys to use mode2, auto run.
 
 #### Step 7. AutoML
-```python
-    # batch size does influence the final performance.
-    self.iter_num_update_optimizer = ParameterRange([1, 2, 3]) 
 
-
-    self.embedding_size = ParameterRange([128, 256, 512]) 
-    self.kernel_sizes = ParameterRange([[3, 4, 5], [1, 2, 3, 4, 5], [5, 6, 7]])
-    self.kernel_number = ParameterRange([128, 256]) 
-    self.dropout_ratio = ParameterRange([0.1, 0.3])
-
-    # even you could AutoML training data.
-    self.train_files = ParameterRange(["train.1.pkl", "train.2.pkl"])
-```
-
-#### Step 8. Run mode2: Auto Run - for AutoML or batch tasks 
-By convention, we write a train_starter.py
-```python
-  starter.start_train(
-    Param.get_instance(), 
-    "example/nlp/intent_dection/train.py",
-    [starter.Server(None, [1, 3, 4, 6, 7])]
-  )
-```
 
 #### Step 9. Run mode3: Dist Run - for large training
-Set your server_file in your param.py, and use a different starting function
-```
-  starter.start_distributed_train(
-    Param.get_instance(),
-    "example/nlp/intent_dection/train.py",
-  )
 
-```
 
 #### Step 10. Read your log 
 Run.
