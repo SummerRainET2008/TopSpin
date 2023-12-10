@@ -63,7 +63,7 @@ Regarding other packages, higher versions might be working too.
 
 <a id="item-core-components"></a>
 ## 3. Core Components
-### 3.1 ParamBase Interfaces
+### 3.1 ParamBase 
 * [Interface](doc/ParamBase.md)
 * [code](src/topspin/estimator6/param.py)
   
@@ -92,7 +92,7 @@ Regarding other packages, higher versions might be working too.
 >> python3 example/nlp/intent_dection/train.py 
 ```
 By design, quck run mode is for debugging, though you could run for simple tasks
-which require only one GPU. TopSpin, in this mode, would find a free GPU on your back and
+which require only one GPU. TopSpin, in this mode, would find a free GPU behind your back and
 assign to your task. You don't need to set GPU id.
 
 This mode is not supportive of GPU allocation, server allocation, task
@@ -105,7 +105,6 @@ You just use TopSpin.ParameterRange to list candiate values. TopSpin would unfol
 and sent to GPU queue for paralleled training.
 
 ```python
-    # batch size does influence the final performance.
 self.iter_num_update_optimizer = ParameterRange([1, 2, 3])
 
 
@@ -189,22 +188,23 @@ We actually use Network-attached Storage ([NAS](https://en.wikipedia.org/wiki/Ne
 
 <a id="item-popular-questions"></a>
 ## 9. Popular questions
+### As I do not need distributed training in foreseeable future, do I really need TopSpin?
+The distributed training is not our selling point. `TopSpin` is a training framework for DL models, which
+integrates many proven effective techniques in training, as well as AutoML to greatly improve your training efficieny.
+
+Meantime, it supports multiple-GPU and distributed training, even your daily work might not use them.
 
 ### GPU is not available.
-**TopSpin** would detect whether your task has sufficient GPUs to run. If not, it would refuse to run.
+**TopSpin** would detect whether the server cluster has sufficient GPUs to run your task. If not, it would refuse to run.
 
 ### Data path is not available.
-**TopSpin** would detect whether your designated `data path` are available. If not, ti would refuse to run.
+**TopSpin** would detect whether your designated data path (or feature path, etc.) are available. If not, it would refuse to run.
 
 ### Can not automatically set `ParamBase.net_name`.
-In the most cases, TopSpin would set this for you. Yet in some very
+In most cases, TopSpin would set this for you. Yet in some very
 rare case, TopSpin can not set a correct value. One workable
 solution is `ls /sys/class/net)` to try those value one by one.
 A typical `net_name` is `en0`, `eth0`.
-
-### As I do not need distributed training in foreseeable future, do I need TopSpin?
-The distributed training is not our selling point. `TopSpin` is a training framework for DL models, which
-integrates many proven effective techniques in training. Meantime, it supports multiple-GPU and distributed training.
 
 ### Is **model debugging** in TopSpin more complicated than in a naive single GPU training script?
 
