@@ -17,8 +17,9 @@
 >  > ### 3.2 ModelBase
 >  > ### 3.3 TrainerBase
 >  > ### 3.4 PredictorBase
->  > ### 3.5 Server
->  > ### 3.6 TaskManager
+>  > ### 3.5 Datasets 
+>  > ### 3.6 Server
+>  > ### 3.7 TaskManager
 > ## 4. [Run and Stop Training](#item-run-and-stop_training)
 >  > ### 4.1 Run mode 1: Debug Run
 >  > ### 4.2 Run mode 2: Auto ML
@@ -64,16 +65,16 @@ Regarding other packages, higher versions might be working too.
 ## 3. Core Components
 ### 3.1 ParamBase Interfaces
 * [Interface](doc/ParamBase.md)
-* [code]()
+* [code](src/topspin/estimator6/param.py)
 ### 3.2 TrainerBase
 * [Interface](doc/TrainerBase.md)
-* [code]()
+* [code](src/topspin/estimator6/train.py)
 ### 3.3 ModelBase
 * [Interface](doc/ModelBase.md)
-* [code]()
+* [code](src/topspin/estimator6/model.py)
 ### 3.4 PredictorBase
 * [Interface](doc/PredictorBase.md)
-* [code]()
+* [code](src/topspin/estimator6/predict.py)
 ### 3.5 Server
 ### 3.6 TaskManager
 
@@ -108,7 +109,7 @@ Regarding other packages, higher versions might be working too.
 ### 8.1 Remove password in login
 ```
 1. >> ssh-keygen -t rsa
-2. >> chmod 755 ~/.ssh
+2. >> chmod 75[offline_smalldataset.py](src%2Ftopspin%2Fdataset%2Foffline_smalldataset.py)5 ~/.ssh
 3. copy ~/.ssh/id_rsa.pub to your target server and save as ~/.ssh/authorized_keys
 4. chmod 644 ~/.ssh/authorized_keys
 ```
