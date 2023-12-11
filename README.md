@@ -54,11 +54,24 @@ Regarding other packages, higher versions might be working too.
 <a id="item-examples"></a>
 ## 2. Examples
 ### 2.1 NLP
-* Intent detection Task
+* Intent detection Task. 
+  * The core problem is a short sentence classification, and we use TextCNN as its basic model.  
+   * [make_features.py](example/nlp/intent_detection/make_features.py)
+   * [param.py](example/nlp/intent_detection/param.py)
+   * [model.py](example/nlp/intent_detection/model.py)
+   * [train.py](example/nlp/intent_detection/train.py)
+   * [predict.py](example/nlp/intent_detection/predict.py)
+   * Debug mode >> ___python3 example/nlp/intent_detection/train.py___
+   * AutoML mode >> ___python3 example/nlp/intent_detection/train_auto_starter.py___
+   * Distributed mode >> ___python3 example/nlp/intent_detection/train_dist_starter.py___
+
 ### 2.2 ASR
-* EDSR
+* Speaker change detection 
+  * Given a multi-person dialog utterance, we detect the time points speaker changes.
+
+
 ### 2.3 CV
-* Speaker Change detection Task
+* Object detection. 
 
 
 <a id="item-core-components"></a>

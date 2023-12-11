@@ -1,16 +1,17 @@
 #coding: utf8
 #author: Tian Xia
 
+from topspin.dataset.helper import parse_feat_folder
 from topspin.tools import helper
 from topspin.tools.helper import Logger, is_none_or_empty
-from topspin.dataset.helper import parse_feat_folder
-import torch.distributed as dist
-import pickle
-import os
+from topspin.version import display_TopSpin_version
 import abc
-import math
 import copy
 import itertools
+import math
+import os
+import pickle
+import torch.distributed as dist
 
 class ParameterRange:
   def __init__(self, values, grouped_attribute=False):
@@ -316,6 +317,7 @@ class ParamBase(abc.ABC):
 
   def display(self):
     Logger.info("\n", "-" * 64)
+    display_TopSpin_version()
     helper.display_server_info()
     for key in sorted(self.__dict__):
       Logger.info(f"{key:20}: {self.__dict__[key]}")

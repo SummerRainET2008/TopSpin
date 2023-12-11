@@ -12,5 +12,4 @@ from topspin.tools.helper import *
 from topspin.tools.nn_helper import *
 from topspin.tools.measure import Measure
 
-
-__version__ = '1.1.7'
+from topspin.version import __version__

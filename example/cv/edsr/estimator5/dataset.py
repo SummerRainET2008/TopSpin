@@ -4,7 +4,7 @@
 
 import torch
 from param import Param
-from src.topspin.dataset import Dataset as _Dataset,\
+from topspin.dataset.offline_smalldataset import Dataset as _Dataset,\
   get_batch_data_helper
 import h5py
 import numpy as np
