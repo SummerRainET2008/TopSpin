@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from topspin.dataset.helper import get_batch_data_helper
 from topspin.dataset.offline_bigdataset import Dataset as _DataSet

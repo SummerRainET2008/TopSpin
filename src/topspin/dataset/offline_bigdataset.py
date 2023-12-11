@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 import torch.utils.data
 import pickle

@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from topspin.tools.measure import *
 from topspin.tools import helper as nlp

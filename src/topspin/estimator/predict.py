@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from topspin.estimator.model import ModelBase
 from topspin.tools.helper import Logger

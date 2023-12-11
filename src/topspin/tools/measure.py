@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 import numpy as np
 from collections import Counter, defaultdict

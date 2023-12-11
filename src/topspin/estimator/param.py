@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from topspin.dataset.helper import parse_feat_folder
 from topspin.tools import helper

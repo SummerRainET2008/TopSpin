@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from pytorch_transformers import AutoTokenizer
 from topspin import Logger

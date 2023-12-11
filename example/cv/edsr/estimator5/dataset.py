@@ -1,6 +1,6 @@
 #coding: utf8
 #author: Hongchen Liu
-#author: Tian Xia
+#author: Summer Xia
 
 import torch
 from param import Param

@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from topspin.estimator.param import ParamBase
 from topspin.tools.helper import Logger, is_none_or_empty

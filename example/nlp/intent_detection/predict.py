@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from example.nlp.intent_detection.dataset import _pad_batch_data , get_batch_data
 from example.nlp.intent_detection.model import Model

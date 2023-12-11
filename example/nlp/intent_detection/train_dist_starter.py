@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from topspin import start_distributed_train, Logger
 from example.nlp.intent_detection.param import Param

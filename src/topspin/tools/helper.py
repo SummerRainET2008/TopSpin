@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from pyal import INF, EPSILON, is_none_or_empty
 import functools

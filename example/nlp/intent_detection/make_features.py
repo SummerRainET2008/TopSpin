@@ -1,5 +1,5 @@
 #coding: utf8
-#author: Tian Xia
+#author: Summer Xia
 
 from example.nlp.intent_detection.param import Param
 from example.nlp.tokenization.tokenizer import Tokenizer
