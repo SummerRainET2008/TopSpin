@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from topspin.estimator6.model import ModelBase
+from topspin.estimator.model import ModelBase
 from topspin.tools.helper import Logger
 import torch
 

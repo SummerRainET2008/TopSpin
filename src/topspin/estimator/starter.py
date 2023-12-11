@@ -3,7 +3,7 @@
 
 from topspin.tools import helper
 from topspin.tools.helper import Logger
-from topspin.estimator6.param import ParamBase
+from topspin.estimator.param import ParamBase
 import os
 import pickle
 import random

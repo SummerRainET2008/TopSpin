@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Tian Xia
 
-from topspin.estimator6.param import ParamBase
+from topspin.estimator.param import ParamBase
 from topspin.tools.helper import Logger, is_none_or_empty
 import torch.nn as nn
 import torch

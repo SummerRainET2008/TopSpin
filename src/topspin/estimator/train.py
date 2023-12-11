@@ -4,9 +4,9 @@
 from collections import defaultdict
 from filelock import FileLock
 from topspin.dataset.helper import parse_feat_folder
-from topspin.estimator6 import starter
-from topspin.estimator6.model import ModelBase
-from topspin.estimator6.param import ParamBase
+from topspin.estimator import starter
+from topspin.estimator.model import ModelBase
+from topspin.estimator.param import ParamBase
 from topspin.tools import nn_helper, helper
 from topspin.tools.draw_figure import draw_figure
 from topspin.tools.helper import Logger, Timer

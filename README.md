@@ -78,19 +78,19 @@ Regarding other packages, higher versions might be working too.
 ## 3. Core Components
 ### 3.1 ParamBase 
 * [Interface](doc/ParamBase.md)
-* [code](src/topspin/estimator6/param.py)
+* [code](src/topspin/estimator/param.py)
   
 ### 3.2 TrainerBase
 * [Interface](doc/TrainerBase.md)
-* [code](src/topspin/estimator6/train.py)
+* [code](src/topspin/estimator/train.py)
 
 ### 3.3 ModelBase
 * [Interface](doc/ModelBase.md)
-* [code](src/topspin/estimator6/model.py)
+* [code](src/topspin/estimator/model.py)
 
 ### 3.4 PredictorBase
 * [Interface](doc/PredictorBase.md)
-* [code](src/topspin/estimator6/predict.py)
+* [code](src/topspin/estimator/predict.py)
 
 ### 3.5 Dataset 
 

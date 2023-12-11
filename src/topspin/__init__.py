@@ -1,8 +1,8 @@
-from topspin.estimator6.param import ParamBase, ParameterRange
-from topspin.estimator6.model import ModelBase
-from topspin.estimator6.train import TrainerBase
-from topspin.estimator6.predict import PredictorBase
-from topspin.estimator6.starter import (
+from topspin.estimator.param import ParamBase, ParameterRange
+from topspin.estimator.model import ModelBase
+from topspin.estimator.train import TrainerBase
+from topspin.estimator.predict import PredictorBase
+from topspin.estimator.starter import (
   start_train, stop_train,
   start_distributed_train, stop_distributed_train,
   Server, Task
