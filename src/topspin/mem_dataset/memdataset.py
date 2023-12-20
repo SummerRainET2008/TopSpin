@@ -44,7 +44,7 @@ class MemDataset(dataset_base.DatasetBase):
 
   def get_feature(self, index):
     begin, end = self._data_position_map[index]
-    file_id = bisect.bisect_left(self._sample_id_map, index)
+    file_id = bisect.bisect_right(self._sample_id_map, index)
     bytes = self._files[file_id][begin: end]
     return self.decode_bytes_to_sample(bytes)
 
