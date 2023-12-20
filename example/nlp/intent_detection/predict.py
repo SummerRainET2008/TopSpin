@@ -19,7 +19,7 @@ class Predictor(topspin.PredictorBase):
     param = self._model._param
     all_true_labels = []
     all_pred_labels = []
-    for _, batch in topspin.bindataset.get_batch_data(
+    for _, batch in topspin.bindataset_get_batch_data(
       feat_path=data_file,
       epoch_num=1,
       batch_size=param.batch_size_inference_one_gpu,

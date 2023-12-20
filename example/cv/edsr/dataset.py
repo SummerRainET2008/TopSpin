@@ -2,36 +2,35 @@
 #author: Hongchen Liu
 #author: Summer Xia
 
+import functools
 import torch
 from param import Param
-from topspin.dataset.offline_smalldataset import Dataset as _Dataset,\
-  get_batch_data_helper
+import topspin
 import h5py
 import numpy as np
 
 
-class VideoDataset(_Dataset):
-  def _load_data(self, all_feat_files: list, world_size, rank,
-                 sample_filter_func):
-    # Simply return all file names, and read file content on-the-fly.
-    assert len(all_feat_files) == 1
+class VideoDataset(topspin.DatasetBase):
+  def initialization(self):
+    h5_file = self.feat_path
+    f = h5py.File(h5_file, 'r')
+    self._sample_num = len(f['l8'])
+    f.close()
 
-    self.h5_file = all_feat_files[0]
-    self.f = h5py.File(self.h5_file, 'r')
-    total_sample_num = len(self.f['l8'])
-    # You have to do this to distribute data to each worker.
-    worker_data = list(range(total_sample_num))[rank::world_size]
-    self._len = len(worker_data)
+  @functools.cache
+  def _get_file(self):
+    print(f"_get_file()")
+    h5_file = self.feat_path
+    f = h5py.File(h5_file, 'r')
+    return f
 
-    return worker_data
-
-  def __getitem__(self, idx):
-    idx = self._data[idx]
-    return np.moveaxis(self.f['l8'][idx], -1, 0) * 0.000125, \
-         np.moveaxis(self.f['s2'][idx], -1, 0) * 0.000125
+  def get_feature(self, index):
+    f = self._get_file()
+    return np.moveaxis(f['l8'][index], -1, 0) * 0.000125, \
+           np.moveaxis(f['s2'][index], -1, 0) * 0.000125
 
   def __len__(self):
-    return self._len
+    return self._sample_num
 
 
 def _pad_batch_data(batch):
@@ -41,33 +40,34 @@ def _pad_batch_data(batch):
   return l8_imgs, s2_imgs
 
 
-def get_batch_data(param, feat_files: list, epoch_num, rank, world_size,
+def get_batch_data(param, feat_file: str, epoch_num, rank, world_size,
                    is_training: bool):
-  dataset = VideoDataset(feat_path=feat_files,
-                         world_size=world_size,
-                         rank=rank,
-                         shuffle=is_training,
-                         sample_filter_func=None)
-  yield from get_batch_data_helper(dataset=dataset,
-                                   epoch_num=epoch_num,
-                                   batch_size=param.batch_size,
-                                   worker_num=param.num_workers_loading_data,
-                                   shuffle=is_training,
-                                   pad_batch_data_func=_pad_batch_data)
+  dataset = VideoDataset(
+    feat_path=feat_file,
+    global_GPU_worker_num=world_size,
+    global_GPU_worker_rank=rank
+  )
+  yield from topspin.get_batch_data_helper(
+    dataset=dataset,
+    epoch_num=epoch_num,
+    batch_size=param.batch_size,
+    dataloader_worker_num=param.num_workers_loading_data,
+    pad_batch_data_func=_pad_batch_data
+  )
 
 
 def main():
   param = Param.get_instance()
   data_iter = get_batch_data(param=param,
-                             feat_files=["example/cv/edsr/data/train.h5"],
+                             feat_file=param.train_files,
                              epoch_num=1,
                              rank=0,
                              world_size=1,
                              is_training=False)
   sum = 0
   for epoch, batch in data_iter:
-    print(sum)
-    sum += 1
+    sum += batch[0].shape[0]
+    print(f"{sum=}")
     print(epoch, batch[1].shape)
 
 

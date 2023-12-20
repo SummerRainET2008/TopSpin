@@ -1,10 +1,9 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from src.topspin.pytorch import ParamBase
+import topspin
 
-
-class Param(ParamBase):
+class Param(topspin.ParamBase):
   def __init__(self):
     super(Param, self).__init__("paltest", experiment_folder="exp")
 
