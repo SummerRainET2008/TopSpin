@@ -1,17 +1,19 @@
 #coding: utf8
-#author: Hongchen Liu
+#author: Summer Xia
 
-from src.topspin import *
-from example.cv.edsr.estimator5.param import Param
-from example.cv.edsr.estimator5.model import Net
-from example.cv.edsr.estimator5.dataset import get_batch_data
-from src.topspin.pytorch import ModelWrapperBase
+from example.cv.edsr.model import Model
+from example.cv.edsr.dataset import get_batch_data
+from topspin import Measure, Logger
+import topspin
+import time
+import torch
 
 
-class ModelWrapper(ModelWrapperBase):
-  def __init__(self, param: Param):
-    # Initilize ModelWrapperBase with your self-defined model.
-    super(ModelWrapper, self).__init__(param, Net)
+class Predictor(topspin.PredictorBase):
+  def __init__(self, param):
+    model = Model(param)
+
+    super(Predictor, self).__init__(model)
 
   def evaluate_file(self, data_file: str):
     '''
@@ -21,7 +23,14 @@ class ModelWrapper(ModelWrapperBase):
     start_time = time.time()
     ground_truth = []
     pred_l8_imgs = []
-    for _, batch in get_batch_data(self._param, [data_file], 1, 0, 1, False):
+    for _, batch in get_batch_data(
+      param=self._param,
+      feat_file=data_file,
+      epoch_num=1,
+      global_GPU_worker_rank=0,
+      global_GPU_worker_num=1,
+      shuffle=False
+    ):
       batch = [e.to(self._device) for e in batch]
 
       l8_imgs, s2_imgs = batch
@@ -41,14 +50,14 @@ class ModelWrapper(ModelWrapperBase):
     avg_time = total_time / (len(ground_truth) + 1e-6)
     weighted_f = avg_psnr
     Logger.info(
-        f"eval: "
-        f"file={data_file} weighted_f={weighted_f} result={avg_psnr} "
-        f"total_time={total_time:.4f} secs avg_time={avg_time:.4f} sec/sample "
+      f"eval: "
+      f"file={data_file} weighted_f={weighted_f} result={avg_psnr} "
+      f"total_time={total_time:.4f} secs avg_time={avg_time:.4f} sec/sample "
     )
     Logger.info(f"WEIGHTED_F : {weighted_f}")
 
     return -weighted_f
 
-  def predict(self, l8_imgs):
-    pred_l8_imgs = self._model(l8_imgs)
-    return pred_l8_imgs
+  def predict(self, b_word_ids):
+    logits, pred_labels = self._model(b_word_ids)
+    return logits, pred_labels

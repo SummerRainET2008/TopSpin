@@ -41,10 +41,12 @@ def _pad_batch_data(batch):
 
 
 def get_batch_data(
-  param, feat_file: str, epoch_num,
+  param,
+  feat_file: str,
+  epoch_num,
   global_GPU_worker_rank,
   global_GPU_worker_num,
-  shuffle=False
+  shuffle=True,
 ):
   dataset = VideoDataset(
     feat_path=feat_file,
@@ -59,20 +61,3 @@ def get_batch_data(
     pad_batch_data_func=_pad_batch_data
   )
 
-
-def main():
-  param = Param.get_instance()
-  data_iter = get_batch_data(param=param,
-                             feat_file=param.train_files,
-                             epoch_num=1,
-                             global_GPU_worker_rank=0,
-                             global_GPU_worker_num=1)
-  sum = 0
-  for epoch, batch in data_iter:
-    sum += batch[0].shape[0]
-    print(f"{sum=}")
-    print(epoch, batch[1].shape)
-
-
-if __name__ == "__main__":
-  main()

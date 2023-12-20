@@ -4,22 +4,33 @@
 import optparse
 from torch import nn
 from param import Param
-from example.cv.edsr.estimator5.dataset import get_batch_data
-from model_wrapper import ModelWrapper
-from topspin import Logger, TrainerBase
+from example.cv.edsr.model import Model
+from example.cv.edsr.predict import Predictor
+from example.cv.edsr.dataset import get_batch_data
+from topspin import Logger
+import topspin
 
 
-class Trainer(TrainerBase):
+class Trainer(topspin.TrainerBase):
   def __init__(self, param):
-    model_wrapper = ModelWrapper(param)
+    model = Model(param)
 
-    super(Trainer, self).__init__(
-        model_wrapper,
-        get_batch_data(param, param.train_files, param.epoch_num,
-                       dist.get_rank(), dist.get_world_size(), True), None)
+    super(Trainer, self).__init__(model, Predictor, None)
+
+
+  def get_training_data(self, rank, world_size):
+    param = self._param
+    yield from get_batch_data(
+      param=param,
+      feat_file=param.train_files,
+      epoch_num=param.epoch_num,
+      global_GPU_worker_num=world_size,
+      global_GPU_worker_rank=rank,
+      shuffle=True
+    )
 
   def train_one_batch(self, l8_imgs, s2_imgs):
-    pred_l8_imgs = self._model_wrapper.predict(l8_imgs)
+    pred_l8_imgs = self._model(l8_imgs)
     print(pred_l8_imgs.shape)
     print(s2_imgs.shape)
     print(type(pred_l8_imgs))

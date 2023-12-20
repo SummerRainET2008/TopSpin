@@ -8,10 +8,10 @@ class Param(topspin.ParamBase):
     super(Param, self).__init__("paltest", experiment_folder="exp")
 
     ################ training related settings ################
-    self.gpu_num = 1
-    self.gpus = [0]  # You should set it when running in the quick mode.
     self.use_gpu = False
     self.use_amp = False  # mixed precision based training
+    self.gpu_num = 1
+
     self.optimizer_name = "Adam"
     self.lr = 6e-5
     self.batch_size = 2  # for one GPU. If you have 2 GPUs, then actual
@@ -31,5 +31,5 @@ class Param(topspin.ParamBase):
     self.eval_gap_sample_num = 4
     self.epoch_num = 50
 
-    # self.warmup_ratio = 0.1
-    # self.model_kept_num = 5
+    self.warmup_ratio = 0.1
+    self.model_kept_num = 5

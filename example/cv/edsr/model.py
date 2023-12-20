@@ -3,6 +3,8 @@
 
 import torch.nn as nn
 import torch
+import math
+import topspin
 
 
 class MeanShift(nn.Conv2d):
@@ -43,9 +45,9 @@ class _Residual_Block(nn.Module):
     return output
 
 
-class Net(nn.Module):
+class Model(topspin.ModelBase):
   def __init__(self, param):
-    super(Net, self).__init__()
+    super(Model, self).__init__(param)
 
     # rgb_mean = (0.4488, 0.4371, 0.4040)
     # self.sub_mean = MeanShift(rgb_mean, -1)

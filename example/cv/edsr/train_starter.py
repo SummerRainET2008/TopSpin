@@ -1,10 +1,10 @@
 #coding: utf8
 #author: Hongchen Liu
 
-from example.cv.edsr.estimator5.param import Param
+from example.cv.edsr.param import Param
 import optparse
-from src.topspin import Logger
-from src.topspin.pytorch import starter
+import topspin
+from topspin import Logger
 
 
 def main():
@@ -15,8 +15,8 @@ def main():
 
   Logger.set_level(options.debug_level)
 
-  starter.start_train(Param.get_instance(), "./example/cv/edsr/train.py",
-                      [starter.Server(None, [0, 1, 2, 3, 4, 5])])
+  topspin.starter.start_train(Param.get_instance(), "./example/cv/edsr/train.py",
+                      [topspin.starter.Server(None, [0, 1, 2, 3, 4, 5])])
 
 
 if __name__ == "__main__":
