@@ -40,18 +40,22 @@ def _pad_batch_data(batch):
   return l8_imgs, s2_imgs
 
 
-def get_batch_data(param, feat_file: str, epoch_num, rank, world_size,
-                   is_training: bool):
+def get_batch_data(
+  param, feat_file: str, epoch_num,
+  global_GPU_worker_rank,
+  global_GPU_worker_num,
+  shuffle=False
+):
   dataset = VideoDataset(
     feat_path=feat_file,
-    global_GPU_worker_num=world_size,
-    global_GPU_worker_rank=rank
+    global_GPU_worker_num=global_GPU_worker_num,
+    global_GPU_worker_rank=global_GPU_worker_rank
   )
   yield from topspin.get_batch_data_helper(
     dataset=dataset,
     epoch_num=epoch_num,
     batch_size=param.batch_size,
-    dataloader_worker_num=param.num_workers_loading_data,
+    shuffle=shuffle,
     pad_batch_data_func=_pad_batch_data
   )
 
@@ -61,9 +65,8 @@ def main():
   data_iter = get_batch_data(param=param,
                              feat_file=param.train_files,
                              epoch_num=1,
-                             rank=0,
-                             world_size=1,
-                             is_training=False)
+                             global_GPU_worker_rank=0,
+                             global_GPU_worker_num=1)
   sum = 0
   for epoch, batch in data_iter:
     sum += batch[0].shape[0]

@@ -46,17 +46,20 @@ class DatasetBase(torch.utils.data.Dataset):
     new_index = ((index // wn) * wn + wi) % len(self)
     return self.get_feature(new_index)
 
-def get_batch_data_helper(dataset,
-                          epoch_num: typing.Union[int, None],
-                          batch_size,
-                          dataloader_worker_num,
-                          pad_batch_data_func):
+def get_batch_data_helper(
+  dataset,
+  epoch_num: typing.Union[int, None],
+  batch_size,
+  pad_batch_data_func: typing.Union[typing.Callable, None],
+  shuffle=True,
+  dataloader_worker_num=4,
+):
   epoch_num = 1024 if epoch_num is None else epoch_num
   for epoch_id in range(epoch_num):
     data_iter = torch.utils.data.DataLoader(
       dataset=dataset,
       batch_size=batch_size,
-      shuffle=True,
+      shuffle=shuffle,
       num_workers=0 if helper.is_debugging() else dataloader_worker_num,
       collate_fn=pad_batch_data_func,
     )

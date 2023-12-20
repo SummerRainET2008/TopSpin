@@ -18,7 +18,6 @@ class Param(topspin.ParamBase):
     # batch
     # size would be 16x2=32.
     self.iter_num_update_optimizer = 1  #
-    self.num_workers_loading_data = 8
     self.path_initial_model = None
 
     ################ model related settings ################

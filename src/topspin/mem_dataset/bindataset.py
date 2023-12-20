@@ -72,6 +72,7 @@ def get_batch_data(
   global_GPU_worker_num=1,
   global_GPU_worker_rank=0,
   dataloader_worker_num=4,
+  shuffle=True,
   decode_bytes_to_sample: typing.Union[typing.Callable, None]=None,
 ):
   dataset = BinDataset(
@@ -86,5 +87,6 @@ def get_batch_data(
     epoch_num=epoch_num,
     batch_size=batch_size,
     dataloader_worker_num=dataloader_worker_num,
+    shuffle=shuffle,
     pad_batch_data_func=pad_batch_data_func
   )

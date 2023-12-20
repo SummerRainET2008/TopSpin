@@ -23,6 +23,7 @@ class Predictor(topspin.PredictorBase):
       feat_path=data_file,
       epoch_num=1,
       batch_size=param.batch_size_inference_one_gpu,
+      shuffle=False,
       dataloader_worker_num=0,
       pad_batch_data_func=_pad_batch_data
     ):
