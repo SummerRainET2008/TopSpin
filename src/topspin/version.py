@@ -1,4 +1,4 @@
-__version__ = '1.1.7'
+__version__ = '1.2.0'
 
 def display_TopSpin_version():
   from topspin.tools.helper import Logger
