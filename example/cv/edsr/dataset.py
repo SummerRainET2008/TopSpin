@@ -56,7 +56,7 @@ def get_batch_data(
   yield from topspin.get_batch_data_helper(
     dataset=dataset,
     epoch_num=epoch_num,
-    batch_size=param.batch_size,
+    batch_size=param.batch_size_one_gpu,
     shuffle=shuffle,
     pad_batch_data_func=_pad_batch_data
   )

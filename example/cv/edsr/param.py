@@ -5,7 +5,7 @@ import topspin
 
 class Param(topspin.ParamBase):
   def __init__(self):
-    super(Param, self).__init__("paltest", experiment_folder="exp")
+    super(Param, self).__init__("paltest", experiment_folder="work")
 
     ################ training related settings ################
     self.use_gpu = False
@@ -14,7 +14,7 @@ class Param(topspin.ParamBase):
 
     self.optimizer_name = "Adam"
     self.lr = 6e-5
-    self.batch_size = 2  # for one GPU. If you have 2 GPUs, then actual
+    self.batch_size_one_gpu = 2  # for one GPU. If you have 2 GPUs, then actual
     # batch
     # size would be 16x2=32.
     self.iter_num_update_optimizer = 1  #
@@ -27,9 +27,10 @@ class Param(topspin.ParamBase):
     # self.test_files = []
 
     self.train_sample_num = 128
+    # self.epoch_num = 1
+    self.max_train_step = 6
     # self.eval_gap_sample_num = self.train_sample_num
     self.eval_gap_sample_num = 4
-    self.epoch_num = 50
 
     self.warmup_ratio = 0.1
     self.model_kept_num = 5
