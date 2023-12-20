@@ -2,8 +2,9 @@
 #author: Summer Xia
 
 import torch.utils.data
-from topspin import *
 from topspin.dataset.offline_smalldataset import Dataset
+from collections import defaultdict
+import random
 
 
 class MyBatchSampler:
