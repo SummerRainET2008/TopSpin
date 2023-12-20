@@ -11,11 +11,11 @@ class Param(topspin.ParamBase):
     # self.path_initial_model = "/tmp/model.init.pt"
 
     self.path_feat = "feat/textcnn"
-    self.train_files = [f"{self.path_feat}/train.pydict"]
-    self.vali_file = f"{self.path_feat}/test.pydict"
+    self.train_files = [f"{self.path_feat}/train.bin"]
+    self.vali_file = f"{self.path_feat}/test.bin"
     self.test_files = []
 
-    self.tokenizer_data = "example/nlp/tokenization/data/roberta"
+    self.tokenizer_data = "example/nlp/intent_detection/tokenization/data/roberta"
 
     self.use_gpu = False
     self.gpu_num = 2

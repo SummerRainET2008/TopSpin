@@ -1,11 +1,7 @@
 #coding: utf8
 #author: Summer Xia
 
-from pytorch_transformers import AutoTokenizer
-from topspin import Logger
-import optparse
-import typing
-from example.nlp.tokenization.tokenizer import Tokenizer
+from example.nlp.intent_detection.tokenization.tokenizer import Tokenizer
 
 def test_tokenizer():
   tokenizer = Tokenizer.get_instance(

@@ -33,10 +33,8 @@ class Trainer(topspin.TrainerBase):
     yield from get_batch_data(feat_path=param.train_files,
                               epoch_num=1024,
                               batch_size=param.batch_size_one_gpu,
-                              worker_num=4,
-                              shuffle=True,
-                              rank=rank,
-                              world_size=world_size,
+                              global_GPU_worker_num=world_size,
+                              global_GPU_worker_rank=rank,
                               pad_batch_data_func=_pad_batch_data)
 
   # def _train_one_batch(self, b_word_ids, b_label, memo):

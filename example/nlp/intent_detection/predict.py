@@ -20,14 +20,11 @@ class Predictor(topspin.PredictorBase):
     all_true_labels = []
     all_pred_labels = []
     for _, batch in get_batch_data(
-        feat_path=data_file,
-        epoch_num=1,
-        batch_size=param.batch_size_inference_one_gpu,
-        worker_num=4,
-        shuffle=False,
-        rank=0,
-        world_size=1,
-        pad_batch_data_func=_pad_batch_data):
+      feat_path=data_file,
+      epoch_num=1,
+      batch_size=param.batch_size_inference_one_gpu,
+      dataloader_worker_num=0,
+      pad_batch_data_func=_pad_batch_data):
       batch = topspin.to_device(batch, self._device)
 
       b_word_ids, b_labels, _ = batch

@@ -328,19 +328,19 @@ class ParamBase(abc.ABC):
     Logger.info("-" * 64, "\n")
 
   def check_param_validity(self):
-    files = parse_feat_folder(self.train_files)
-    if len(files) == 0:
-      Logger.warn(f"Empty {self.train_files}")
-
-    if not is_none_or_empty(self.vali_file):
-      files = parse_feat_folder(self.vali_file)
-      if len(files) == 0:
-        Logger.warn(f"Empty {self.vali_file}")
-
-    if not is_none_or_empty(self.test_files):
-      files = parse_feat_folder(self.test_files)
-      if len(files) == 0:
-        Logger.warn(f"Empty {self.test_files}")
+    # files = parse_feat_folder(self.train_files)
+    # if len(files) == 0:
+    #   Logger.warn(f"Empty {self.train_files}")
+    #
+    # if not is_none_or_empty(self.vali_file):
+    #   files = parse_feat_folder(self.vali_file)
+    #   if len(files) == 0:
+    #     Logger.warn(f"Empty {self.vali_file}")
+    #
+    # if not is_none_or_empty(self.test_files):
+    #   files = parse_feat_folder(self.test_files)
+    #   if len(files) == 0:
+    #     Logger.warn(f"Empty {self.test_files}")
 
     if int(self.epoch_num is None) + int(self.max_train_step is None) != 1:
       assert False, \
