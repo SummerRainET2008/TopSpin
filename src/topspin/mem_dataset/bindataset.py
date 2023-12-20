@@ -5,7 +5,7 @@ from topspin.mem_dataset import dataset_base
 import bisect
 import typing
 
-class MemDataset(dataset_base.DatasetBase):
+class BinDataset(dataset_base.DatasetBase):
   def initialization(self):
     self._data_position_map = self._read_data_position(self.feat_path)
 
@@ -58,7 +58,7 @@ def get_batch_data(feat_path: typing.Union[str, list],
                    pad_batch_data_func: typing.Union[typing.Callable, None],
                    dataloader_worker_num=4,
                    ):
-  dataset = MemDataset(
+  dataset = BinDataset(
     feat_path=feat_path,
     global_GPU_worker_num=global_GPU_worker_num,
     global_GPU_worker_rank=global_GPU_worker_rank

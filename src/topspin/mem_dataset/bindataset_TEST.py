@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Summer Xia
 
-from topspin.mem_dataset.memdataset import get_batch_data
+from topspin.mem_dataset.bindataset import get_batch_data
 from topspin.tools import helper
 from topspin.tools.helper import Logger
 import pickle
