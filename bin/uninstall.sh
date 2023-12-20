@@ -1,1 +1,1 @@
-python3 -m pip uninstall Python-Algorithm-pyal
+python3 -m pip uninstall TopSpin 

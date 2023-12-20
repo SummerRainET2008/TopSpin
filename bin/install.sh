@@ -1,1 +1,1 @@
-python3 -m pip install install Python-Algorithm-pyal
+python3 -m pip install install TopSpin 
