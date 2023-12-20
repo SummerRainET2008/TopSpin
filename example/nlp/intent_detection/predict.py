@@ -1,7 +1,7 @@
 #coding: utf8
 #author: Summer Xia
 
-from example.nlp.intent_detection.dataset import _pad_batch_data , get_batch_data
+from example.nlp.intent_detection.dataset import _pad_batch_data
 from example.nlp.intent_detection.model import Model
 from topspin import Measure, Logger
 import topspin
@@ -19,12 +19,13 @@ class Predictor(topspin.PredictorBase):
     param = self._model._param
     all_true_labels = []
     all_pred_labels = []
-    for _, batch in get_batch_data(
+    for _, batch in topspin.bindataset.get_batch_data(
       feat_path=data_file,
       epoch_num=1,
       batch_size=param.batch_size_inference_one_gpu,
       dataloader_worker_num=0,
-      pad_batch_data_func=_pad_batch_data):
+      pad_batch_data_func=_pad_batch_data
+    ):
       batch = topspin.to_device(batch, self._device)
 
       b_word_ids, b_labels, _ = batch

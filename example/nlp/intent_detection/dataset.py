@@ -2,7 +2,6 @@
 #author: Summer Xia
 
 import torch.utils.data
-from topspin.mem_dataset.bindataset import get_batch_data
 
 def _pad_batch_data(batch):
   batch = sorted(batch, key=lambda x: len(x[0]), reverse=True)

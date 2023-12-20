@@ -12,4 +12,7 @@ from topspin.tools.helper import *
 from topspin.tools.nn_helper import *
 from topspin.tools.measure import Measure
 
+from topspin.mem_dataset import (
+  dataset_base, bindataset)
+
 from topspin.version import __version__
