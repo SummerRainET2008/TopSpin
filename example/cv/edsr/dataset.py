@@ -17,7 +17,7 @@ class VideoDataset(topspin.DatasetBase):
     self._sample_num = len(f['l8'])
     f.close()
 
-  @functools.cache
+  @functools.lru_cache
   def _get_file(self):
     print(f"_get_file()")
     h5_file = self.feat_path

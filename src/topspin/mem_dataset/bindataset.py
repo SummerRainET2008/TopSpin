@@ -47,7 +47,7 @@ class BinDataset(dataset_base.DatasetBase):
     '''
     return pickle.loads(bytes)
 
-  @functools.cache
+  @functools.lru_cache
   def _get_mmobject(self, file_name):
     f = open(file_name, "r+b")
     mm = mmap.mmap(f.fileno(), 0)
