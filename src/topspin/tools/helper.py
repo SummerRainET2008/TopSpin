@@ -225,7 +225,7 @@ def replace_file_name(file_name: str, old_suffix: str, new_suffix: str):
 
 def get_files_in_folder(data_path,
                         file_extensions: typing.Union[list, set] = None,
-                        resursive=False) -> list:
+                        recursive=False) -> list:
   '''file_exts: should be a set, or None, e.g, ["wav", "flac"]
   return: a list, [fullFilePath]'''
   def legal_file(short_name):
@@ -238,9 +238,15 @@ def get_files_in_folder(data_path,
     assert isinstance(file_extensions, (list, set))
     file_extensions = set(file_extensions)
 
-  for path, folders, files in os.walk(data_path,
-                                      topdown=resursive,
+  all_folders = set()
+  for path, folders, files in os.walk(data_path, topdown=True,
                                       followlinks=False):
+    if not recursive:
+      for folder in folders:
+        all_folders.add(os.path.join(path, folder))
+      if path in all_folders:
+        continue
+
     for short_name in files:
       if legal_file(short_name):
         yield os.path.realpath(os.path.join(path, short_name))
