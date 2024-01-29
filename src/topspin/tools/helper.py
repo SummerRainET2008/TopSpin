@@ -232,7 +232,7 @@ def get_files_in_folder(data_path,
     if short_name.startswith("."):
       return False
     ext = get_file_extension(short_name)
-    return is_none_or_empty(file_extensions) or ext in file_extensions
+    return is_none_or_empty(file_extensions) or ext.lower() in file_extensions
 
   if file_extensions is not None:
     assert isinstance(file_extensions, (list, set))

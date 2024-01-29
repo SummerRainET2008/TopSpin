@@ -48,7 +48,7 @@
 >> python3 -m pip install TopSpin
 >> python3 -m pip install -r requirements.txt
 ```
-Especially we require to install `protobuf==3.20.*` designed in `requirements.txt`. 
+Especially we require to install `protobuf==3.20.*` designated in `requirements.txt`. 
 Regarding other packages, higher versions might be working too.
 
 <a id="item-examples"></a>
