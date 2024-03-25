@@ -8,6 +8,10 @@ import sys
 import time
 import typing
 
+def bit_not(m):
+  import ctypes
+  return ctypes.c_uint32(~m).value
+
 def load_py_data(py_file):
   user_data = {}
   with open(py_file) as fin:
