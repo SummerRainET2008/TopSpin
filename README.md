@@ -44,6 +44,7 @@
 
 <a id="item-install"></a>
 ## 1. Install
+python version < 3.12
 ```bash
 >> python3 -m pip install TopSpin
 >> python3 -m pip install -r requirements.txt

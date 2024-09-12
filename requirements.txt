@@ -10,3 +10,4 @@ psutil==5.7.2
 pytorch-transformers==1.2.0
 pytz
 tensorboard==2.3.0
+torch==2.2.2
