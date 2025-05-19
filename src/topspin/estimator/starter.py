@@ -12,6 +12,7 @@ import threading
 import time
 import traceback
 import typing
+import re
 
 
 def _check_server_disk_path(server_ips, current_path):
